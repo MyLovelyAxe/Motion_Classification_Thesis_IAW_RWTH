@@ -19,8 +19,8 @@ parser = argparse.ArgumentParser(description='Visualize original csv data')
 parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
 
 ### animation ###
-parser.add_argument('--start_frame', type=int, default=3400, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=4600, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=5800, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=6000, help='to which frame to end visualize')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 
 args = parser.parse_args([])

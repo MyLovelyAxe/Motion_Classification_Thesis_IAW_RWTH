@@ -16,10 +16,8 @@ def calc_dist(coords,joints_idx):
 def calc_distances_timeline(coords,joints_dict):
     # coords: [#frames,3,26]
     dist_time = np.zeros((len(joints_dict),coords.shape[0])) # dist_time: [5,#frames]
-    # dist_time = []
     for idx,(_,joints_idx) in enumerate(joints_dict.items()):
         dist_time[idx,:] = calc_dist(coords,joints_idx)
-    print(f'dist_time shape: {dist_time.shape}')
     return dist_time
 
 ##############################
@@ -58,7 +56,6 @@ def get_ori_data(path,save):
     x_pos_ori = csv_np[:,[6,12,18,24,30,36,42,48,54,60,66,72,78,84,90,96,102,108,114,120,126,132,138,144,150,168]] # x_pos_ori: [#frames,26]
     z_pos_ori = csv_np[:,[7,13,19,25,31,37,43,49,55,61,67,73,79,85,91,97,103,109,115,121,127,133,139,145,151,169]]
     y_pos_ori = csv_np[:,[8,14,20,26,32,38,44,50,56,62,68,74,80,86,92,98,104,110,116,122,128,134,140,146,152,170]]
-    print(f'x_pos shape: {x_pos_ori.shape}')
     
     coords = np.concatenate((np.expand_dims(x_pos_ori, axis=1),
                              np.expand_dims(y_pos_ori, axis=1),
@@ -94,12 +91,8 @@ def get_prepared(path,frame_range=None):
 ##################################
 
 def calc_axis_limit(coords):
-    x_high, x_low = int(np.ceil(coords[:,0,:].max()*1000/200.0))*200, int(np.floor(coords[:,0,:].min()*1000/200.0))*200
-    y_high, y_low = int(np.ceil(coords[:,1,:].max()*1000/200.0))*200, int(np.floor(coords[:,1,:].min()*1000/200.0))*200
-    z_high, z_low = int(np.ceil(coords[:,2,:].max()*1000/200.0))*200, int(np.floor(coords[:,2,:].min()*1000/200.0))*200
-    high = np.array([x_high,y_high,z_high])
-    low = np.array([x_low,y_low,z_low])
-    del x_high, x_low, y_high, y_low, z_high, z_low
+    high = np.array(list(int(np.ceil(coords[:,i,:].max()*1000/200.0))*200 for i in range(coords.shape[1])))
+    low = np.array(list(int(np.ceil(coords[:,i,:].min()*1000/200.0))*200 for i in range(coords.shape[1])))
     return high,low
 
 def prepare_ax(ax,high,low):
