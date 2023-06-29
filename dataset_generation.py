@@ -1,20 +1,37 @@
+import os
+import argparse
 import numpy as np
+from util.utils import get_ori_data, get_dist_feature, get_angle_feature, get_gall_features
 
-def get_coords(path):
-    Path = get_path()
-    csv_df = pd.read_csv(Path,header=None) # ,header=None
-    csv_np = csv_df.to_numpy()
-    # center of gravity
-    cogs = np.expand_dims(csv_np[:,0:3],axis=1)
-    # coordinates of all joints
-    x_coord = np.expand_dims(csv_np[:,3::3], axis=1)
-    y_coord = np.expand_dims(csv_np[:,4::3], axis=1)
-    z_coord = np.expand_dims(csv_np[:,5::3], axis=1)
-    coords = np.concatenate((x_coord,y_coord,z_coord), axis=1)
-    return coords,cogs
+####################################
+###### get general parameters ######
+####################################
+
+parser = argparse.ArgumentParser(description='Visualize original csv data')
+
+### general ###
+# parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
+parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
+
+### feature selection ###
+parser.add_argument('--desired_dists', type=list,
+                    default=['LHandEnd_head','LWrist_head','LElbow_head','LShoulder_head',
+                             'RHandEnd_head','RWrist_head','RElbow_head','RShoulder_head']
+                             )
+parser.add_argument('--desized_angles', type=list,
+                    default=['LHandEnd_LWrist_LElbow',
+                             'LWrist_LElbow_LShoulder',
+                             'LElbow_LShoulder_LClavicle',
+                             'LShoulder_LClavicle_spine5']
+                             )
+
+args = parser.parse_args([])
 
 if __name__ == '__main__':
-    path = ''
-    coords,cogs = get_coords(path)
-    print(f'Coordinates shape: {coords.shape}')
-    print(f'Center of gravity shape: {cogs.shape}')
+
+    # get original data
+    input_path = os.path.join(args.data_path,'unknown.NoHead.csv')
+    cog,coords = get_ori_data(input_path)
+
+    all_features = get_gall_features(input_path,args.desired_dists,args.desized_angles)
+    print(f'dataset shape: {all_features.shape}')
