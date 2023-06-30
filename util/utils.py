@@ -1,23 +1,24 @@
 import os
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 #################################
 ###### calculate distances ######
 #################################
         
-def calc_dist(coords,joints_idx):
+def calc_dist_plot(coords,links_idx):
     dist_sum = np.zeros(coords.shape[0])
-    for i,j in zip(joints_idx[:-1],joints_idx[1:]):
+    for i,j in zip(links_idx[:-1],links_idx[1:]):
         # coords[:,0,i]: all frames, x, i-th joint
         dist_sum += np.sqrt((coords[:,0,i] - coords[:,0,j])**2 + (coords[:,1,i] - coords[:,1,j])**2 + (coords[:,2,i] - coords[:,2,j])**2)
     return dist_sum
     
-def calc_distances_timeline(coords,joints_dict):
+def calc_distances_timeline(coords,links_dict):
     # coords: [#frames,3,26]
-    dist_time = np.zeros((len(joints_dict),coords.shape[0])) # dist_time: [5,#frames]
-    for idx,(_,joints_idx) in enumerate(joints_dict.items()):
-        dist_time[idx,:] = calc_dist(coords,joints_idx)
+    dist_time = np.zeros((len(links_dict),coords.shape[0])) # dist_time: [5,#frames]
+    for idx,(_,links_idx) in enumerate(links_dict.items()):
+        dist_time[idx,:] = calc_dist_plot(coords,links_idx)
     return dist_time
 
 ##############################
@@ -66,25 +67,27 @@ def get_ori_data(path):
     
     return cog,coords
 
-def get_prepared(path,frame_range=None):
-
-    cog,coords = get_ori_data(path=path) 
-
-    # if frame_range is designated, then return designated ones
-    if not frame_range == None:
-        coords = coords[frame_range[0]:frame_range[1]]
-    
-    # joints list
-    joints_dict = {'left arm': [15,0,1,2,14,24],
+def get_links_dict():
+    links_dict = {'left arm': [15,0,1,2,14,24],
                   'right arm': [18,3,4,5,17,24],
                   'left leg': [16,6,7,8,9,20],
                   'right leg': [19,10,11,12,13,20],
                   'spine': [20,21,22,23,24,25]
                  }
+    return links_dict
+
+def get_prepared(path,frame_range=None):
+
+    cog,coords = get_ori_data(path=path) 
+    # if frame_range is designated, then return designated ones
+    if not frame_range == None:
+        coords = coords[frame_range[0]:frame_range[1]]
+    # joints list
+    links_dict = get_links_dict()
     # change of distances
-    dist_time = calc_distances_timeline(coords,joints_dict)
+    dist_time = calc_distances_timeline(coords,links_dict)
     
-    return coords,dist_time,joints_dict
+    return coords,dist_time,links_dict
 
 ##################################
 ###### plot with each frame ######
@@ -162,6 +165,7 @@ def calc_all_distances(ori_data_path):
     #       meaning: (x-x.T)**2 + (y-y.T)**2 + (z-z.T)**2
     #       shape: [18000,3,26,26] -> [18000,26,26]
     all_distances = np.sqrt(np.sum((new_coords - np.transpose(new_coords,(0,1,3,2)))**2,axis=1))
+    all_distances = np.round(all_distances.astype(np.float64),decimals=5)
     return all_distances
 
 def examine_distance(ori_data_path,frame,joint_1,joint_2):
@@ -172,7 +176,9 @@ def examine_distance(ori_data_path,frame,joint_1,joint_2):
     joint_2_idx = joint_index_dict[joint_2]
     # due to unclear reason, np.round doesn't work on type np.float32, but only on np.float64
     # and values inside all_distances are defaultly calculated as np.float32
-    dist_from_array = np.round(all_distances[frame,joint_1_idx,joint_2_idx].astype(np.float64),decimals=5)
+
+    dist_from_array = all_distances[frame,joint_1_idx,joint_2_idx]
+    # dist_from_array = np.round(all_distances[frame,joint_1_idx,joint_2_idx].astype(np.float64),decimals=5)
     dist_calculated = np.round(np.sqrt((coords[frame,0,joint_1_idx] - coords[frame,0,joint_2_idx])**2
                                        +(coords[frame,1,joint_1_idx] - coords[frame,1,joint_2_idx])**2
                                        +(coords[frame,2,joint_1_idx] - coords[frame,2,joint_2_idx])**2
@@ -241,7 +247,7 @@ def calc_angles(joints_lst,distances):
     c = distances[joints_lst[1],joints_lst[2]]
     cos_b = (c**2 + a**2 - b**2) / (2*c*a)
     B = np.arccos(cos_b) # radius = np.arccos(cos_value)
-    return B
+    return np.round(B,decimals=5)
 
 def get_angle_feature(ori_data_path,desized_angles):
     all_distances = calc_all_distances(ori_data_path)
@@ -266,12 +272,12 @@ def get_all_features(ori_data_path,desired_dists,desized_angles):
     return all_features
 
 def output_dataset(ori_data_path, desired_dists,desized_angles,output_name='UpperBody', output_npy=False):
-    dataset = get_all_features(ori_data_path,desired_dists,desized_angles)
-    x_data = np.concatenate((dataset[200:3700],
-                            dataset[3900:7200],
-                            dataset[7400:10700],
-                            dataset[10900:14400],
-                            dataset[14600:]),axis=0)
+    all_features = get_all_features(ori_data_path,desired_dists,desized_angles)
+    x_data = np.concatenate((all_features[200:3700],
+                            all_features[3900:7200],
+                            all_features[7400:10700],
+                            all_features[10900:14400],
+                            all_features[14600:]),axis=0)
     y_data = np.concatenate((np.full((3700-200),1),
                             np.full((7200-3900),2),
                             np.full((10700-7400),3),
@@ -284,3 +290,107 @@ def output_dataset(ori_data_path, desired_dists,desized_angles,output_name='Uppe
         np.save(os.path.join(ori_data_path,f'y_data_{output_name}.npy'), y_data)
     else:
         return [x_data,y_data]
+    
+#########################################
+###### verify dataset to be output ######
+#########################################
+
+def verification_dataset(ori_data_path,desired_dists,desized_angles):
+    all_features = get_all_features(ori_data_path,desired_dists,desized_angles)
+    _,coords = get_ori_data(ori_data_path)
+    x_data = np.concatenate((all_features[200:3700],
+                            all_features[3900:7200],
+                            all_features[7400:10700],
+                            all_features[10900:14400],
+                            all_features[14600:]),axis=0)
+    y_data = np.concatenate((np.full((3700-200),1),
+                            np.full((7200-3900),2),
+                            np.full((10700-7400),3),
+                            np.full((14400-10900),4),
+                            np.full((18000-14600),5)),axis=0)
+    skeletons = np.concatenate((coords[200:3700],
+                               coords[3900:7200],
+                               coords[7400:10700],
+                               coords[10900:14400],
+                               coords[14600:]),axis=0)
+    return x_data,y_data,skeletons,desired_dists,desized_angles
+
+def calc_dist_verify(skeleton,joint_1_idx,joint_2_idx):
+    dist = np.sqrt((skeleton[0,joint_1_idx] - skeleton[0,joint_2_idx])**2 
+                        + (skeleton[1,joint_1_idx] - skeleton[1,joint_2_idx])**2 
+                        + (skeleton[2,joint_1_idx] - skeleton[2,joint_2_idx])**2
+                       )
+    return np.around(dist,decimals=5)
+    
+def dist_equal_or_not(skeleton,dist_feature,desired_dists):
+    joint_index_dict = get_joint_index()
+    dist_equal_lst = []
+    for idx,desired_dist in enumerate(desired_dists):
+        dist_dataset = dist_feature[idx]
+        joint1,joint2 = desired_dist.split('_')
+        joint_1_idx = joint_index_dict[joint1]
+        joint_2_idx = joint_index_dict[joint2]
+        dist_skeleton = calc_dist_verify(skeleton,joint_1_idx,joint_2_idx)
+        dist_equal_lst.append(dist_dataset == dist_skeleton)
+        if not dist_dataset == dist_skeleton:
+            print(f'dist_dataset={dist_dataset},dist_skeleton={dist_skeleton}')
+    return np.all(np.array(dist_equal_lst))
+
+def calc_angle_verify(skeleton,joints_lst):
+    # b: the edge in triangle ABC which is opposite to the angle to be calculated
+    # a,c: side edges
+    # refer to formular: 
+    # https://www.mathsisfun.com/algebra/trig-cosine-law.html
+    a = calc_dist_verify(skeleton,joints_lst[0],joints_lst[1])
+    b = calc_dist_verify(skeleton,joints_lst[0],joints_lst[2])
+    c = calc_dist_verify(skeleton,joints_lst[1],joints_lst[2])
+    cos_b = (c**2 + a**2 - b**2) / (2*c*a)
+    B = np.arccos(cos_b) # radius = np.arccos(cos_value)
+    return np.around(B,decimals=5)
+
+def angles_equal_or_not(skeleton,angle_feature,desized_angles):
+    angle_pairs_dict = get_angle_pairs(desized_angles)
+    angle_equal_lst = []
+    for idx, (angle_name,joints_lst) in enumerate(angle_pairs_dict.items()):
+        angle_dataset = angle_feature[idx]
+        angle_skeleton = calc_angle_verify(skeleton,joints_lst)
+        angle_equal_lst.append(angle_dataset == angle_skeleton)
+        if not angle_dataset == angle_skeleton:
+            print(f'angle_dataset={angle_dataset},angle_skeleton={angle_skeleton}')
+    return np.all(np.array(angle_equal_lst))
+
+def verification(ori_data_path,desired_dists,desized_angles,dataset_path=None):
+    if not dataset_path == None:
+        x_data_path, y_data_path = dataset_path[0], dataset_path[1]
+        with open(x_data_path, 'rb') as xf:
+            x_data = np.load(xf)
+        with open(y_data_path, 'rb') as yf:
+            y_data = np.load(yf)
+        _,_,skeletons,desired_dists,desized_angles = verification_dataset(ori_data_path,desired_dists,desized_angles)
+        assert x_data.shape[1] == len(desired_dists) + len(desized_angles), 'Number of features of loaded dataset is different from verified features'
+        print(f'Loaded x_data with shape {x_data.shape}')
+        print(f'Loaded y_data with shape {y_data.shape}')
+    else:
+        x_data,y_data,skeletons,desired_dists,desized_angles = verification_dataset(ori_data_path,desired_dists,desized_angles)
+        print(f'Generated x_data with shape {x_data.shape}')
+        print(f'Generated y_data with shape {y_data.shape}')
+    # select random frames
+    choices = np.random.randint(17000, size = 16)
+    print(f'These frames will be verified: {choices}')
+    # plot
+    links_dict = get_links_dict()
+    fig = plt.figure(figsize=(15,15))
+    for idx,(frame,feature,label,skeleton) in enumerate(zip(choices,x_data[choices],y_data[choices],skeletons[choices])):
+        # verify whether distances and angles are the same with dataset
+        dist_equal = dist_equal_or_not(skeleton,feature[:len(desired_dists)],desired_dists)
+        angles_equal = angles_equal_or_not(skeleton,feature[len(desired_dists):],desized_angles)
+        # plot skeleton
+        ax = fig.add_subplot(4, 4, idx+1, projection='3d')
+        high,low = calc_axis_limit(np.expand_dims(skeleton, axis=0))
+        prepare_ax(ax,high,low)
+        ax.scatter3D(skeleton[0], skeleton[1], skeleton[2], c='steelblue', marker='<')
+        connect_with_lines(skeleton,ax,links_dict)
+        ax.set_title(f'label: {label}, dist: {dist_equal}, angles: {angles_equal}')
+        ax.set_axis_off()
+    fig.tight_layout()
+    plt.show()
