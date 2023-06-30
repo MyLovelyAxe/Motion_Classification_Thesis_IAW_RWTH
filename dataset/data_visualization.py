@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='Visualize original csv data')
 ### general ###
 parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
 # parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
-parser.add_argument('--function', type=str, default='verify_before_output',choices=['check_ori_data','verify_before_output','verify_npy'],
+parser.add_argument('--function', type=str, default='verify_npy',choices=['check_ori_data','verify_before_output','verify_npy'],
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output')
@@ -36,11 +36,11 @@ from util.utils import get_prepared, calc_axis_limit, plot_func
 
 ###### function: verify_gefore_output ######
 from util.utils import verification
-parser.add_argument('--desired_dists', type=list,
+parser.add_argument('--desired_dists_trial', type=list,
                     default=['LHandEnd_head','LWrist_head','LElbow_head','LShoulder_head',
                              'RHandEnd_head','RWrist_head','RElbow_head','RShoulder_head']
                              )
-parser.add_argument('--desized_angles', type=list,
+parser.add_argument('--desized_angles_trial', type=list,
                     default=['LHandEnd_LWrist_LElbow',
                              'LWrist_LElbow_LShoulder',
                              'LElbow_LShoulder_LClavicle',
@@ -48,6 +48,41 @@ parser.add_argument('--desized_angles', type=list,
                              )
 
 ###### function: verify_npy ######
+parser.add_argument('--npy_path', type=list, default=['dataset/chor2_20230609/x_data_UpperBody.npy',
+                                                      'dataset/chor2_20230609/y_data_UpperBody.npy'])
+parser.add_argument('--desired_dists', type=list,
+                    default=['LHandEnd_head','LWrist_head','LElbow_head','LShoulder_head',
+                             'RHandEnd_head','RWrist_head','RElbow_head','RShoulder_head',
+                             'LHandEnd_spine5','LWrist_spine5','LElbow_spine5','LShoulder_spine5',
+                             'RHandEnd_spine5','RWrist_spine5','RElbow_spine5','RShoulder_spine5',
+                             'LHandEnd_spine4','LWrist_spine4','LElbow_spine4','LShoulder_spine4',
+                             'RHandEnd_spine4','RWrist_spine4','RElbow_spine4','RShoulder_spine4',
+                             'LAnkle_spine1','LKnee_spine1','LHip_spine1',
+                             'RAnkle_spine1','RKnee_spine1','RHip_spine1']
+                             )
+parser.add_argument('--desized_angles', type=list,
+                    default=['LHandEnd_LWrist_LElbow',
+                             'LWrist_LElbow_LShoulder',
+                             'LElbow_LShoulder_LClavicle',
+                             'LShoulder_LClavicle_spine5',
+                             'LClavicle_spine5_spine4',
+                             'LClavicle_spine5_head',
+                             'RHandEnd_RWrist_RElbow',
+                             'RWrist_RElbow_RShoulder',
+                             'RElbow_RShoulder_RClavicle',
+                             'RShoulder_RClavicle_spine5',
+                             'RClavicle_spine5_spine4',
+                             'RClavicle_spine5_head',
+                             'spine3_spine4_spine5',
+                             'spine4_spine5_head',
+                             'LToe_LAnkle_LKnee',
+                             'LAnkle_LKnee_LHip',
+                             'LKnee_LHip_spine1',
+                             'RToe_RAnkle_RKnee',
+                             'RAnkle_RKnee_RHip',
+                             'RKnee_RHip_spine1']
+                             )
+
 
 ### animation ###
 parser.add_argument('--start_frame', type=int, default=3400, help='from which frame to start visualize')
@@ -90,4 +125,8 @@ if __name__ == '__main__':
 
     if args.function == 'verify_before_output':
 
-        verification(input_path, args.desired_dists,args.desized_angles)
+        verification(input_path, args.desired_dists_trial,args.desized_angles_trial)
+
+    if args.function == 'verify_npy':
+
+        verification(input_path, args.desired_dists,args.desized_angles,dataset_path=args.npy_path)

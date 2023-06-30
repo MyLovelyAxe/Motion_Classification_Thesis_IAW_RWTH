@@ -271,7 +271,7 @@ def get_all_features(ori_data_path,desired_dists,desized_angles):
     all_features = np.concatenate((dist_feature, angle_feature), axis=1)
     return all_features
 
-def output_dataset(ori_data_path, desired_dists,desized_angles,output_name='UpperBody', output_npy=False):
+def output_dataset(ori_data_path,desired_dists,desized_angles,output_name='UpperBody', output_npy=False):
     all_features = get_all_features(ori_data_path,desired_dists,desized_angles)
     x_data = np.concatenate((all_features[200:3700],
                             all_features[3900:7200],
@@ -284,10 +284,11 @@ def output_dataset(ori_data_path, desired_dists,desized_angles,output_name='Uppe
                             np.full((14400-10900),4),
                             np.full((18000-14600),5)),axis=0)
     if output_npy:
+        output_path = os.path.join(ori_data_path.split('/')[0],ori_data_path.split('/')[1])
         print(f'type: {type(x_data)}, shape: {x_data.shape}')
-        np.save(os.path.join(ori_data_path,f'x_data_{output_name}.npy'), x_data)
+        np.save(os.path.join(output_path,f'x_data_{output_name}.npy'), x_data)
         print(f'type: {type(y_data)}, shape: {y_data.shape}')
-        np.save(os.path.join(ori_data_path,f'y_data_{output_name}.npy'), y_data)
+        np.save(os.path.join(output_path,f'y_data_{output_name}.npy'), y_data)
     else:
         return [x_data,y_data]
     
