@@ -1,7 +1,7 @@
 import os
 import argparse
 import numpy as np
-from util.utils import get_ori_data, get_dist_feature, get_angle_feature, get_gall_features
+from util.utils import get_ori_data, get_dist_feature, get_angle_feature, get_all_features
 
 ####################################
 ###### get general parameters ######
@@ -10,8 +10,8 @@ from util.utils import get_ori_data, get_dist_feature, get_angle_feature, get_ga
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 ### general ###
-# parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
-parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
+parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
+# parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
 
 ### feature selection ###
 parser.add_argument('--desired_dists', type=list,
@@ -33,5 +33,5 @@ if __name__ == '__main__':
     input_path = os.path.join(args.data_path,'unknown.NoHead.csv')
     cog,coords = get_ori_data(input_path)
 
-    all_features = get_gall_features(input_path,args.desired_dists,args.desized_angles)
+    all_features = get_all_features(input_path,args.desired_dists,args.desized_angles)
     print(f'dataset shape: {all_features.shape}')

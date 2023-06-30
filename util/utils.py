@@ -258,9 +258,29 @@ def get_angle_feature(ori_data_path,desized_angles):
 ###### generate dataset ######
 ##############################
 
-def get_gall_features(ori_data_path,desired_dists,desized_angles):
+def get_all_features(ori_data_path,desired_dists,desized_angles):
     # get features
     dist_feature = get_dist_feature(ori_data_path,desired_dists)
     angle_feature = get_angle_feature(ori_data_path,desized_angles)
     all_features = np.concatenate((dist_feature, angle_feature), axis=1)
     return all_features
+
+def output_dataset(ori_data_path, desired_dists,desized_angles,output_name='UpperBody', output_npy=False):
+    dataset = get_all_features(ori_data_path,desired_dists,desized_angles)
+    x_data = np.concatenate((dataset[200:3700],
+                            dataset[3900:7200],
+                            dataset[7400:10700],
+                            dataset[10900:14400],
+                            dataset[14600:]),axis=0)
+    y_data = np.concatenate((np.full((3700-200),1),
+                            np.full((7200-3900),2),
+                            np.full((10700-7400),3),
+                            np.full((14400-10900),4),
+                            np.full((18000-14600),5)),axis=0)
+    if output_npy:
+        print(f'type: {type(x_data)}, shape: {x_data.shape}')
+        np.save(os.path.join(ori_data_path,f'x_data_{output_name}.npy'), x_data)
+        print(f'type: {type(y_data)}, shape: {y_data.shape}')
+        np.save(os.path.join(ori_data_path,f'y_data_{output_name}.npy'), y_data)
+    else:
+        return [x_data,y_data]
