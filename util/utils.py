@@ -1,7 +1,10 @@
 import os
+import yaml
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from datetime import datetime as dt
 
 #################################
 ###### calculate distances ######
@@ -136,6 +139,33 @@ def plot_func(frame_id,ax1,joints_dict,coords_ori,high_1,low_1,title_1,ax2,dist_
     plot_func_3d(frame_id,ax1,joints_dict,coords_ori,high_1,low_1,title_1)
     plot_func_2d(frame_id,ax2,dist_plots,dist_time,title_2)
 
+def plot_ori_data(input_path,args):
+        ### prepare ###
+        coords,dist_time,joints_dict = get_prepared(input_path,frame_range=[args.start_frame,args.end_frame])
+        N_frames = args.end_frame - args.start_frame
+        ### plot ###
+        fig = plt.figure(figsize=(16,8))
+        fig.tight_layout()
+        ### ax1: original coordinates in 3D ###
+        ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+        ax1.view_init(30, 150)
+        high_1, low_1 = calc_axis_limit(coords) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
+        title_1 = f'Original coordinates in frames {args.start_frame}-{args.end_frame}'
+        #### ax2: distance changing in 2D ###
+        ax2 = fig.add_subplot(1, 2, 2)
+        x = np.arange(N_frames)
+        dist_plots = [ax2.plot(x, dist_time[idx],label=f'{links}')[0] for idx,(links,joints) in enumerate(joints_dict.items())]
+        plt.legend()
+        title_2 = f'Distances of limbs in frames {args.start_frame}-{args.end_frame}'
+        ### animation ###
+        ani1 = animation.FuncAnimation(fig,plot_func,frames=N_frames,fargs=(ax1,joints_dict,coords,high_1,low_1,title_1,
+                                                                            ax2,dist_plots,dist_time,title_2),interval=17)
+        plt.show()
+        #### save animation.gif ###
+        if args.output_anim:
+            writergif = animation.PillowWriter(fps=30) 
+            ani1.save(os.path.join(args.data_path,f"anim_{dt.now().strftime('%d-%h-%H-%M')}_{args.data_path.split('/')[1]}.gif"), writer=writergif)
+
 ################################################################
 ###### Calculation of all distances between random joints ######
 ################################################################
@@ -264,6 +294,13 @@ def get_angle_feature(ori_data_path,desized_angles):
 ###### generate dataset ######
 ##############################
 
+def get_yaml(yaml_path):
+    with open(yaml_path, "r") as file:
+        features = yaml.safe_load(file)
+    dists = features['desired_dists']
+    angles = features['desized_angles']
+    return dists,angles
+
 def get_all_features(ori_data_path,desired_dists,desized_angles):
     # get features
     dist_feature = get_dist_feature(ori_data_path,desired_dists)
@@ -297,24 +334,14 @@ def output_dataset(ori_data_path,desired_dists,desized_angles,output_name='Upper
 #########################################
 
 def verification_dataset(ori_data_path,desired_dists,desized_angles):
-    all_features = get_all_features(ori_data_path,desired_dists,desized_angles)
     _,coords = get_ori_data(ori_data_path)
-    x_data = np.concatenate((all_features[200:3700],
-                            all_features[3900:7200],
-                            all_features[7400:10700],
-                            all_features[10900:14400],
-                            all_features[14600:]),axis=0)
-    y_data = np.concatenate((np.full((3700-200),1),
-                            np.full((7200-3900),2),
-                            np.full((10700-7400),3),
-                            np.full((14400-10900),4),
-                            np.full((18000-14600),5)),axis=0)
+    x_data,y_data = output_dataset(ori_data_path,desired_dists,desized_angles)
     skeletons = np.concatenate((coords[200:3700],
                                coords[3900:7200],
                                coords[7400:10700],
                                coords[10900:14400],
                                coords[14600:]),axis=0)
-    return x_data,y_data,skeletons,desired_dists,desized_angles
+    return x_data,y_data,skeletons
 
 def calc_dist_verify(skeleton,joint_1_idx,joint_2_idx):
     dist = np.sqrt((skeleton[0,joint_1_idx] - skeleton[0,joint_2_idx])**2 
@@ -360,19 +387,20 @@ def angles_equal_or_not(skeleton,angle_feature,desized_angles):
             print(f'angle_dataset={angle_dataset},angle_skeleton={angle_skeleton}')
     return np.all(np.array(angle_equal_lst))
 
-def verification(ori_data_path,desired_dists,desized_angles,dataset_path=None):
+def verification(ori_data_path,yaml_path,dataset_path=None):
+    desired_dists,desized_angles = get_yaml(yaml_path)
     if not dataset_path == None:
         x_data_path, y_data_path = dataset_path[0], dataset_path[1]
         with open(x_data_path, 'rb') as xf:
             x_data = np.load(xf)
         with open(y_data_path, 'rb') as yf:
             y_data = np.load(yf)
-        _,_,skeletons,desired_dists,desized_angles = verification_dataset(ori_data_path,desired_dists,desized_angles)
+        _,_,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles)
         assert x_data.shape[1] == len(desired_dists) + len(desized_angles), 'Number of features of loaded dataset is different from verified features'
         print(f'Loaded x_data with shape {x_data.shape}')
         print(f'Loaded y_data with shape {y_data.shape}')
     else:
-        x_data,y_data,skeletons,desired_dists,desized_angles = verification_dataset(ori_data_path,desired_dists,desized_angles)
+        x_data,y_data,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles)
         print(f'Generated x_data with shape {x_data.shape}')
         print(f'Generated y_data with shape {y_data.shape}')
     # select random frames
