@@ -294,7 +294,7 @@ def get_angle_feature(ori_data_path,desized_angles):
 ###### generate dataset ######
 ##############################
 
-def get_yaml(yaml_path):
+def get_feature_selection(yaml_path):
     with open(yaml_path, "r") as file:
         features = yaml.safe_load(file)
     dists = features['desired_dists']
@@ -308,18 +308,34 @@ def get_all_features(ori_data_path,desired_dists,desized_angles):
     all_features = np.concatenate((dist_feature, angle_feature), axis=1)
     return all_features
 
-def output_dataset(ori_data_path,desired_dists,desized_angles,output_name='UpperBody', output_npy=False):
+def get_splilt_method(yaml_path):
+    with open(yaml_path, "r") as file:
+        split_method = yaml.safe_load(file)
+    return split_method
+
+def output_dataset(ori_data_path,desired_dists,desized_angles,split_method_path,output_name='UpperBody', output_npy=False):
     all_features = get_all_features(ori_data_path,desired_dists,desized_angles)
-    x_data = np.concatenate((all_features[200:3700],
-                            all_features[3900:7200],
-                            all_features[7400:10700],
-                            all_features[10900:14400],
-                            all_features[14600:]),axis=0)
-    y_data = np.concatenate((np.full((3700-200),1),
-                            np.full((7200-3900),2),
-                            np.full((10700-7400),3),
-                            np.full((14400-10900),4),
-                            np.full((18000-14600),5)),axis=0)
+    x_data_lst = []
+    y_data_lst = []
+    split_method = get_splilt_method(split_method_path)
+    # e.g. split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
+    for _,config in split_method.items():
+        start,end,label = list(i for _,i in config.items())
+        x_data_lst.append(all_features[start:end])
+        y_data_lst.append(np.full((end-start),label))
+    x_data = np.concatenate(x_data_lst,axis=0)
+    y_data = np.concatenate(y_data_lst,axis=0)
+    del x_data_lst, y_data_lst
+    # x_data = np.concatenate((all_features[200:3700],
+    #                         all_features[3900:7200],
+    #                         all_features[7400:10700],
+    #                         all_features[10900:14400],
+    #                         all_features[14600:]),axis=0)
+    # y_data = np.concatenate((np.full((3700-200),1),
+    #                         np.full((7200-3900),2),
+    #                         np.full((10700-7400),3),
+    #                         np.full((14400-10900),4),
+    #                         np.full((18000-14600),5)),axis=0)
     if output_npy:
         output_path = os.path.join(ori_data_path.split('/')[0],ori_data_path.split('/')[1])
         print(f'type: {type(x_data)}, shape: {x_data.shape}')
@@ -333,14 +349,22 @@ def output_dataset(ori_data_path,desired_dists,desized_angles,output_name='Upper
 ###### verify dataset to be output ######
 #########################################
 
-def verification_dataset(ori_data_path,desired_dists,desized_angles):
+def verification_dataset(ori_data_path,desired_dists,desized_angles,split_method_path):
     _,coords = get_ori_data(ori_data_path)
-    x_data,y_data = output_dataset(ori_data_path,desired_dists,desized_angles)
-    skeletons = np.concatenate((coords[200:3700],
-                               coords[3900:7200],
-                               coords[7400:10700],
-                               coords[10900:14400],
-                               coords[14600:]),axis=0)
+    x_data,y_data = output_dataset(ori_data_path,desired_dists,desized_angles,split_method_path)
+    skeletons_lst = []
+    split_method = get_splilt_method(split_method_path)
+    # e.g. split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
+    for _,config in split_method.items():
+        start,end,label = list(i for _,i in config.items())
+        skeletons_lst.append(coords[start:end])
+    skeletons = np.concatenate(skeletons_lst,axis=0)
+    del skeletons_lst
+    # skeletons = np.concatenate((coords[200:3700],
+    #                            coords[3900:7200],
+    #                            coords[7400:10700],
+    #                            coords[10900:14400],
+    #                            coords[14600:]),axis=0)
     return x_data,y_data,skeletons
 
 def calc_dist_verify(skeleton,joint_1_idx,joint_2_idx):
@@ -387,20 +411,20 @@ def angles_equal_or_not(skeleton,angle_feature,desized_angles):
             print(f'angle_dataset={angle_dataset},angle_skeleton={angle_skeleton}')
     return np.all(np.array(angle_equal_lst))
 
-def verification(ori_data_path,yaml_path,dataset_path=None):
-    desired_dists,desized_angles = get_yaml(yaml_path)
+def verification(ori_data_path,feature_path,split_method_path,dataset_path=None):
+    desired_dists,desized_angles = get_feature_selection(feature_path)
     if not dataset_path == None:
         x_data_path, y_data_path = dataset_path[0], dataset_path[1]
         with open(x_data_path, 'rb') as xf:
             x_data = np.load(xf)
         with open(y_data_path, 'rb') as yf:
             y_data = np.load(yf)
-        _,_,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles)
+        _,_,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles,split_method_path)
         assert x_data.shape[1] == len(desired_dists) + len(desized_angles), 'Number of features of loaded dataset is different from verified features'
         print(f'Loaded x_data with shape {x_data.shape}')
         print(f'Loaded y_data with shape {y_data.shape}')
     else:
-        x_data,y_data,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles)
+        x_data,y_data,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles,split_method_path)
         print(f'Generated x_data with shape {x_data.shape}')
         print(f'Generated y_data with shape {y_data.shape}')
     # select random frames

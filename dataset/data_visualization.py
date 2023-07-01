@@ -45,7 +45,7 @@ parser.add_argument('--output_anim', type=bool, default=False, help='whether to 
 
 from util.utils import verification
 parser.add_argument('--desired_features_trial', type=str, 
-                    default='dataset/yaml/desired_features_trial.yaml', help='load features name from .yaml')
+                    default='dataset/desired_features_trial.yaml', help='load features name from .yaml')
 
 ##################################
 ###### function: verify_npy ######
@@ -54,19 +54,20 @@ parser.add_argument('--desired_features_trial', type=str,
 parser.add_argument('--npy_path', type=list, default=['dataset/chor2_20230609/x_data_UpperBody.npy',
                                                       'dataset/chor2_20230609/y_data_UpperBody.npy'])
 parser.add_argument('--desired_features', type=str, 
-                    default='dataset/yaml/desired_features.yaml', help='load features name from .yaml')
+                    default='dataset/desired_features.yaml', help='load features name from .yaml')
 
 args = parser.parse_args([])
 
 if __name__ == '__main__':
 
     input_path = os.path.join(args.data_path,'unknown.NoHead.csv')
+    split_method_path = os.path.join(args.data_path,'split_method.yaml')
 
     if args.function == 'check_ori_data':
         plot_ori_data(input_path,args)
 
     if args.function == 'verify_before_output':
-        verification(input_path,args.desired_features_trial)
+        verification(input_path,args.desired_features_trial,split_method_path)
 
     if args.function == 'verify_npy':
-        verification(input_path,args.desired_features,dataset_path=args.npy_path)
+        verification(input_path,args.desired_features,split_method_path,dataset_path=args.npy_path)
