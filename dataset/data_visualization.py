@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 # parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
 parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
-parser.add_argument('--function', type=str, default='verify_npy',
+parser.add_argument('--function', type=str, default='verify_before_output',
                     choices=['check_ori_data','verify_before_output','verify_npy'],
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \

@@ -12,3 +12,5 @@ desized_angles:
   - LWrist_LElbow_LShoulder
   - LElbow_LShoulder_LClavicle
   - LShoulder_LClavicle_spine5
+  - LAnkle_LKnee_LHip
+  - RAnkle_RKnee_RHip

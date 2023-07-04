@@ -127,7 +127,11 @@ def calc_angles(joints_lst,distances):
     b = distances[joints_lst[0],joints_lst[2]]
     c = distances[joints_lst[1],joints_lst[2]]
     cos_b = (c**2 + a**2 - b**2) / (2*c*a)
-    B = np.arccos(cos_b) # radius = np.arccos(cos_value)
+    # usually only when B slightly exceeds 180°, cos_b would be less than -1
+    if cos_b < -1:
+        B = np.pi
+    else:
+        B = np.arccos(cos_b) # radius = np.arccos(cos_value)
     return np.round(B,decimals=5)
 
 def get_angle_feature(coords,desized_angles):

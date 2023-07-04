@@ -12,7 +12,6 @@ sys.path.insert(0, parent_dir)
 
 from util.utils import output_dataset,get_feature_selection
 
-
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 # parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
 parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
