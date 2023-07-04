@@ -248,7 +248,7 @@ def verification(ori_data_path,feature_path,split_method_path,dataset_path=None)
         print(f'Generated x_data with shape {x_data.shape}')
         print(f'Generated y_data with shape {y_data.shape}')
     # select random frames
-    choices = np.random.randint(17000, size = 16)
+    choices = np.random.randint(x_data.shape[0], size = 16)
     print(f'These frames will be verified: {choices}')
     # plot
     links_dict = get_links_dict()

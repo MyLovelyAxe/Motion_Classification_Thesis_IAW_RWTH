@@ -18,8 +18,8 @@ from util.plots import plot_ori_data,verification
 
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
-parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
-# parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
+# parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
+parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
 parser.add_argument('--function', type=str, default='verify_npy',
                     choices=['check_ori_data','verify_before_output','verify_npy'],
                     help='check_ori_data: visualize original data from Captury Live; \
@@ -30,8 +30,8 @@ parser.add_argument('--function', type=str, default='verify_npy',
 ###### function: check_ori_data ######
 ######################################
 
-parser.add_argument('--start_frame', type=int, default=200, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=400, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=4000, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=4300, help='to which frame to end visualize')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 
 ############################################
@@ -45,8 +45,8 @@ parser.add_argument('--desired_features_trial', type=str,
 ###### function: verify_npy ######
 ##################################
 
-parser.add_argument('--npy_path', type=list, default=['dataset/chor2_20230609/x_data_UpperLowerBody.npy',
-                                                      'dataset/chor2_20230609/y_data_UpperLowerBody.npy'])
+parser.add_argument('--npy_path', type=list, default=['x_data_UpperLowerBody.npy',
+                                                      'y_data_UpperLowerBody.npy'])
 parser.add_argument('--desired_features', type=str, 
                     default='dataset/desired_features.yaml', help='load features name from .yaml')
 
@@ -64,4 +64,5 @@ if __name__ == '__main__':
         verification(input_path,args.desired_features_trial,split_method_path)
 
     if args.function == 'verify_npy':
+        args.npy_path = os.path.join(args.data_path,args.npy_path[0]),os.path.join(args.data_path,args.npy_path[1])
         verification(input_path,args.desired_features,split_method_path,dataset_path=args.npy_path)
