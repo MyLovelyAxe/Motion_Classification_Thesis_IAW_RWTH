@@ -29,8 +29,8 @@ def get_ori_data(path):
                              np.expand_dims(y_pos_ori, axis=1),
                              np.expand_dims(z_pos_ori, axis=1)), axis=1) # coords: [#frames,3,26]
     cog = np.expand_dims(cog,axis=1)
-    # print(f'coords shape: {coords.shape}')
-    # print(f'cog shape: {cog.shape}')
+    print(f'coords shape: {coords.shape}')
+    print(f'cog shape: {cog.shape}')
     return cog,coords
 
 ##############################
