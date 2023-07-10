@@ -1,0 +1,48 @@
+Waving1:
+  start: 230
+  end: 660
+  label: 4
+Waving2:
+  start: 770
+  end: 1220
+  label: 4
+Waving3:
+  start: 1340
+  end: 1770
+  label: 4
+Waving4:
+  start: 1870
+  end: 2300
+  label: 4
+Reaching1:
+  start: 2440
+  end: 2980
+  label: 5
+Reaching2:
+  start: 3100
+  end: 3550
+  label: 5
+Reaching3:
+  start: 3670
+  end: 4180
+  label: 5
+Reaching4:
+  start: 4300
+  end: 4750
+  label: 5
+Drinking1:
+  start: 4950
+  end: 5530
+  label: 6
+Drinking2:
+  start: 5690
+  end: 6200
+  label: 6
+Drinking3:
+  start: 6350
+  end: 6830
+  label: 6
+Drinking4:
+  start: 6950
+  end: 7460
+  label: 6
