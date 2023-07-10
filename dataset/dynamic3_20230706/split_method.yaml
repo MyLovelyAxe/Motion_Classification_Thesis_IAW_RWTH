@@ -1,0 +1,96 @@
+Boxing1:
+  start: 220
+  end: 480
+  label: 7
+Boxing2:
+  start: 680
+  end: 860
+  label: 7
+Boxing3:
+  start: 1000
+  end: 1250
+  label: 7
+Boxing4:
+  start: 1400
+  end: 1620
+  label: 7
+Bicep1:
+  start: 1770
+  end: 2160
+  label: 8
+Bicep2:
+  start: 2280
+  end: 2700
+  label: 8
+Bicep3:
+  start: 2850
+  end: 3260
+  label: 8
+Bicep4:
+  start: 3370
+  end: 3810
+  label: 8
+JumpJack1:
+  start: 3960
+  end: 4210
+  label: 9
+JumpJack2:
+  start: 4360
+  end: 4630
+  label: 9
+JumpJack3:
+  start: 4800
+  end: 5080
+  label: 9
+JumpJack4:
+  start: 5210
+  end: 5490
+  label: 9
+Boxing5:
+  start: 5730
+  end: 5960
+  label: 7
+Boxing6:
+  start: 6100
+  end: 6370
+  label: 7
+Boxing7:
+  start: 6550
+  end: 6830
+  label: 7
+Boxing8:
+  start: 6990
+  end: 7250
+  label: 7
+Bicep5:
+  start: 7460
+  end: 7950
+  label: 8
+Bicep6:
+  start: 8100
+  end: 8500
+  label: 8
+Bicep7:
+  start: 8650
+  end: 9100
+  label: 8
+Bicep8:
+  start: 9240
+  end: 9670
+  label: 8
+JumpJack5:
+  start: 9850
+  end: 10120
+  label: 9
+JumpJack6:
+  start: 10250
+  end: 10520
+  label: 9
+JumpJack7:
+  start: 10710
+  end: 10970
+  label: 9
+JumpJack8:
+  start: 11150
+  end: 11410
+  label: 9

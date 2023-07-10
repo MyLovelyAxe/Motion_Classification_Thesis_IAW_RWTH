@@ -34,8 +34,8 @@ parser.add_argument('--function', type=str, default='check_ori_data',
 ###### function: check_ori_data ######
 ######################################
 
-parser.add_argument('--start_frame', type=int, default=7460, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=7670, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=11410, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=11730, help='to which frame to end visualize')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 
 ############################################
