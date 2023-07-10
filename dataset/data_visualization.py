@@ -18,13 +18,13 @@ from util.plots import plot_ori_data,verification
 
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
-parser.add_argument('--data_path', type=str, default='dataset/dynamic3_20230706',
+parser.add_argument('--data_path', type=str, default='dataset/dynamic1_20230706',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
                              'dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
                              'dataset/dynamic3_20230706'])
-parser.add_argument('--function', type=str, default='check_ori_data',
+parser.add_argument('--function', type=str, default='verify_before_output',
                     choices=['check_ori_data','verify_before_output','verify_npy'],
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
@@ -34,8 +34,8 @@ parser.add_argument('--function', type=str, default='check_ori_data',
 ###### function: check_ori_data ######
 ######################################
 
-parser.add_argument('--start_frame', type=int, default=0, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=300, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=3000, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=3500, help='to which frame to end visualize')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 
 ############################################

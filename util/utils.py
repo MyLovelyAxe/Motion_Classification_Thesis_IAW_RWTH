@@ -47,6 +47,7 @@ def get_feature_selection(yaml_path):
 def get_splilt_method(yaml_path):
     with open(yaml_path, "r") as file:
         split_method = yaml.safe_load(file)
+        print(f'split method: {split_method}')
     return split_method
 
 def output_dataset(ori_data_path,desired_dists,desized_angles,split_method_path,output_name='UpperBody', output_npy=False):

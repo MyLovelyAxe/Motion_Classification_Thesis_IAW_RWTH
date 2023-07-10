@@ -127,7 +127,6 @@ def plot_ori_data(input_path,args):
     """
     ### prepare ###
     coords,dist_time = prepare_for_plot(input_path,frame_range=[args.start_frame,args.end_frame])
-    print(f'There are {len(coords)} frames in this shot.')
     joints_dict = get_links_dict()
     N_frames = args.end_frame - args.start_frame
     ### plot ###

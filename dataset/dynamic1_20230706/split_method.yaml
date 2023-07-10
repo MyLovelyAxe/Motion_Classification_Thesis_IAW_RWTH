@@ -1,0 +1,48 @@
+Walking1:
+  start: 300
+  end: 700
+  label: 1
+Jumping1:
+  start: 870
+  end: 1300
+  label: 2
+Squating1:
+  start: 1420
+  end: 2200
+  label: 3
+Walking2:
+  start: 2350
+  end: 2700
+  label: 1
+Jumping2:
+  start: 2870
+  end: 3320
+  label: 2
+Squating2:
+  start: 3470
+  end: 4280
+  label: 3
+Walking3:
+  start: 4440
+  end: 4770
+  label: 1
+Jumping3:
+  start: 4920
+  end: 5380
+  label: 2
+Squating3:
+  start: 5500
+  end: 6340
+  label: 3
+Walking4:
+  start: 6480
+  end: 6820
+  label: 1
+Jumping4:
+  start: 6960
+  end: 7460
+  label: 2
+Squating4:
+  start: 7610
+  end: 7800
+  label: 3
