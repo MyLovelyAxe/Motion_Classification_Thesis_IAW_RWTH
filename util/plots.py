@@ -156,23 +156,6 @@ def plot_ori_data(input_path,args):
 ###### verify dataset to be output by visualization ######
 ##########################################################
 
-# def verification_dataset(ori_data_paths,desired_dists,desized_angles,split_method_paths):
-#     """
-#     In order to verify dataset, x_data and y_data are necessary, as well as original skeleton data
-#     """
-#     x_data,y_data = output_dataset_static(ori_data_paths,desired_dists,desized_angles,split_method_paths)
-#     skeletons_lst = []
-#     for split_path,data_path in zip(split_method_paths,ori_data_paths):
-#         _,coords = get_ori_data(data_path)
-#         split_method = get_splilt_method(split_path)
-#         # e.g. static split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
-#         for seg_name,config in split_method.items():
-#             start,end,label = list(i for _,i in config.items())
-#             skeletons_lst.append(coords[start:end])
-#     skeletons = np.concatenate(skeletons_lst,axis=0)
-#     del skeletons_lst
-#     return x_data,y_data,skeletons
-
 def calc_dist_verify(skeleton,joint_1_idx,joint_2_idx):
     """
     calculate distance between 2 joints, when only 1 frame of skeleton data is provided
