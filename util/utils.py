@@ -44,25 +44,40 @@ def get_feature_selection(yaml_path):
     angles = features['desized_angles']
     return dists,angles
 
-def get_splilt_method(yaml_path):
+def get_splilt_method(yaml_path,show=False):
     with open(yaml_path, "r") as file:
         split_method = yaml.safe_load(file)
+    if show:
         print(f'split method: {split_method}')
     return split_method
 
-def output_dataset(ori_data_path,desired_dists,desized_angles,split_method_path,output_name='UpperBody', output_npy=False):
+def output_dataset(ori_data_path,
+                   desired_dists,
+                   desized_angles,
+                   split_method_path,
+                   output_name='UpperBody',
+                   output_npy=False,
+                   dynamic=False):
     _,coords = get_ori_data(ori_data_path)
     all_features = get_all_features(coords,desired_dists,desized_angles)
     x_data_lst = []
     y_data_lst = []
     split_method = get_splilt_method(split_method_path)
-    # e.g. split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
-    for _,config in split_method.items():
-        start,end,label = list(i for _,i in config.items())
-        x_data_lst.append(all_features[start:end])
-        y_data_lst.append(np.full((end-start),label))
-    x_data = np.concatenate(x_data_lst,axis=0)
-    y_data = np.concatenate(y_data_lst,axis=0)
+    if not dynamic:
+        # e.g. static split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
+        for seg_name,config in split_method.items():
+            start,end,label = list(i for _,i in config.items())
+            x_data_lst.append(all_features[start:end])
+            y_data_lst.append(np.full((end-start),label))
+        x_data = np.concatenate(x_data_lst,axis=0)
+        y_data = np.concatenate(y_data_lst,axis=0)
+    else:
+        name_dict = {}
+        for seg_name,config in split_method.items():
+            start,end,label = list(i for _,i in config.items())
+            name_dict[seg_name[:-1]] += end - start
+            
+        # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
     del x_data_lst, y_data_lst
     if output_npy:
         output_path = os.path.join(ori_data_path.split('/')[0],ori_data_path.split('/')[1])
