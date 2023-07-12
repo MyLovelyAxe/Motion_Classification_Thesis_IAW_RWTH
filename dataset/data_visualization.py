@@ -18,13 +18,13 @@ from util.plots import plot_ori_data,verification
 
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
-parser.add_argument('--data_path', type=str, default='dataset/dynamic3_20230706',
+parser.add_argument('--data_path', type=str, default='dataset/testset_20230627',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
                              'dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
                              'dataset/dynamic3_20230706'])
-parser.add_argument('--function', type=str, default='check_ori_data',
+parser.add_argument('--function', type=str, default='verify_npy',
                     choices=['check_ori_data','verify_before_output','verify_npy'],
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
@@ -34,8 +34,8 @@ parser.add_argument('--function', type=str, default='check_ori_data',
 ###### function: check_ori_data ######
 ######################################
 
-parser.add_argument('--start_frame', type=int, default=11410, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=11730, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=2300, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=2350, help='to which frame to end visualize')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 
 ############################################
@@ -58,15 +58,20 @@ args = parser.parse_args([])
 
 if __name__ == '__main__':
 
-    input_path = os.path.join(args.data_path,'unknown.NoHead.csv')
-    split_method_path = os.path.join(args.data_path,'split_method.yaml')
-
     if args.function == 'check_ori_data':
+
+        input_path = os.path.join(args.data_path,'unknown.NoHead.csv')
         plot_ori_data(input_path,args)
 
     if args.function == 'verify_before_output':
-        verification(input_path,args.desired_features_trial,split_method_path)
+
+        input_paths = [os.path.join(args.data_path,'unknown.NoHead.csv')]
+        split_method_paths = [os.path.join(args.data_path,'split_method.yaml')]
+        verification(input_paths,args.desired_features_trial,split_method_paths)
 
     if args.function == 'verify_npy':
+
+        input_paths = [os.path.join(args.data_path,'unknown.NoHead.csv')]
+        split_method_paths = [os.path.join(args.data_path,'split_method.yaml')]
         args.npy_path = os.path.join(args.data_path,args.npy_path[0]),os.path.join(args.data_path,args.npy_path[1])
-        verification(input_path,args.desired_features,split_method_path,dataset_path=args.npy_path)
+        verification(input_paths,args.desired_features,split_method_paths,dataset_path=args.npy_path)

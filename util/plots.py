@@ -3,7 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from util.utils import get_ori_data,output_dataset,get_splilt_method,get_feature_selection
+from util.utils import get_ori_data,output_dataset_static,get_splilt_method,get_feature_selection
 from util.features import get_joint_index,get_angle_pairs
 
 
@@ -156,18 +156,19 @@ def plot_ori_data(input_path,args):
 ###### verify dataset to be output by visualization ######
 ##########################################################
 
-def verification_dataset(ori_data_path,desired_dists,desized_angles,split_method_path):
+def verification_dataset(ori_data_paths,desired_dists,desized_angles,split_method_paths):
     """
     In order to verify dataset, x_data and y_data are necessary, as well as original skeleton data
     """
-    _,coords = get_ori_data(ori_data_path)
-    x_data,y_data = output_dataset(ori_data_path,desired_dists,desized_angles,split_method_path)
+    x_data,y_data = output_dataset_static(ori_data_paths,desired_dists,desized_angles,split_method_paths)
     skeletons_lst = []
-    split_method = get_splilt_method(split_method_path)
-    # e.g. split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
-    for _,config in split_method.items():
-        start,end,_ = list(i for _,i in config.items())
-        skeletons_lst.append(coords[start:end])
+    for split_path,data_path in zip(split_method_paths,ori_data_paths):
+        _,coords = get_ori_data(data_path)
+        split_method = get_splilt_method(split_path)
+        # e.g. static split_method = {'segmen1': {'start': 200, 'end': 3700, 'label': 1}}
+        for seg_name,config in split_method.items():
+            start,end,label = list(i for _,i in config.items())
+            skeletons_lst.append(coords[start:end])
     skeletons = np.concatenate(skeletons_lst,axis=0)
     del skeletons_lst
     return x_data,y_data,skeletons
@@ -228,7 +229,7 @@ def angles_equal_or_not(skeleton,angle_feature,desized_angles):
             print(f'angle_dataset={angle_dataset},angle_skeleton={angle_skeleton}')
     return np.all(np.array(angle_equal_lst))
 
-def verification(ori_data_path,feature_path,split_method_path,dataset_path=None):
+def verification(ori_data_paths,feature_path,split_method_paths,dataset_path=None):
     """
     verify whether output datasets have wrong calculated values, and whether the label is correct
     """
@@ -239,12 +240,12 @@ def verification(ori_data_path,feature_path,split_method_path,dataset_path=None)
             x_data = np.load(xf)
         with open(y_data_path, 'rb') as yf:
             y_data = np.load(yf)
-        _,_,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles,split_method_path)
+        _,_,skeletons = verification_dataset(ori_data_paths,desired_dists,desized_angles,split_method_paths)
         assert x_data.shape[1] == len(desired_dists) + len(desized_angles), 'Number of features of loaded dataset is different from verified features'
         print(f'Loaded x_data with shape {x_data.shape}')
         print(f'Loaded y_data with shape {y_data.shape}')
     else:
-        x_data,y_data,skeletons = verification_dataset(ori_data_path,desired_dists,desized_angles,split_method_path)
+        x_data,y_data,skeletons = verification_dataset(ori_data_paths,desired_dists,desized_angles,split_method_paths)
         print(f'Generated x_data with shape {x_data.shape}')
         print(f'Generated y_data with shape {y_data.shape}')
     # select random frames
