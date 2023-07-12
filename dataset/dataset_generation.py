@@ -47,10 +47,12 @@ if __name__ == '__main__':
 
         input_paths = ['dataset/dynamic1_20230706/unknown.NoHead.csv',
                        'dataset/dynamic2_20230706/unknown.NoHead.csv',
-                       'dataset/dynamic3_20230706/unknown.NoHead.csv']
+                       'dataset/dynamic3_20230706/unknown.NoHead.csv'
+                       ]
         split_method_paths = ['dataset/dynamic1_20230706/split_method.yaml',
                               'dataset/dynamic2_20230706/split_method.yaml',
-                              'dataset/dynamic3_20230706/split_method.yaml']
+                              'dataset/dynamic3_20230706/split_method.yaml'
+                              ]
         dists,angles = get_feature_selection(args.desired_features)
 
         output_dataset_dynamic(ori_data_paths=input_paths,
@@ -58,4 +60,4 @@ if __name__ == '__main__':
                                desized_angles=angles,
                                split_method_paths=split_method_paths,
                                output_path='dataset/dynamic_dataset',
-                               output_name='qqq')
+                               output_name='lalala')
