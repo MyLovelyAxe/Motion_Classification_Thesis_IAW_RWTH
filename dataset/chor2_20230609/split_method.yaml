@@ -1,20 +1,20 @@
-segmen1:
+HandNear1:
   start: 200
   end: 3700
   label: 1
-segmen2:
+HandAway1:
   start: 3900
   end: 7200
   label: 2
-segmen3:
+HandOverHead:
   start: 7400
   end: 10700
   label: 3
-segmen4:
+PhoneLH1:
   start: 10900
   end: 14400
   label: 4
-segmen5:
+PhoneRH1:
   start: 14600
   end: 18000
   label: 5

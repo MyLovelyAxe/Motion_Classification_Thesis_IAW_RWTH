@@ -72,6 +72,7 @@ class Classification():
             plt.ylabel(f'Prediction Probability [%]')
             plt.legend()
             plt.show()
+            print(f'type of P_pred: {type(self.P_pred)}')
             print(f'probability of predicted target: {self.P_pred}')
         print(f'true target: {self.y_test}')
         print(f'Accuracy = {np.sum(self.T_pred == self.y_test) / len(self.T_pred)}')
@@ -115,7 +116,10 @@ class RandomForest(Classification):
         self.random_forest.fit(self.x_train, self.y_train)
     def test(self):
         self.P_pred = self.random_forest.predict_proba(self.x_test)
+        maximums = np.max(self.P_pred,axis=1)
+        mask = np.where(maximums < 0.4, False, True)
         self.T_pred = self.random_forest.predict(self.x_test)
+        self.T_pred = np.multiply(self.T_pred,mask)
         
 class SVM(Classification):
     

@@ -10,54 +10,73 @@ current_dir = os.path.dirname(current_path)
 parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
 sys.path.insert(0, parent_dir)
 
-from util.utils import output_dataset_static,output_dataset_dynamic,get_feature_selection
-
-### change:
-#       --data_path
-#       --output_path
-#       --output_name
-#       --type
+from util.utils import get_feature_selection
+from util.utils import output_dataset
 
 parser = argparse.ArgumentParser(description='generate dataset for training')
-# parser.add_argument('--data_path', type=str, default='dataset/chor2_20230609')
-parser.add_argument('--data_path', type=str, default='dataset/testset_20230627')
-parser.add_argument('--output_path', type=str, default='dataset/testset_20230627')
-parser.add_argument('--output_name', type=str, default='UpperLowerBody')
-parser.add_argument('--type', type=str, default='dynamic',choices=['static','dynamic'])
-parser.add_argument('--desired_features', type=str, 
-                    default='dataset/desired_features.yaml', help='load features name from .yaml')
+
+################## Attention ######################
+## Please edit these arguments in order:
+##      1. --type
+##      2. corresponding data_path
+##      3. corresponding output_path
+## Both static and dynamic datasets can be multiple
+## and insert together
+###################################################
+
+
+parser.add_argument('--type',type=str,default='static',choices=['static','dynamic'])
+# static dataset
+parser.add_argument('--static_data_path',type=list,
+                    help='the list containing all static dataset to be merged',
+                    choices=['dataset/testset_20230627',
+                             'dataset/chor2_20230609'
+                             ],
+                    default=['dataset/testset_20230627',
+                             ])
+parser.add_argument('--static_output_path',type=str,default='dataset/testset_20230627')
+# dynamic dataset
+parser.add_argument('--dynamic_data_path',type=list,
+                    help='the list containing all dynamic dataset to be merged',
+                    choices=['dataset/dynamic1_20230706',
+                             'dataset/dynamic2_20230706',
+                             'dataset/dynamic3_20230706',
+                             ],
+                    default=['dataset/dynamic1_20230706',
+                             'dataset/dynamic2_20230706',
+                             'dataset/dynamic3_20230706',
+                             ])
+parser.add_argument('--dynamic_output_path',type=str,default='dataset/dynamic_dataset')
+# common parameters
+parser.add_argument('--output_name',type=str,default='UpperLowerBody')
+parser.add_argument('--desired_features',type=str, 
+                    default='dataset/desired_features.yaml',help='load features name from .yaml')
 args = parser.parse_args([])
 
 if __name__ == '__main__':
 
     if args.type == 'static':
 
-        input_paths = [os.path.join(args.data_path,'unknown.NoHead.csv')]
-        split_method_paths = [os.path.join(args.data_path,'split_method.yaml')]
+        input_paths = [os.path.join(data_path,'unknown.NoHead.csv') for data_path in args.static_data_path]
+        split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.static_data_path]
         dists,angles = get_feature_selection(args.desired_features)
 
-        output_dataset_static(ori_data_paths=input_paths,
-                              desired_dists=dists,
-                              desized_angles=angles,
-                              split_method_paths=split_method_paths,
-                              output_path=args.output_path,
-                              output_name=args.output_name)
+        output_dataset(ori_data_paths=input_paths,
+                       split_method_paths=split_method_paths,
+                       desired_dists=dists,
+                       desized_angles=angles,
+                       output_path=args.static_output_path,
+                       output_name=args.output_name)
         
     elif args.type == 'dynamic':
 
-        input_paths = ['dataset/dynamic1_20230706/unknown.NoHead.csv',
-                       'dataset/dynamic2_20230706/unknown.NoHead.csv',
-                       'dataset/dynamic3_20230706/unknown.NoHead.csv'
-                       ]
-        split_method_paths = ['dataset/dynamic1_20230706/split_method.yaml',
-                              'dataset/dynamic2_20230706/split_method.yaml',
-                              'dataset/dynamic3_20230706/split_method.yaml'
-                              ]
+        input_paths = [os.path.join(data_path,'unknown.NoHead.csv') for data_path in args.dynamic_data_path]
+        split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.dynamic_data_path]
         dists,angles = get_feature_selection(args.desired_features)
 
-        output_dataset_dynamic(ori_data_paths=input_paths,
-                               desired_dists=dists,
-                               desized_angles=angles,
-                               split_method_paths=split_method_paths,
-                               output_path='dataset/dynamic_dataset',
-                               output_name='lalala')
+        output_dataset(ori_data_paths=input_paths,
+                       desired_dists=dists,
+                       desized_angles=angles,
+                       split_method_paths=split_method_paths,
+                       output_path=args.dynamic_output_path,
+                       output_name=args.output_name)

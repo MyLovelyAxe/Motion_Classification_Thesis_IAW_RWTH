@@ -1,44 +1,44 @@
-segmen1:
+None1:
   start: 0
   end: 965
   label: 0
-segmen2:
+PhoneLH1:
   start: 965
   end: 2040
   label: 4
-segmen3:
+None2:
   start: 2040
   end: 2090
   label: 0
-segmen4:
+HandAway1:
   start: 2090
   end: 3450
   label: 2
-segmen5:
+None3:
   start: 3450
   end: 3495
   label: 0
-segmen6:
+HandNear1:
   start: 3495
   end: 5030
   label: 1
-segmen7:
+None4:
   start: 5030
   end: 5060
   label: 0
-segmen8:
+PhoneRH1:
   start: 5060
   end: 6210
   label: 5
-segmen9:
+None5:
   start: 6210
   end: 6280
   label: 0
-segmen10:
+HandOverHead:
   start: 6280
   end: 7685
   label: 3
-segmen11:
+None6:
   start: 7685
   end: 8500
   label: 0
