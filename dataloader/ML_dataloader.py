@@ -1,4 +1,5 @@
 import numpy as np
+from util.features import dynamic_features
 
 class StaticData():
 
@@ -77,9 +78,9 @@ class DynamicData():
         self.testset_path = testset_path
         self.load_data()
         self.create_windows()
-        # self.calc_statistic_features()
-        # self.create_trainset()
-        # self.create_testset()
+        self.calc_statistic_features()
+        self.create_trainset()
+        self.create_testset()
 
     def load_data(self):
         """
@@ -106,20 +107,17 @@ class DynamicData():
             original: [#frames,]
             with windows: [#win,]
         """
-        # self.x_data_win = np.zeros((self.num_frames,self.wl,self.num_ori_features))
         self.x_data_win_lst = []
         self.y_data_win_lst = []
-        values, start_index, counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
+        _,start_index,counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
         counts = counts[start_index.argsort()]
         start_index.sort()
-        # end_index = start_index + list(count-1 for count in counts)
         for start,count in zip(start_index,counts):
             for step in range(count-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl),:]
                 label = self.y_data_ori[int(start+step+self.wl/2)]
                 self.x_data_win_lst.append(np.expand_dims(window,axis=0))
                 self.y_data_win_lst.append(np.expand_dims(label,axis=0))
-                # self.y_data_win_lst.append(label)
         self.x_data_win = np.concatenate(self.x_data_win_lst,axis=0)
         self.y_data_win = np.concatenate(self.y_data_win_lst,axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
@@ -135,7 +133,7 @@ class DynamicData():
             with windows: [#win,]
             with statistic features: [#win,]
         """
-        self.x_data = self.x_data_win
+        self.x_data = dynamic_features(self.x_data_win)
         self.y_data = self.y_data_win
         del self.x_data_win,self.y_data_win
 
@@ -145,7 +143,9 @@ class DynamicData():
         self.choices_train = np.random.randint(self.x_data.shape[0], size = self.train_len)
         self.x_train = self.x_data[self.choices_train]
         self.y_train = self.y_data[self.choices_train]
-
+        print(f'x_train shape: {self.x_train.shape}')
+        print(f'y_train shape: {self.y_train.shape}')
+        print()
 
     def create_testset(self):
 

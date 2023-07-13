@@ -156,3 +156,16 @@ def get_all_features(coords,desired_dists,desized_angles):
     angle_feature = get_angle_feature(coords,desized_angles)
     all_features = np.concatenate((dist_feature, angle_feature), axis=1)
     return all_features
+
+#################################################################
+###### Dynamic features: statistic features inside windows ######
+#################################################################
+
+def dynamic_features(x_data):
+    """
+    input x_data should have shape: [#win,window_size,#features]
+    output x_data should have shape: [#win,#stat_features]
+    """
+    x_data = np.max(x_data,axis=1)
+    x_data = np.concatenate((x_data,x_data),axis=1)
+    return x_data
