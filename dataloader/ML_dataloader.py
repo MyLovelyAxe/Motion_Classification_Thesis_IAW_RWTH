@@ -77,9 +77,9 @@ class DynamicData():
         self.testset_path = testset_path
         self.load_data()
         self.create_windows()
-        self.calc_statistic_features()
-        self.create_trainset()
-        self.create_testset()
+        # self.calc_statistic_features()
+        # self.create_trainset()
+        # self.create_testset()
 
     def load_data(self):
         """
@@ -95,28 +95,45 @@ class DynamicData():
         print(f'loaded original x_data shape: {self.x_data_ori.shape}')
         print(f'loaded original y_data shape: {self.y_data_ori.shape}')
         print()
+        self.num_frames, self.num_ori_features = self.x_data_ori.shape
 
     def create_windows(self):
         """
         x_data shape:
             original: [#frames,#features]
-            with windows: [#frames,window_size,#features]
+            with windows: [#win,window_size,#features]
         y_data shape:
             original: [#frames,]
-            with windows: [#frames,]
+            with windows: [#win,]
         """
-        self.x_data_win = self.x_data_ori
-        self.y_data_win = self.y_data_ori
-        del self.x_data_ori,self.y_data_ori
+        # self.x_data_win = np.zeros((self.num_frames,self.wl,self.num_ori_features))
+        self.x_data_win_lst = []
+        self.y_data_win_lst = []
+        values, start_index, counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
+        counts = counts[start_index.argsort()]
+        start_index.sort()
+        # end_index = start_index + list(count-1 for count in counts)
+        for start,count in zip(start_index,counts):
+            for step in range(count-self.wl):
+                window = self.x_data_ori[(start+step):(start+step+self.wl),:]
+                label = self.y_data_ori[int(start+step+self.wl/2)]
+                self.x_data_win_lst.append(np.expand_dims(window,axis=0))
+                self.y_data_win_lst.append(np.expand_dims(label,axis=0))
+                # self.y_data_win_lst.append(label)
+        self.x_data_win = np.concatenate(self.x_data_win_lst,axis=0)
+        self.y_data_win = np.concatenate(self.y_data_win_lst,axis=0)
+        print(f'x_data with window has shape: {self.x_data_win.shape}')
+        print(f'y_data with window has shape: {self.y_data_win.shape}')
+        del self.x_data_win_lst,self.y_data_win_lst
 
     def calc_statistic_features(self):
         """
         x_data shape:
-            with windows: [#frames,window_size,#features]
-            with statistic features: [#frames,#stat_features]
+            with windows: [#win,window_size,#features]
+            with statistic features: [#win,#stat_features]
         y_data shape:
-            with windows: [#frames,]
-            with statistic features: [#frames,]
+            with windows: [#win,]
+            with statistic features: [#win,]
         """
         self.x_data = self.x_data_win
         self.y_data = self.y_data_win
