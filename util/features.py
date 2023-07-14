@@ -258,6 +258,4 @@ if __name__ == '__main__':
     FFT = fft(data,axis=1)
     print(f'FFT shape {FFT.shape}')
     print(f'FFT {FFT}')
-
-    data = np.array([1,1,2,2,2,2,2,2,3,4,4,4,4,5,5,5,5,5,6,3,3,3,2,2,2,2,4])
     
