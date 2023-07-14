@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.stats import skew
+from scipy.stats import kurtosis
 
 ########################################################
 ###### Feature: distances between random 2 joints ######
@@ -161,11 +163,101 @@ def get_all_features(coords,desired_dists,desized_angles):
 ###### Dynamic features: statistic features inside windows ######
 #################################################################
 
+def calc_Mean(data) -> np.array:
+    """
+    shape:
+        inpu: [#win,window_size,#features]
+        output: [#win,#features]
+    type:
+        mean of data along dimension of window
+    """
+    return np.mean(data,axis=1)
+
+def calc_Std(data) -> np.array:
+    """
+    shape:
+        inpu: [#win,window_size,#features]
+        output: [#win,#features]
+    type:
+        standard deviation of data along dimension of window
+    """
+    return np.std(data,axis=1)
+
+def calc_TopMean_Range(data,num=5) -> np.array:
+    """
+    shape:
+        inpu: [#win,window_size,#features]
+        output: [#win,#features]
+    type:
+        return mean of the num-highest maximum and mean of num-lowest minimum
+        and range between TopMaxMean and TopMinMean
+    """
+    assert num>1, 'calc_TopMaxMean(): num should be larger than 1'
+    # sort along dimension of window
+    sort_index = np.argsort(data, axis=1)
+    sorted_data = np.take_along_axis(data,sort_index,axis=1)
+    top_max = sorted_data[:,:num,:]
+    top_min = sorted_data[:,-num:,:]
+    # take mean of num-highest maximum and num-lowest minimum
+    top_max_mean = np.mean(top_max,axis=1)
+    top_min_mean = np.mean(top_min,axis=1)
+    # take range
+    max_min_range = top_max_mean - top_min_mean
+    # return concatenated array
+    return np.concatenate((top_max_mean,
+                           top_min_mean,
+                           max_min_range),axis=1)
+
+def calc_Kurtosis(data) -> np.array:
+    """
+    shape:
+        inpu: [#win,window_size,#features]
+        output: [#win,#features]
+    type:
+        the concept of kurtosis:
+        https://www.scribbr.com/statistics/kurtosis/#:~:text=Kurtosis%20is%20a%20measure%20of,(medium%20tails)%20are%20mesokurtic.
+    """
+    return kurtosis(data,axis=1)
+
+def calc_Skewness(data) -> np.array:
+    """
+    shape:
+        inpu: [#win,window_size,#features]
+        output: [#win,#features]
+    type:
+        the concept of skewness:
+        https://www.scribbr.com/statistics/skewness/
+    """
+    return skew(data,axis=1)
+
+def calc_FFT(data):
+    pass
+
 def dynamic_features(x_data):
     """
-    input x_data should have shape: [#win,window_size,#features]
-    output x_data should have shape: [#win,#stat_features]
+    shape:
+        input x_data should have shape: [#win,window_size,#features]
+        output x_data should have shape: [#win,#stat_features] = [#win,#features*#metrics]
+    type:
+        concatenation of different statistic features of features inside each window
     """
-    x_data = np.max(x_data,axis=1)
-    x_data = np.concatenate((x_data,x_data),axis=1)
-    return x_data
+    dynamic_statistics = np.concatenate((calc_Mean(x_data),
+                                         calc_Std(x_data),
+                                         calc_TopMean_Range(x_data),
+                                         calc_Kurtosis(x_data),
+                                         calc_Skewness(x_data),
+                                         ),axis=1)
+    return dynamic_statistics
+
+if __name__ == '__main__':
+
+    from scipy.fft import fft
+
+    data = np.arange(0,24,1).reshape(2,3,4)
+    print(f'data {data}')
+    FFT = fft(data,axis=1)
+    print(f'FFT shape {FFT.shape}')
+    print(f'FFT {FFT}')
+
+    data = np.array([1,1,2,2,2,2,2,2,3,4,4,4,4,5,5,5,5,5,6,3,3,3,2,2,2,2,4])
+    

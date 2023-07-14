@@ -80,7 +80,7 @@ class DynamicData():
         self.create_windows()
         self.calc_statistic_features()
         self.create_trainset()
-        self.create_testset()
+        self.create_testset()                                 
 
     def load_data(self):
         """
@@ -128,7 +128,7 @@ class DynamicData():
         """
         x_data shape:
             with windows: [#win,window_size,#features]
-            with statistic features: [#win,#stat_features]
+            with statistic features: [#win,#features*#metrics]
         y_data shape:
             with windows: [#win,]
             with statistic features: [#win,]
