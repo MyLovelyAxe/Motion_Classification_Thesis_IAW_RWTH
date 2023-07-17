@@ -251,11 +251,41 @@ def dynamic_features(x_data):
 
 if __name__ == '__main__':
 
-    from scipy.fft import fft
+    from scipy.fft import fft,fftfreq
+    import matplotlib.pyplot as plt
 
-    data = np.arange(0,24,1).reshape(2,3,4)
-    print(f'data {data}')
+    data = np.random.randint(0,24,40).reshape(2,5,4)
     FFT = fft(data,axis=1)
-    print(f'FFT shape {FFT.shape}')
-    print(f'FFT {FFT}')
-    
+    freq = fftfreq(data.shape[1])
+    freq_index = np.argsort(freq)
+    print(f'freq index shape: {freq_index.shape}')
+    # freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
+    # sorted_real_FFT = np.take_along_axis(FFT.real,freq_index,axis=1)
+    # sorted_imag_FFT = np.take_along_axis(FFT.imag,freq_index,axis=1)
+    # print(f'real sorted fft: {sorted_real_FFT}')
+    # print(f'imag sorted fft: {sorted_imag_FFT}')
+    freq.sort()
+    fig = plt.figure(figsize=(8,6))
+    ax1 = plt.subplot(1,1,1)
+    # ax2 = plt.subplot(1,3,2)
+    # ax3 = plt.subplot(1,3,3)
+    half_index = freq_index[len(freq)//2:]
+    half_freq = freq[len(freq)//2:]
+    for frame in range(data.shape[0]):
+        for feature in range(data.shape[-1]):
+            
+            ax1.plot(half_freq, FFT[frame,:,feature][half_index],label=f'frame{frame+1} feature{feature+1}')
+            # ax2.plot(freq, FFT.real[frame,:,feature][freq_index],label=f'real frame{frame+1} feature{feature+1}')
+            # ax3.plot(freq, FFT.imag[frame,:,feature][freq_index],label=f'imag frame{frame+1} feature{feature+1}')
+    ax1.set_title(f'fft')
+    ax1.set_xticks(half_freq,half_freq)
+    ax1.legend()
+
+    # ax2.set_xticks(freq,freq)
+    # ax2.set_title(f'real fft')
+    # ax2.legend()
+    # ax3.set_xticks(freq,freq)
+    # ax3.set_title(f'imag fft')
+    # ax3.legend()
+
+    plt.show()
