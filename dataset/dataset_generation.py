@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(description='generate dataset for training')
 ###################################################
 
 
-parser.add_argument('--type',type=str,default='static',choices=['static','dynamic'])
+parser.add_argument('--type',type=str,default='dynamic',choices=['static','dynamic'])
 # static dataset
 parser.add_argument('--static_data_path',type=list,
                     help='the list containing all static dataset to be merged',

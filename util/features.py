@@ -25,8 +25,6 @@ def calc_all_distances(coords):
     calculate all distance between random 2 joints for further slicing
     """
     # coords: [frames,xyz,num_joints] = [18000,3,26]
-    num_frame, num_joints = coords[:,0,:].shape
-    all_distances = np.zeros((num_frame,num_joints,num_joints))
     new_coords = np.expand_dims(coords, axis=-2) # shape [18000,3,26] -> [18000,3,1,26]
     # calculate dis_feature:
     #     diff = coords - transpose(coords,(0,1,3,2)):
@@ -36,7 +34,7 @@ def calc_all_distances(coords):
     #       meaning: (x-x.T)**2 + (y-y.T)**2 + (z-z.T)**2
     #       shape: [18000,3,26,26] -> [18000,26,26]
     all_distances = np.sqrt(np.sum((new_coords - np.transpose(new_coords,(0,1,3,2)))**2,axis=1))
-    all_distances = np.round(all_distances.astype(np.float64),decimals=5)
+    all_distances = np.round(all_distances.astype(np.float32),decimals=5)
     # e,g, dist_feature[3,1,4] means distance between LElbow and RElbow in 3rd frame
     return all_distances
 
@@ -131,10 +129,11 @@ def calc_angles(joints_lst,distances):
     cos_b = (c**2 + a**2 - b**2) / (2*c*a)
     # usually only when B slightly exceeds 180°, cos_b would be less than -1
     if cos_b < -1:
-        B = np.pi
+        B = np.float32(np.pi)
     else:
         B = np.arccos(cos_b) # radius = np.arccos(cos_value)
-    return np.round(B,decimals=5)
+    B = np.round(B.astype(np.float32),decimals=5)
+    return B
 
 def get_angle_feature(coords,desized_angles):
     """
