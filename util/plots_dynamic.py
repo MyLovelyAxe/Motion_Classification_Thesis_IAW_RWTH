@@ -222,19 +222,19 @@ def angles_equal_or_not(skeleton,angle_feature,desized_angles):
 
 def dynamic_plot_func(frame_id,plot_configs_lst):
     """
-    plot_configs consists of lists, each of which contains:
-        ax,coords_ori,high,low,title
+    plot_configs_lst consists of lists, each of list contains:
+        ax,coords,high,low,title
     """
     joints_dict = get_links_dict()
     for plot_configs in plot_configs_lst:
         ax,coords,high,low,title = plot_configs
         plot_func_3d(frame_id,ax,joints_dict,coords,high,low,title)
-    # plot_func_3d(frame_id,plot_configs['ax'],joints_dict,plot_configs['skeleton'],plot_configs['high'],plot_configs['low'],plot_configs['title'])
 
 def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,win_len=1):
     """
     verify whether output datasets have wrong calculated values, and whether the label is correct
     """
+    ### get data
     desired_dists,desized_angles = get_feature_selection(feature_path)
     if not npy_path is None:
         x_data_path, y_data_path = npy_path[0], npy_path[1]
@@ -256,12 +256,23 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
                                                  desized_angles)
         print(f'Trial x_data with shape {x_data.shape}')
         print(f'Trial y_data with shape {y_data.shape}')
-    # select random frames
-    # for static activities, win_len = 1 defaultly
+
+    ### select random frames
     choice_starts = np.random.randint(x_data.shape[0], size = 4)
-    choices_lst = list(range(start,start+win_len) for start in choice_starts)
+    _,start_index = np.unique(y_data,return_index=True)
+    choices_lst = []
+    for start in choice_starts:
+        # if distance between choice and start index of each activity
+        # is less than window, then a window doesn't cross broundries
+        if np.all(np.abs(start-start_index) > win_len):
+            choices_lst.append(range(start,start+win_len))
+        # if a window crosses 2 segments belonging to different activities
+        # then take the window in reserve direction
+        else:
+            choices_lst.append(range(start+win_len,start))
     print(f'These frames will be verified: {choices_lst}')
 
+    ### plot
     plot_configs_lst = []
     fig = plt.figure(figsize=(12,12))
     for idx,choices in enumerate(choices_lst):
@@ -277,7 +288,6 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
         high,low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
         title = f'label: {label}, dist: {dist_equal}, angles: {angles_equal} in frames {choices[0]}-{choices[-1]}'
         plot_configs_lst.append([ax,skeleton,high,low,title])
-    # fig.tight_layout()
     ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(plot_configs_lst,),interval=17)
     plt.show()
 
