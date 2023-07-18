@@ -220,15 +220,27 @@ def angles_equal_or_not(skeleton,angle_feature,desized_angles):
             print()
     return np.all(np.array(angle_equal_lst))
 
-def dynamic_plot_func(frame_id,plot_configs_lst):
+def dynamic_plot_func(frame_id,anim_configs_lst,fft_configs_lst):
     """
     plot_configs_lst consists of lists, each of list contains:
         ax,coords,high,low,title
     """
     joints_dict = get_links_dict()
-    for plot_configs in plot_configs_lst:
+    for plot_configs in anim_configs_lst:
         ax,coords,high,low,title = plot_configs
         plot_func_3d(frame_id,ax,joints_dict,coords,high,low,title)
+
+def crossLine(start,start_index,end_index,win_len):
+    # add end_index into start_index
+    end_index = np.expand_dims(end_index,axis=0)
+    start_index = np.concatenate((start_index,end_index),axis=0)
+    # get distances between start and each start index
+    dist = start_index - start
+    # find the smallest positive distance, which is closest to start and on the right
+    closest_dist = dist[dist>0][0]
+    # check whether it is larger than window length, i.e. whether current window crosses line
+    cross = False if closest_dist >= win_len else True
+    return cross
 
 def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,win_len=1):
     """
@@ -260,20 +272,22 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
     ### select random frames
     choice_starts = np.random.randint(x_data.shape[0], size = 4)
     _,start_index = np.unique(y_data,return_index=True)
+    print(f'start_index here: {start_index}')
     choices_lst = []
     for start in choice_starts:
         # if distance between choice and start index of each activity
         # is less than window, then a window doesn't cross broundries
-        if np.all(np.abs(start-start_index) > win_len):
+        if not crossLine(start,start_index,len(y_data),win_len):
             choices_lst.append(range(start,start+win_len))
         # if a window crosses 2 segments belonging to different activities
         # then take the window in reserve direction
         else:
-            choices_lst.append(range(start+win_len,start))
+            choices_lst.append(range(start-win_len,start))
     print(f'These frames will be verified: {choices_lst}')
 
     ### plot
-    plot_configs_lst = []
+    anim_configs_lst = []
+    fft_configs_lst = []
     fig = plt.figure(figsize=(12,12))
     for idx,choices in enumerate(choices_lst):
         feature = x_data[choices]
@@ -282,13 +296,16 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
         # verify whether distances and angles are the same with dataset
         dist_equal = dist_equal_or_not(skeleton,feature[:,:len(desired_dists)],desired_dists)
         angles_equal = angles_equal_or_not(skeleton,feature[:,len(desired_dists):],desized_angles)
-        # plots
+        # plot animation of skeleton
         ax = fig.add_subplot(2, 2, idx+1, projection='3d')
         ax.view_init(30, 150)
         high,low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
         title = f'label: {label}, dist: {dist_equal}, angles: {angles_equal} in frames {choices[0]}-{choices[-1]}'
-        plot_configs_lst.append([ax,skeleton,high,low,title])
-    ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(plot_configs_lst,),interval=17)
+        anim_configs_lst.append([ax,skeleton,high,low,title])
+        # plot fft
+        whatever = 0
+        fft_configs_lst.append(whatever)
+    ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,fft_configs_lst),interval=17)
     plt.show()
 
 if __name__ == '__main__':

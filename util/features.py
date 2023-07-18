@@ -243,7 +243,10 @@ def calc_FFT(data):
     freq.sort()
     half_freq = freq[len(freq)//2:]
     half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
-    return 
+    return half_freq,half_sorted_real_FFT
+
+def select_FFT(Freq,FFT):
+    pass
 
 def dynamic_features(x_data):
     """
