@@ -4,8 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from util.utils import get_ori_data,output_dataset,get_feature_selection
-from util.features import get_joint_index,get_angle_pairs
-
+from util.features import get_joint_index,get_angle_pairs,calc_FFT
 
 def calc_dist_plot(coords,links_idx):
     """
@@ -171,7 +170,6 @@ def dist_equal_or_not(skeleton,dist_feature,desired_dists):
     check whether all distances in samples are equal
     """
     joint_index_dict = get_joint_index()
-    dist_equal_lst = []
     for idx,desired_dist in enumerate(desired_dists):
         dist_dataset = dist_feature[:,idx]
         joint1,joint2 = desired_dist.split('_')
@@ -179,13 +177,11 @@ def dist_equal_or_not(skeleton,dist_feature,desired_dists):
         joint_2_idx = joint_index_dict[joint2]
         dist_skeleton = calc_dist_verify(skeleton,joint_1_idx,joint_2_idx)
         all_equal = np.all(np.equal(dist_dataset,dist_skeleton))
-        dist_equal_lst.append(all_equal)
         if not all_equal:
             NoEqual_index = np.argwhere(dist_dataset != dist_skeleton)
             print(f'{NoEqual_index}th frame of feature: {desired_dist} in this window has difference:')
             print(f'dist_dataset={dist_dataset[NoEqual_index]}, dist_skeleton={dist_skeleton[NoEqual_index]}')
             print()
-    return np.all(np.array(dist_equal_lst))
 
 def calc_angle_verify(skeleton,joints_lst):
     """
@@ -207,28 +203,25 @@ def angles_equal_or_not(skeleton,angle_feature,desized_angles):
     check whether all calculated angles are correct
     """
     angle_pairs_dict = get_angle_pairs(desized_angles)
-    angle_equal_lst = []
     for idx, (angle_name,joints_lst) in enumerate(angle_pairs_dict.items()):
         angle_dataset = angle_feature[:,idx]
         angle_skeleton = calc_angle_verify(skeleton,joints_lst)
         all_equal = np.all(np.equal(angle_dataset,angle_skeleton))
-        angle_equal_lst.append(all_equal)
         if not all_equal:
             NoEqual_index = np.argwhere(angle_dataset != angle_skeleton)
             print(f'{NoEqual_index}th frame of feature: {angle_name} in this window has difference:')
             print(f'dist_dataset={angle_dataset[NoEqual_index]}, dist_skeleton={angle_skeleton[NoEqual_index]}')
             print()
-    return np.all(np.array(angle_equal_lst))
 
-def dynamic_plot_func(frame_id,anim_configs_lst,fft_configs_lst):
+def dynamic_plot_func(frame_id,anim_configs_lst):
     """
     plot_configs_lst consists of lists, each of list contains:
         ax,coords,high,low,title
     """
     joints_dict = get_links_dict()
-    for plot_configs in anim_configs_lst:
-        ax,coords,high,low,title = plot_configs
-        plot_func_3d(frame_id,ax,joints_dict,coords,high,low,title)
+    for anim_configs in anim_configs_lst:
+        ax1,coords,high,low,title = anim_configs
+        plot_func_3d(frame_id,ax1,joints_dict,coords,high,low,title)
 
 def crossLine(start,start_index,end_index,win_len):
     # add end_index into start_index
@@ -287,25 +280,29 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
 
     ### plot
     anim_configs_lst = []
-    fft_configs_lst = []
-    fig = plt.figure(figsize=(12,12))
+    fig = plt.figure(figsize=(24,12))
     for idx,choices in enumerate(choices_lst):
         feature = x_data[choices]
         label = y_data[choices[len(choices)//2]]
         skeleton = skeletons[choices]
         # verify whether distances and angles are the same with dataset
-        dist_equal = dist_equal_or_not(skeleton,feature[:,:len(desired_dists)],desired_dists)
-        angles_equal = angles_equal_or_not(skeleton,feature[:,len(desired_dists):],desized_angles)
+        dist_equal_or_not(skeleton,feature[:,:len(desired_dists)],desired_dists)
+        angles_equal_or_not(skeleton,feature[:,len(desired_dists):],desized_angles)
         # plot animation of skeleton
-        ax = fig.add_subplot(2, 2, idx+1, projection='3d')
+        ax = fig.add_subplot(2, 2*2, 2*idx+1, projection='3d')
         ax.view_init(30, 150)
         high,low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
-        title = f'label: {label}, dist: {dist_equal}, angles: {angles_equal} in frames {choices[0]}-{choices[-1]}'
+        title = f'label: {label} in frames {choices[0]}-{choices[-1]}'
         anim_configs_lst.append([ax,skeleton,high,low,title])
         # plot fft
-        whatever = 0
-        fft_configs_lst.append(whatever)
-    ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,fft_configs_lst),interval=17)
+        ax_fft = fig.add_subplot(2, 2*2, 2*idx+2)
+        Freq,FFT = calc_FFT(np.expand_dims(feature,axis=0))
+        for window in range(FFT.shape[0]):
+            for feature in range(FFT.shape[-1]):
+                ax_fft.plot(Freq, FFT[window,:,feature],label=f'feature{feature+1}')
+        ax_fft.set_title(f'fft real')
+        ax_fft.set_xticks(Freq,Freq)
+    ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,),interval=17)
     plt.show()
 
 if __name__ == '__main__':

@@ -1,6 +1,8 @@
-import numpy as np
 from scipy.stats import skew
 from scipy.stats import kurtosis
+from scipy.fft import fft,fftfreq
+import numpy as np
+import matplotlib.pyplot as plt
 
 ########################################################
 ###### Feature: distances between random 2 joints ######
@@ -229,13 +231,15 @@ def calc_Skewness(data) -> np.array:
     """
     return skew(data,axis=1)
 
+############################ TODO: if we need more features ######################
+
 def calc_FFT(data):
     """
     calculate the fft of each window
     only return the real part and the half with positive frequencies
     """
     FFT = fft(data,axis=1)
-    freq = fftfreq(n=data.shape[1],d=1/800)
+    freq = fftfreq(n=data.shape[1],d=1/200)
     freq_index = np.argsort(freq)
     print(f'freq index shape: {freq_index.shape}')
     freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
@@ -245,8 +249,10 @@ def calc_FFT(data):
     half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
     return half_freq,half_sorted_real_FFT
 
-def select_FFT(Freq,FFT):
-    pass
+# def select_FFT(Freq,FFT):
+#     pass
+
+##################################################################################
 
 def dynamic_features(x_data):
     """
@@ -258,16 +264,13 @@ def dynamic_features(x_data):
     """
     dynamic_statistics = np.concatenate((calc_Mean(x_data),
                                          calc_Std(x_data),
-                                         calc_TopMean_Range(x_data),
+                                         calc_TopMean_Range(x_data,num=30),
                                          calc_Kurtosis(x_data),
                                          calc_Skewness(x_data),
                                          ),axis=1)
     return dynamic_statistics
 
 if __name__ == '__main__':
-
-    from scipy.fft import fft,fftfreq
-    import matplotlib.pyplot as plt
 
     data = np.random.randint(0,24,160).reshape(2,20,4)
     FFT = fft(data,axis=1)
@@ -282,11 +285,10 @@ if __name__ == '__main__':
     # plot
     fig = plt.figure(figsize=(8,6))
     ax1 = plt.subplot(1,1,1)
-    for frame in range(data.shape[0]):
+    for window in range(data.shape[0]):
         for feature in range(data.shape[-1]):
-            ax1.plot(half_freq, half_sorted_real_FFT[frame,:,feature],label=f'real frame{frame+1} feature{feature+1}')
+            ax1.plot(half_freq, half_sorted_real_FFT[window,:,feature],label=f'real window{window+1} feature{feature+1}')
     ax1.set_title(f'fft real')
     ax1.set_xticks(half_freq,half_freq)
     ax1.legend()
-
     plt.show()

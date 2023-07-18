@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
         input_paths = os.path.join(args.single_data_path,'unknown.NoHead.csv')
         split_method_paths = os.path.join(args.single_data_path,'split_method.yaml')
-        verification([input_paths],args.desired_features_trial,[split_method_paths],win_len=21)
+        verification([input_paths],args.desired_features_trial,[split_method_paths],win_len=51)
         # verification([input_paths],args.desired_features_trial,[split_method_paths])
 
     if args.function == 'verify_npy':
