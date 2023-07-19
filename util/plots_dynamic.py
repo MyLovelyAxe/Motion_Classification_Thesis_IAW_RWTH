@@ -251,7 +251,7 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
                                        split_method_paths,
                                        desired_dists,
                                        desired_angles)
-        assert x_data.shape[1] == len(desired_dists) + len(desired_angles), 'Number of features of loaded dataset is different from verified features'
+        assert x_data.shape[1] == 2*(len(desired_dists) + len(desired_angles)), 'Number of features of loaded dataset is different from verified features'
         print(f'Loaded x_data with shape {x_data.shape}')
         print(f'Loaded y_data with shape {y_data.shape}')
     else:

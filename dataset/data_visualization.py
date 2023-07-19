@@ -13,11 +13,18 @@ sys.path.insert(0, parent_dir)
 from util.plots_dynamic import plot_ori_data,verification
 # from util.plots import plot_ori_data,verification
 
-################## Attention ######################
+############################# Attention ###########################
+##
 ## Please edit these arguments in order:
-##      1. --function
-##      2. corresponding other arguments
-###################################################
+##
+##      1. if --function is check_ori_data or verify_before_output
+##              edit --single_data_path
+##
+##      2. if --function is verify_npy
+##              edit --source_data_path
+##              edit --npy_root
+##
+###################################################################
 
 
 ####################################
@@ -27,7 +34,7 @@ from util.plots_dynamic import plot_ori_data,verification
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='verify_before_output',
+                    default='verify_npy',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
@@ -39,7 +46,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/dynamic3_20230706',
+                    default='dataset/testset_20230627',
                     help='one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
@@ -60,8 +67,7 @@ parser.add_argument('--desired_features_trial', type=str,
 parser.add_argument('--source_data_path', type=str,
                     default=['dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706'
-                             ],
+                             'dataset/dynamic3_20230706'],
                     help='original source of generated dataset for function verify_npy',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
@@ -94,4 +100,4 @@ if __name__ == '__main__':
         input_paths = [os.path.join(data_path,'unknown.NoHead.csv') for data_path in args.source_data_path]
         split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.source_data_path]
         npy_paths = [os.path.join(args.npy_root,'x_data_UpperLowerBody.npy'),os.path.join(args.npy_root,'y_data_UpperLowerBody.npy')]
-        verification(input_paths,args.desired_features,split_method_paths,npy_path=npy_paths,win_len=11)
+        verification(input_paths,args.desired_features,split_method_paths,npy_path=npy_paths,win_len=51)

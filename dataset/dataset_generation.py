@@ -15,14 +15,23 @@ from util.utils import output_dataset
 
 parser = argparse.ArgumentParser(description='generate dataset for training')
 
-################## Attention ######################
+################# Attention #################
+##
 ## Please edit these arguments in order:
-##      1. --type
-##      2. corresponding data_path
-##      3. corresponding output_path
-## Both static and dynamic datasets can be multiple
-## and insert together
-###################################################
+##
+##      1. if --type is 'static'
+##          edit --static_data_path
+##          edit --static_output_path
+##
+##      2. if --type is 'dynamic'
+##          edit --static_data_path
+##          edit --static_output_path
+##
+## Attention:
+##
+##      Both static and dynamic datasets can
+##      be multiple and insert together
+#############################################
 
 
 parser.add_argument('--type',type=str,default='dynamic',choices=['static','dynamic'])
