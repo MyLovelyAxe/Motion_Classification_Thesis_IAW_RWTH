@@ -64,7 +64,7 @@ if __name__ == '__main__':
         output_dataset(ori_data_paths=input_paths,
                        split_method_paths=split_method_paths,
                        desired_dists=dists,
-                       desized_angles=angles,
+                       desired_angles=angles,
                        output_path=args.static_output_path,
                        output_name=args.output_name)
         
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
         output_dataset(ori_data_paths=input_paths,
                        desired_dists=dists,
-                       desized_angles=angles,
+                       desired_angles=angles,
                        split_method_paths=split_method_paths,
                        output_path=args.dynamic_output_path,
                        output_name=args.output_name)

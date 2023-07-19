@@ -7,7 +7,7 @@ desired_dists:
   - RWrist_head
   - RElbow_head
   - RShoulder_head
-desized_angles:
+desired_angles:
   - LHandEnd_LWrist_LElbow
   - LWrist_LElbow_LShoulder
   - LElbow_LShoulder_LClavicle

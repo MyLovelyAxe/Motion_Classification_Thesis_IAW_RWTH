@@ -29,7 +29,7 @@ desired_dists:
   - RAnkle_spine1
   - RKnee_spine1
   - RHip_spine1
-desized_angles:
+desired_angles:
   - LHandEnd_LWrist_LElbow
   - LWrist_LElbow_LShoulder
   - LElbow_LShoulder_LClavicle

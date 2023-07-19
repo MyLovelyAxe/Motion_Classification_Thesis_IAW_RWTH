@@ -41,7 +41,7 @@ def get_feature_selection(yaml_path):
     with open(yaml_path, "r") as file:
         features = yaml.safe_load(file)
     dists = features['desired_dists']
-    angles = features['desized_angles']
+    angles = features['desired_angles']
     return dists,angles
 
 def get_splilt_method(yaml_path,show=False):
@@ -54,14 +54,14 @@ def get_splilt_method(yaml_path,show=False):
 def output_dataset(ori_data_paths,
                    split_method_paths,
                    desired_dists,
-                   desized_angles,
+                   desired_angles,
                    output_path=None,
                    output_name='UpperBody'):
     out_dict = {}
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
         _,coords = get_ori_data(data_path)
         split_method = get_splilt_method(split_path)
-        all_features = get_all_features(coords,desired_dists,desized_angles)
+        all_features = get_all_features(coords,desired_dists,desired_angles)
         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
         for act_name,config in split_method.items():
             start,end,label = list(i for _,i in config.items())

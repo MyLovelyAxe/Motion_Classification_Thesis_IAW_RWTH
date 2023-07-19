@@ -198,11 +198,11 @@ def calc_angle_verify(skeleton,joints_lst):
     B = np.arccos(cos_b) # radius = np.arccos(cos_value)
     return np.around(B,decimals=5)
 
-def angles_equal_or_not(skeleton,angle_feature,desized_angles):
+def angles_equal_or_not(skeleton,angle_feature,desired_angles):
     """
     check whether all calculated angles are correct
     """
-    angle_pairs_dict = get_angle_pairs(desized_angles)
+    angle_pairs_dict = get_angle_pairs(desired_angles)
     for idx, (angle_name,joints_lst) in enumerate(angle_pairs_dict.items()):
         angle_dataset = angle_feature[:,idx]
         angle_skeleton = calc_angle_verify(skeleton,joints_lst)
@@ -240,7 +240,7 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
     verify whether output datasets have wrong calculated values, and whether the label is correct
     """
     ### get data
-    desired_dists,desized_angles = get_feature_selection(feature_path)
+    desired_dists,desired_angles = get_feature_selection(feature_path)
     if not npy_path is None:
         x_data_path, y_data_path = npy_path[0], npy_path[1]
         with open(x_data_path, 'rb') as xf:
@@ -250,15 +250,15 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
         _,_,skeletons = output_dataset(ori_data_paths,
                                        split_method_paths,
                                        desired_dists,
-                                       desized_angles)
-        assert x_data.shape[1] == len(desired_dists) + len(desized_angles), 'Number of features of loaded dataset is different from verified features'
+                                       desired_angles)
+        assert x_data.shape[1] == len(desired_dists) + len(desired_angles), 'Number of features of loaded dataset is different from verified features'
         print(f'Loaded x_data with shape {x_data.shape}')
         print(f'Loaded y_data with shape {y_data.shape}')
     else:
         x_data,y_data,skeletons = output_dataset(ori_data_paths,
                                                  split_method_paths,
                                                  desired_dists,
-                                                 desized_angles)
+                                                 desired_angles)
         print(f'Trial x_data with shape {x_data.shape}')
         print(f'Trial y_data with shape {y_data.shape}')
 
@@ -287,7 +287,7 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
         skeleton = skeletons[choices]
         # verify whether distances and angles are the same with dataset
         dist_equal_or_not(skeleton,feature[:,:len(desired_dists)],desired_dists)
-        angles_equal_or_not(skeleton,feature[:,2*len(desired_dists):2*len(desired_dists)+len(desized_angles)],desized_angles)
+        angles_equal_or_not(skeleton,feature[:,2*len(desired_dists):2*len(desired_dists)+len(desired_angles)],desired_angles)
         # plot animation of skeleton
         ax = fig.add_subplot(2, 2*2, 2*idx+1, projection='3d')
         ax.view_init(30, 150)

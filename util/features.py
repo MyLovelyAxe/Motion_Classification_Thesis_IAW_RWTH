@@ -78,7 +78,7 @@ def get_dist_feature(coords,desired_dists):
 ###### Feature: angles between adjacent links ######
 ####################################################
 
-def get_angle_pairs(desized_angles):
+def get_angle_pairs(desired_angles):
     """
     get index of corresponding index of joints based on desired angles
     """
@@ -112,7 +112,7 @@ def get_angle_pairs(desized_angles):
                         'spine3_spine4_spine5':[22,23,24],
                         'spine4_spine5_head':[23,24,25]
                        }
-    for desired_angle in desized_angles:
+    for desired_angle in desired_angles:
         if not all_angle_pairs_dict.get(desired_angle) is None:
             angle_pairs_dict[desired_angle] = all_angle_pairs_dict[desired_angle]
     return angle_pairs_dict
@@ -137,12 +137,12 @@ def calc_angles(joints_lst,distances):
     B = np.round(B.astype(np.float32),decimals=5)
     return B
 
-def get_angle_feature(coords,desized_angles):
+def get_angle_feature(coords,desired_angles):
     """
     get desired angle features
     """
     all_distances = calc_all_distances(coords)
-    angle_pairs_dict = get_angle_pairs(desized_angles)
+    angle_pairs_dict = get_angle_pairs(desired_angles)
     num_frames = all_distances.shape[0]
     num_angles = len(angle_pairs_dict)
     angle_feature = np.zeros((num_frames,num_angles))
@@ -158,16 +158,16 @@ def calc_ChangeRatio(features):
     diff = np.concatenate((first_diff,diff),axis=0) # diff: [#frame,#feature]
     frame_ratio = 1/60
     change_ratio = diff / frame_ratio # change_ratio: [#frame,#feature]
-    
+
     return change_ratio
 
-def get_all_features(coords,desired_dists,desized_angles):
+def get_all_features(coords,desired_dists,desired_angles):
     """
     concatenate all features
     """
     dist_feature = get_dist_feature(coords,desired_dists) # dist_feature: [#frames,#desired_dist]
     dist_ratio = calc_ChangeRatio(dist_feature) # dist_ratio with same shape of dist_feature
-    angle_feature = get_angle_feature(coords,desized_angles) # angle_feature: [#frames,#desired_angle]
+    angle_feature = get_angle_feature(coords,desired_angles) # angle_feature: [#frames,#desired_angle]
     angle_ratio = calc_ChangeRatio(angle_feature) # angle_ratio with same shape of angle_feature
 
     all_features = np.concatenate((dist_feature,
