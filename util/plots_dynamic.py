@@ -287,7 +287,7 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
         skeleton = skeletons[choices]
         # verify whether distances and angles are the same with dataset
         dist_equal_or_not(skeleton,feature[:,:len(desired_dists)],desired_dists)
-        angles_equal_or_not(skeleton,feature[:,len(desired_dists):],desized_angles)
+        angles_equal_or_not(skeleton,feature[:,2*len(desired_dists):2*len(desired_dists)+len(desized_angles)],desized_angles)
         # plot animation of skeleton
         ax = fig.add_subplot(2, 2*2, 2*idx+1, projection='3d')
         ax.view_init(30, 150)

@@ -151,13 +151,29 @@ def get_angle_feature(coords,desized_angles):
             angle_feature[frame,angle_idx] = calc_angles(joints_lst,distances)
     return angle_feature
 
+def calc_ChangeRatio(features):
+
+    diff = features[1:,:] - features[:-1,:] # diff: [#frame-1,#feature]
+    first_diff = np.expand_dims(diff[0],axis=0) # first_diff: [1,#feature]
+    diff = np.concatenate((first_diff,diff),axis=0) # diff: [#frame,#feature]
+    frame_ratio = 1/60
+    change_ratio = diff / frame_ratio # change_ratio: [#frame,#feature]
+    
+    return change_ratio
+
 def get_all_features(coords,desired_dists,desized_angles):
     """
     concatenate all features
     """
-    dist_feature = get_dist_feature(coords,desired_dists)
-    angle_feature = get_angle_feature(coords,desized_angles)
-    all_features = np.concatenate((dist_feature, angle_feature), axis=1)
+    dist_feature = get_dist_feature(coords,desired_dists) # dist_feature: [#frames,#desired_dist]
+    dist_ratio = calc_ChangeRatio(dist_feature) # dist_ratio with same shape of dist_feature
+    angle_feature = get_angle_feature(coords,desized_angles) # angle_feature: [#frames,#desired_angle]
+    angle_ratio = calc_ChangeRatio(angle_feature) # angle_ratio with same shape of angle_feature
+
+    all_features = np.concatenate((dist_feature,
+                                   dist_ratio,
+                                   angle_feature,
+                                   angle_ratio), axis=1)
     return all_features
 
 #################################################################

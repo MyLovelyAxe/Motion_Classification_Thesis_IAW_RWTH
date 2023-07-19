@@ -60,8 +60,8 @@ def output_dataset(ori_data_paths,
     out_dict = {}
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
         _,coords = get_ori_data(data_path)
-        all_features = get_all_features(coords,desired_dists,desized_angles)
         split_method = get_splilt_method(split_path)
+        all_features = get_all_features(coords,desired_dists,desized_angles)
         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
         for act_name,config in split_method.items():
             start,end,label = list(i for _,i in config.items())
