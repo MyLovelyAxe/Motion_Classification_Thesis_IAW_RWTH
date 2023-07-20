@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features
+from util.features import dynamic_features,get_feature_index
 
 class StaticData():
 
@@ -149,28 +149,33 @@ class DynamicData():
     def plot_window_features(self,
                              which_activity:list,
                              win_range:list,
-                             feature_idx:list,
-                             metric_idx:list):
+                             which_feature:list,
+                             which_metric:list):
         """
-            which_activity: [act_label_1,act_label_2,...]
-                a list containing the label of which activities to plot
+            which_activity: [act_name_1,act_name_2,...]
+                a list containing the name of which activities to plot
             win_range: [start_idx,end_idx]
                 a list containing the desired range to plot, i.e. from which window to which window
                 ps: the range is the index inside each activity, i.e. relatice range, not absolute range
                 e.g. which_activity=3, win_range=[0,200] means plot from 0th to 200th window of act_3
                      which_activity=6, win_range=[0,200] means plot from 0th to 200th window of act_6
-            feature_idx: [f_idx_1,f_idx2,...]
-                a list containing indices of desired features to plot
-            metric_idx: [m_idx_1,m_idx_2,...]
-                a list containing indices of desired metrics (e.g. mean, std) to plot
+            which_feature: [f_idx_1,f_idx2,...]
+                a list containing names of desired features to plot
+            which_metric: [m_idx_1,m_idx_2,...]
+                a list containing names of desired metrics (e.g. mean, std) to plot
         """
+        ### prepare
+        feature_lst = get_feature_index(which_feature)
+        ### localization
         values,starts,counts = np.unique(self.y_data, return_counts=True, return_index=True)
         print(f'values: {values}')
         print(f'starts: {starts}')
         print(f'counts: {counts}')
+        ### get shapes
         self.num_win = win_range[0] - win_range[1]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
         print(f'{self.num_win} windows will be checked, in each window there are {self.num_features} features, each feature has {self.num_metrics} metrics')
+        ### plot
         fig = plt.figure(figsize=(8,6))
         ax = plt.subplot(1,1,1)
         for act in which_activity:
@@ -188,8 +193,8 @@ class DynamicData():
             desired_windows = desired_windows.reshape(self.num_win,self.num_metrics,self.num_features)
             print(f'Reshaped batch have shape: {desired_windows.shape}')
             # 5. plot static plot
-            for i in metric_idx:
-                for j in feature_idx:
+            for i in which_metric:
+                for j in feature_lst:
                     ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,i,j],label=f'Act{act}-F{j}-M{i}')
         ax.legend()
         ax.set_xlabel('num_window')

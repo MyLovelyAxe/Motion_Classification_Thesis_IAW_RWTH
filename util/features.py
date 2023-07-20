@@ -1,8 +1,9 @@
+import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats import skew
 from scipy.stats import kurtosis
 from scipy.fft import fft,fftfreq
-import numpy as np
-import matplotlib.pyplot as plt
+import yaml
 
 ########################################################
 ###### Feature: distances between random 2 joints ######
@@ -286,7 +287,46 @@ def dynamic_features(x_data):
                                          ),axis=1)
     return dynamic_statistics
 
+def get_activity_index():
+    pass
+
+def get_feature_index(which_feature):
+    feature_lst = []
+    feature_index_dict = get_feature_index_dict()
+    print(feature_index_dict)
+    for f in which_feature:
+        feature_lst.append(feature_index_dict[f])
+    return feature_lst
+
+def get_feature_index_dict():
+    feature_yaml_path = 'dataset/desired_features.yaml'
+    print(f'{feature_yaml_path}')
+    with open(feature_yaml_path, "r") as file:
+        features = yaml.safe_load(file)
+    dists = features['desired_dists']
+    angles = features['desired_angles']
+    feature_index_dict = {}
+    idx = 0
+    for dist_name in dists:
+        feature_index_dict[f'dist_{dist_name}']=idx
+        idx += 1
+    for dist_name in dists:
+        feature_index_dict[f'dist_ratio_{dist_name}']=idx
+        idx += 1
+    for angle_name in angles:
+        feature_index_dict[f'dist_{angle_name}']=idx
+        idx += 1
+    for angle_name in angles:
+        feature_index_dict[f'dist_ratio_{angle_name}']=idx
+        idx += 1
+    return feature_index_dict
+
+def get_metric_index():
+    pass
+
 if __name__ == '__main__':
+
+    print(yaml.__version__)
 
     data = np.random.randint(0,24,160).reshape(2,20,4)
     FFT = fft(data,axis=1)
