@@ -113,10 +113,10 @@ class DynamicData():
         """
         self.x_data_win_lst = []
         self.y_data_win_lst = []
-        _,self.start_index,self.counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
-        self.counts = self.counts[self.start_index.argsort()]
-        self.start_index.sort()
-        for start,count in zip(self.start_index,self.counts):
+        _,start_index,counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
+        counts = counts[start_index.argsort()]
+        start_index.sort()
+        for start,count in zip(start_index,counts):
             for step in range(count-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl),:]
                 label = self.y_data_ori[int(start+step+self.wl/2)]
@@ -126,7 +126,8 @@ class DynamicData():
         self.y_data_win = np.concatenate(self.y_data_win_lst,axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
-        del self.x_data_win_lst,self.y_data_win_lst,self.x_data_ori,self.y_data_ori
+        print()
+        del self.x_data_win_lst,self.y_data_win_lst,self.x_data_ori,self.y_data_ori,start_index,counts
 
     def calc_statistic_features(self):
         """
@@ -141,6 +142,7 @@ class DynamicData():
         self.y_data = self.y_data_win
         print(f'x_data with window features has shape: {self.x_data.shape}')
         print(f'y_data with window features has shape: {self.y_data.shape}')
+        print()
         if not self.trial:
             del self.x_data_win,self.y_data_win
 
@@ -162,21 +164,26 @@ class DynamicData():
             metric_idx: [m_idx_1,m_idx_2,...]
                 a list containing indices of desired metrics (e.g. mean, std) to plot
         """
-        print(f'start index: {self.start_index}')
+        values,starts,counts = np.unique(self.y_data, return_counts=True, return_index=True)
+        print(f'values: {values}')
+        print(f'starts: {starts}')
+        print(f'counts: {counts}')
         fig = plt.figure(figsize=(8,6))
         ax = plt.subplot(1,1,1)
         for act in which_activity:
-            # 1. where is first index of this act in self.y_data:
-            first_idx = np.where(self.y_data==act)[0][0]
+            # 1. where is beginning index of this act in self.y_data, based on 'values':
+            label_idx = np.where(values==act)[0][0]
+            print(f'act: {act}, label_idx: {label_idx}')
             # 2. check if the given win_range exceeds the upper limit of this act's range
-            count = 0
-            assert win_range[1]<=count, f'the desired window_range exceeds upper limit of act {act}'
+            print(f'upper limit of this act: {counts[label_idx]}')
+            assert win_range[1]<=counts[label_idx], f'the desired window_range exceeds upper limit of act {act}'
             # 3. select te segment of windows to plot
-            desired_windows = self.x_data[first_idx+win_range[0]:first_idx+win_range[1],:]
+            print(f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
+            desired_windows = self.x_data[starts[label_idx]+win_range[0]:starts[label_idx]+win_range[1],:]
             # 4. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
             # 5. slice the corresponding range with [desired_windows,desired_metrics_of_desired_features]
             # 6. plot static plot
-            ### plt.plot(desired_windows,desired_metrics,label=f'whatever_for_now')
+            # plt.plot(desired_windows,desired_metrics,label=f'whatever_for_now')
 
     def create_trainset(self):
 
