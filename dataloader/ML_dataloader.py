@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from util.features import dynamic_features
 
 class StaticData():
@@ -70,17 +71,20 @@ class DynamicData():
                  train_len,
                  test_len,
                  trainset_path,
-                 testset_path):
+                 testset_path,
+                 trial=False):
         self.wl = window_size
         self.train_len = train_len
         self.test_len = test_len
         self.trainset_path = trainset_path
         self.testset_path = testset_path
+        self.trial = trial
         self.load_data()
         self.create_windows()
         self.calc_statistic_features()
-        self.create_trainset()
-        self.create_testset()                                 
+        if not self.trial:
+            self.create_trainset()
+            self.create_testset()                                 
 
     def load_data(self):
         """
@@ -109,10 +113,10 @@ class DynamicData():
         """
         self.x_data_win_lst = []
         self.y_data_win_lst = []
-        _,start_index,counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
-        counts = counts[start_index.argsort()]
-        start_index.sort()
-        for start,count in zip(start_index,counts):
+        _,self.start_index,self.counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
+        self.counts = self.counts[self.start_index.argsort()]
+        self.start_index.sort()
+        for start,count in zip(self.start_index,self.counts):
             for step in range(count-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl),:]
                 label = self.y_data_ori[int(start+step+self.wl/2)]
@@ -122,7 +126,7 @@ class DynamicData():
         self.y_data_win = np.concatenate(self.y_data_win_lst,axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
-        del self.x_data_win_lst,self.y_data_win_lst
+        del self.x_data_win_lst,self.y_data_win_lst,self.x_data_ori,self.y_data_ori
 
     def calc_statistic_features(self):
         """
@@ -135,7 +139,44 @@ class DynamicData():
         """
         self.x_data = dynamic_features(self.x_data_win)
         self.y_data = self.y_data_win
-        del self.x_data_win,self.y_data_win
+        print(f'x_data with window features has shape: {self.x_data.shape}')
+        print(f'y_data with window features has shape: {self.y_data.shape}')
+        if not self.trial:
+            del self.x_data_win,self.y_data_win
+
+    def plot_window_features(self,
+                             which_activity:list,
+                             win_range:list,
+                             feature_idx:list,
+                             metric_idx:list):
+        """
+            which_activity: [act_label_1,act_label_2,...]
+                a list containing the label of which activities to plot
+            win_range: [start_idx,end_idx]
+                a list containing the desired range to plot, i.e. from which window to which window
+                ps: the range is the index inside each activity, i.e. relatice range, not absolute range
+                e.g. which_activity=3, win_range=[0,200] means plot from 0th to 200th window of act_3
+                     which_activity=6, win_range=[0,200] means plot from 0th to 200th window of act_6
+            feature_idx: [f_idx_1,f_idx2,...]
+                a list containing indices of desired features to plot
+            metric_idx: [m_idx_1,m_idx_2,...]
+                a list containing indices of desired metrics (e.g. mean, std) to plot
+        """
+        print(f'start index: {self.start_index}')
+        fig = plt.figure(figsize=(8,6))
+        ax = plt.subplot(1,1,1)
+        for act in which_activity:
+            # 1. where is first index of this act in self.y_data:
+            first_idx = np.where(self.y_data==act)[0][0]
+            # 2. check if the given win_range exceeds the upper limit of this act's range
+            count = 0
+            assert win_range[1]<=count, f'the desired window_range exceeds upper limit of act {act}'
+            # 3. select te segment of windows to plot
+            desired_windows = self.x_data[first_idx+win_range[0]:first_idx+win_range[1],:]
+            # 4. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
+            # 5. slice the corresponding range with [desired_windows,desired_metrics_of_desired_features]
+            # 6. plot static plot
+            ### plt.plot(desired_windows,desired_metrics,label=f'whatever_for_now')
 
     def create_trainset(self):
 
@@ -167,3 +208,4 @@ class DynamicData():
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()
+
