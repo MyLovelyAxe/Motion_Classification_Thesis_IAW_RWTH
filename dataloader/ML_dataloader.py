@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features,get_feature_index,get_metric_index
+from util.features import dynamic_features,get_feature_index,get_metric_index,get_act_index
 
 class StaticData():
 
@@ -147,6 +147,7 @@ class DynamicData():
             del self.x_data_win,self.y_data_win
 
     def plot_window_features(self,
+                             split_method_paths:list,
                              which_activity:list,
                              win_range:list,
                              which_feature:list,
@@ -165,6 +166,7 @@ class DynamicData():
                 a list containing names of desired metrics (e.g. mean, std) to plot
         """
         ### prepare
+        act_idx_lst = get_act_index(split_method_paths,which_activity)
         feature_idx_lst = get_feature_index(which_feature)
         metric_idx_lst = get_metric_index(which_metric)
         ### localization
@@ -179,13 +181,13 @@ class DynamicData():
         ### plot
         fig = plt.figure(figsize=(8,6))
         ax = plt.subplot(1,1,1)
-        for act in which_activity:
+        for aIdx,aName in zip(act_idx_lst,which_activity):
             # 1. where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(values==act)[0][0]
-            print(f'act: {act}, label_idx: {label_idx}')
+            label_idx = np.where(values==aIdx)[0][0]
+            print(f'act: {aName}, label_idx: {label_idx}')
             # 2. check if the given win_range exceeds the upper limit of this act's range
             print(f'upper limit of this act: {counts[label_idx]}')
-            assert win_range[1]<=counts[label_idx], f'the desired window_range exceeds upper limit of act {act}'
+            assert win_range[1]<=counts[label_idx], f'the desired window_range exceeds upper limit of act {aName}'
             # 3. select te segment of windows to plot
             print(f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
             desired_windows = self.x_data[starts[label_idx]+win_range[0]:starts[label_idx]+win_range[1],:]
@@ -194,9 +196,9 @@ class DynamicData():
             desired_windows = desired_windows.reshape(self.num_win,self.num_metrics,self.num_features)
             print(f'Reshaped batch have shape: {desired_windows.shape}')
             # 5. plot static plot
-            for midx,mname in zip(metric_idx_lst,which_metric):
-                for fidx,fname in zip(feature_idx_lst,which_feature):
-                    ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,midx,fidx],label=f'Act[{act}]-F[{fname}]-M[{mname}]')
+            for mIdx,mName in zip(metric_idx_lst,which_metric):
+                for fIdx,fName in zip(feature_idx_lst,which_feature):
+                    ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,mIdx,fIdx],label=f'Act[{aName}]-F[{fName}]-M[{mName}]')
         # Put a legend to the right of the current axis
         ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
         ax.set_xlabel('num_window')
@@ -233,4 +235,3 @@ class DynamicData():
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()
-

@@ -287,20 +287,34 @@ def dynamic_features(x_data):
                                          ),axis=1)
     return dynamic_statistics
 
-def get_activity_index():
-    pass
+def get_act_index(split_method_paths,which_activity):
+    act_idx_lst = []
+    act_index_dict = get_act_index_dict(split_method_paths)
+    print(f'act_index_dict: {act_index_dict}')
+    for f in which_activity:
+        act_idx_lst.append(act_index_dict[f])
+    return act_idx_lst
+
+def get_act_index_dict(split_method_paths):
+    act_index_dict = {}
+    for split_path in split_method_paths:
+        with open(split_path, "r") as file:
+            split_method = yaml.safe_load(file)
+        for act_name,config in split_method.items():
+            _,_,label = list(i for _,i in config.items())
+            if not act_name[:-1] in act_index_dict:
+                act_index_dict[act_name[:-1]] = label
+    return act_index_dict
 
 def get_feature_index(which_feature):
     feature_idx_lst = []
     feature_index_dict = get_feature_index_dict()
-    # print(feature_index_dict)
     for f in which_feature:
         feature_idx_lst.append(feature_index_dict[f])
     return feature_idx_lst
 
 def get_feature_index_dict():
     feature_yaml_path = 'dataset/desired_features.yaml'
-    print(f'{feature_yaml_path}')
     with open(feature_yaml_path, "r") as file:
         features = yaml.safe_load(file)
     dists = features['desired_dists']
