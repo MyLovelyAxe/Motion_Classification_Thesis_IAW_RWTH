@@ -100,7 +100,7 @@ class DynamicData():
         print(f'loaded original x_data shape: {self.x_data_ori.shape}')
         print(f'loaded original y_data shape: {self.y_data_ori.shape}')
         print()
-        self.num_frames, self.num_ori_features = self.x_data_ori.shape
+        self.num_features = self.x_data_ori.shape[1]
 
     def create_windows(self):
         """
@@ -168,6 +168,9 @@ class DynamicData():
         print(f'values: {values}')
         print(f'starts: {starts}')
         print(f'counts: {counts}')
+        self.num_win = win_range[0] - win_range[1]
+        self.num_metrics = int(self.x_data.shape[1] / self.num_features)
+        print(f'{self.num_win} windows will be checked, in each window there are {self.num_features} features, each feature has {self.num_metrics} metrics')
         fig = plt.figure(figsize=(8,6))
         ax = plt.subplot(1,1,1)
         for act in which_activity:
@@ -180,10 +183,17 @@ class DynamicData():
             # 3. select te segment of windows to plot
             print(f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
             desired_windows = self.x_data[starts[label_idx]+win_range[0]:starts[label_idx]+win_range[1],:]
+            print(f'Batch of these windows have shape: {desired_windows.shape}')
             # 4. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
-            # 5. slice the corresponding range with [desired_windows,desired_metrics_of_desired_features]
-            # 6. plot static plot
-            # plt.plot(desired_windows,desired_metrics,label=f'whatever_for_now')
+            desired_windows = desired_windows.reshape(self.num_win,self.num_metrics,self.num_features)
+            print(f'Reshaped batch have shape: {desired_windows.shape}')
+            # 5. plot static plot
+            for i in metric_idx:
+                for j in feature_idx:
+                    ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,i,j],label=f'Act{act}-F{j}-M{i}')
+        ax.legend()
+        ax.set_xlabel('num_window')
+        plt.show()
 
     def create_trainset(self):
 
