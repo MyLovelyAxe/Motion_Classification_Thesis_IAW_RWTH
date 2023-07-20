@@ -1,26 +1,28 @@
 ### 1. Label method
 
 1. Static Activity
-    
-Label   Activity  
-1       hold hands near body
-2       hold hands away from body
-3       hands over head
-4       hold phone with left hand
-5       hold phone with right hand
+
+| label | Abbreviation | Description |
+|-------|--------------|-------------|
+|1| HandNear | hold hands near body |
+|2| HandAway | hold hands away from body |
+|3| HandOverHead | hands over head |
+|4| PhoneLH | hold phone with left hand |
+|5| PhoneRH | hold phone with right hand |
     
 2. Dynamic Activity
 
-Label   Activity
-1       Walking
-2       Jumping
-3       Squating
-4       Waving
-5       Reaching out for a cup
-6       Drinking from a cup
-7       Boxing
-8       Bicep curl
-9       Jumping jack
+| label | Abbreviation | Description |
+|-------|--------------|-------------|
+|1| Walking | Walking |
+|2| Jumping | Jumping |
+|3| Squating | Squating |
+|4| Waving | Waving |
+|5| Reaching | Reaching out for a cup |
+|6| Drinking | Drinking from a cup |
+|7| Boxing | Reaching out left and right arms alternatively |
+|8| Bicep | Bicep curl |
+|9| JumpJack | Jumping jack |
 
 3. Attention on split method
 

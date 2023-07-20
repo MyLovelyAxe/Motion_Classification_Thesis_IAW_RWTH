@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features,get_feature_index
+from util.features import dynamic_features,get_feature_index,get_metric_index
 
 class StaticData():
 
@@ -165,7 +165,8 @@ class DynamicData():
                 a list containing names of desired metrics (e.g. mean, std) to plot
         """
         ### prepare
-        feature_lst = get_feature_index(which_feature)
+        feature_idx_lst = get_feature_index(which_feature)
+        metric_idx_lst = get_metric_index(which_metric)
         ### localization
         values,starts,counts = np.unique(self.y_data, return_counts=True, return_index=True)
         print(f'values: {values}')
@@ -193,11 +194,13 @@ class DynamicData():
             desired_windows = desired_windows.reshape(self.num_win,self.num_metrics,self.num_features)
             print(f'Reshaped batch have shape: {desired_windows.shape}')
             # 5. plot static plot
-            for i in which_metric:
-                for j in feature_lst:
-                    ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,i,j],label=f'Act{act}-F{j}-M{i}')
-        ax.legend()
+            for midx,mname in zip(metric_idx_lst,which_metric):
+                for fidx,fname in zip(feature_idx_lst,which_feature):
+                    ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,midx,fidx],label=f'Act[{act}]-F[{fname}]-M[{mname}]')
+        # Put a legend to the right of the current axis
+        ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
         ax.set_xlabel('num_window')
+        ax.set_title('Metrics of features for windows')
         plt.show()
 
     def create_trainset(self):

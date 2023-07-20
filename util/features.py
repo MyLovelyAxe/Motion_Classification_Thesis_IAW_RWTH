@@ -291,12 +291,12 @@ def get_activity_index():
     pass
 
 def get_feature_index(which_feature):
-    feature_lst = []
+    feature_idx_lst = []
     feature_index_dict = get_feature_index_dict()
-    print(feature_index_dict)
+    # print(feature_index_dict)
     for f in which_feature:
-        feature_lst.append(feature_index_dict[f])
-    return feature_lst
+        feature_idx_lst.append(feature_index_dict[f])
+    return feature_idx_lst
 
 def get_feature_index_dict():
     feature_yaml_path = 'dataset/desired_features.yaml'
@@ -314,15 +314,26 @@ def get_feature_index_dict():
         feature_index_dict[f'dist_ratio_{dist_name}']=idx
         idx += 1
     for angle_name in angles:
-        feature_index_dict[f'dist_{angle_name}']=idx
+        feature_index_dict[f'angle_{angle_name}']=idx
         idx += 1
     for angle_name in angles:
-        feature_index_dict[f'dist_ratio_{angle_name}']=idx
+        feature_index_dict[f'angle_ratio_{angle_name}']=idx
         idx += 1
     return feature_index_dict
 
-def get_metric_index():
-    pass
+def get_metric_index(which_metric):
+    metric_index_dict = {'mean':0,
+                         'std':1,
+                         'top_max_mean':2,
+                         'top_min_mean':3,
+                         'max_min_range':4,
+                         'kurtosis':5,
+                         'skewness':6}
+    metric_idx_lst = []
+    for metric in which_metric:
+        metric_idx_lst.append(metric_index_dict[metric])
+    return metric_idx_lst
+
 
 if __name__ == '__main__':
 
