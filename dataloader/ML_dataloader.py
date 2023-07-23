@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features,get_feature_index,get_metric_index,get_act_index
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index
+
 
 class StaticData():
 
@@ -29,7 +30,8 @@ class StaticData():
         with open(self.trainset_path[1], 'rb') as yf:
             self.y_data = np.load(yf)
         # define length for trainset and randomly select train samples
-        self.choices_train = np.random.randint(self.x_data.shape[0], size = self.train_len)
+        self.choices_train = np.random.randint(
+            self.x_data.shape[0], size=self.train_len)
         self.x_train = self.x_data[self.choices_train]
         self.y_train = self.y_data[self.choices_train]
         print(f'x_train shape: {self.x_train.shape}')
@@ -41,10 +43,13 @@ class StaticData():
         # if no outside testset is designated, then extract testset from trainset
         if self.testset_path is None:
             # delete train samples for test samples
-            self.remain_x_data = np.delete(self.x_data, self.choices_train, axis=0)
-            self.remain_y_data = np.delete(self.y_data, self.choices_train, axis=0)
+            self.remain_x_data = np.delete(
+                self.x_data, self.choices_train, axis=0)
+            self.remain_y_data = np.delete(
+                self.y_data, self.choices_train, axis=0)
             # randomly select test samples
-            self.choices_test = np.random.randint(self.remain_x_data.shape[0], size = self.test_len)
+            self.choices_test = np.random.randint(
+                self.remain_x_data.shape[0], size=self.test_len)
             self.x_test = self.remain_x_data[self.choices_test]
             self.y_test = self.remain_y_data[self.choices_test]
         # if outside testset is designated, then load outside testset
@@ -56,6 +61,7 @@ class StaticData():
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()
+
 
 class DynamicData():
 
@@ -84,7 +90,7 @@ class DynamicData():
         self.calc_statistic_features()
         if not self.trial:
             self.create_trainset()
-            self.create_testset()                                 
+            self.create_testset()
 
     def load_data(self):
         """
@@ -100,6 +106,7 @@ class DynamicData():
         print(f'loaded original x_data shape: {self.x_data_ori.shape}')
         print(f'loaded original y_data shape: {self.y_data_ori.shape}')
         print()
+        print(f'how many zeros are there in x_data? {np.count_nonzero(np.isnan(self.x_data_ori))}')
         self.num_features = self.x_data_ori.shape[1]
 
     def create_windows(self):
@@ -113,21 +120,22 @@ class DynamicData():
         """
         self.x_data_win_lst = []
         self.y_data_win_lst = []
-        _,start_index,counts = np.unique(self.y_data_ori, return_counts=True, return_index=True)
+        _, start_index, counts = np.unique(
+            self.y_data_ori, return_counts=True, return_index=True)
         counts = counts[start_index.argsort()]
         start_index.sort()
-        for start,count in zip(start_index,counts):
+        for start, count in zip(start_index, counts):
             for step in range(count-self.wl):
-                window = self.x_data_ori[(start+step):(start+step+self.wl),:]
+                window = self.x_data_ori[(start+step):(start+step+self.wl), :]
                 label = self.y_data_ori[int(start+step+self.wl/2)]
-                self.x_data_win_lst.append(np.expand_dims(window,axis=0))
-                self.y_data_win_lst.append(np.expand_dims(label,axis=0))
-        self.x_data_win = np.concatenate(self.x_data_win_lst,axis=0)
-        self.y_data_win = np.concatenate(self.y_data_win_lst,axis=0)
+                self.x_data_win_lst.append(np.expand_dims(window, axis=0))
+                self.y_data_win_lst.append(np.expand_dims(label, axis=0))
+        self.x_data_win = np.concatenate(self.x_data_win_lst, axis=0)
+        self.y_data_win = np.concatenate(self.y_data_win_lst, axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
-        del self.x_data_win_lst,self.y_data_win_lst,self.x_data_ori,self.y_data_ori,start_index,counts
+        # del self.x_data_win_lst, self.y_data_win_lst, self.x_data_ori, self.y_data_ori, start_index, counts
 
     def calc_statistic_features(self):
         """
@@ -144,71 +152,102 @@ class DynamicData():
         print(f'y_data with window features has shape: {self.y_data.shape}')
         print()
         if not self.trial:
-            del self.x_data_win,self.y_data_win
+            del self.x_data_win, self.y_data_win
 
     def plot_window_features(self,
-                             split_method_paths:list,
-                             which_activity:list,
-                             win_range:list,
-                             which_feature:list,
-                             which_metric:list):
+                             split_method_paths: list,
+                             which_activity: list,
+                             win_range: list,
+                             which_feature: list,
+                             which_metric: list):
         """
-            which_activity: [act_name_1,act_name_2,...]
-                a list containing the name of which activities to plot
-            win_range: [start_idx,end_idx]
-                a list containing the desired range to plot, i.e. from which window to which window
-                ps: the range is the index inside each activity, i.e. relatice range, not absolute range
-                e.g. which_activity=3, win_range=[0,200] means plot from 0th to 200th window of act_3
-                     which_activity=6, win_range=[0,200] means plot from 0th to 200th window of act_6
-            which_feature: [f_idx_1,f_idx2,...]
-                a list containing names of desired features to plot
-            which_metric: [m_idx_1,m_idx_2,...]
-                a list containing names of desired metrics (e.g. mean, std) to plot
+        which_activity: [aName_1,aName_2,...]
+            a list containing the name of which activities to plot
+        win_range: [start_idx,end_idx]
+            a list containing the desired range to plot, i.e. from which window to which window
+            ps: the range is the index inside each activity, i.e. relatice range, not absolute range
+            e.g. which_activity=3, win_range=[0,200] means plot from 0th to 200th window of act_3
+                    which_activity=6, win_range=[0,200] means plot from 0th to 200th window of act_6
+        which_feature: [fName_1,fName_2,...]
+            a list containing names of desired features to plot
+        which_metric: [mName_1,mName_2,...]
+            a list containing names of desired metrics (e.g. mean, std) to plot
         """
-        ### prepare
-        act_idx_lst = get_act_index(split_method_paths,which_activity)
+        # prepare
+        act_idx_lst = get_act_index(split_method_paths, which_activity)
         feature_idx_lst = get_feature_index(which_feature)
         metric_idx_lst = get_metric_index(which_metric)
-        ### localization
-        values,starts,counts = np.unique(self.y_data, return_counts=True, return_index=True)
+        # localization
+        values, starts, counts = np.unique(
+            self.y_data, return_counts=True, return_index=True)
         print(f'values: {values}')
         print(f'starts: {starts}')
         print(f'counts: {counts}')
-        ### get shapes
+        # get shapes
         self.num_win = win_range[0] - win_range[1]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
         print(f'{self.num_win} windows will be checked, in each window there are {self.num_features} features, each feature has {self.num_metrics} metrics')
-        ### plot
-        fig = plt.figure(figsize=(8,6))
-        ax = plt.subplot(1,1,1)
-        for aIdx,aName in zip(act_idx_lst,which_activity):
+        # plot
+        fig = plt.figure(figsize=(8, 6))
+        ax = plt.subplot(1, 1, 1)
+        for aIdx, aName in zip(act_idx_lst, which_activity):
             # 1. where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(values==aIdx)[0][0]
+            label_idx = np.where(values == aIdx)[0][0]
             print(f'act: {aName}, label_idx: {label_idx}')
             # 2. check if the given win_range exceeds the upper limit of this act's range
             print(f'upper limit of this act: {counts[label_idx]}')
-            assert win_range[1]<=counts[label_idx], f'the desired window_range exceeds upper limit of act {aName}'
+            assert win_range[1] <= counts[
+                label_idx], f'the desired window_range exceeds upper limit of act {aName}'
             # 3. select te segment of windows to plot
-            print(f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
-            desired_windows = self.x_data[starts[label_idx]+win_range[0]:starts[label_idx]+win_range[1],:]
-            print(f'Batch of these windows have shape: {desired_windows.shape}')
+            print(
+                f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
+            desired_windows = self.x_data[starts[label_idx] +
+                                          win_range[0]:starts[label_idx]+win_range[1], :]
+            print(
+                f'Batch of these windows have shape: {desired_windows.shape}')
             # 4. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
-            desired_windows = desired_windows.reshape(self.num_win,self.num_metrics,self.num_features)
+            desired_windows = desired_windows.reshape(
+                self.num_win, self.num_metrics, self.num_features)
             print(f'Reshaped batch have shape: {desired_windows.shape}')
             # 5. plot static plot
-            for mIdx,mName in zip(metric_idx_lst,which_metric):
-                for fIdx,fName in zip(feature_idx_lst,which_feature):
-                    ax.plot(np.arange(win_range[0],win_range[1]),desired_windows[:,mIdx,fIdx],label=f'Act[{aName}]-F[{fName}]-M[{mName}]')
+            for mIdx, mName in zip(metric_idx_lst, which_metric):
+                for fIdx, fName in zip(feature_idx_lst, which_feature):
+                    ax.plot(np.arange(win_range[0], win_range[1]), desired_windows[:,
+                            mIdx, fIdx], label=f'Act[{aName}]-F[{fName}]-M[{mName}]')
         # Put a legend to the right of the current axis
-        ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
+        ax.legend(bbox_to_anchor=(1.04, 0.5),
+                  loc="center left", borderaxespad=0)
         ax.set_xlabel('num_window')
         ax.set_title('Metrics of features for windows')
         plt.show()
 
+    def plot_activity_features(self,
+                               split_method_paths: list,
+                               which_act: list):
+        actName = get_act_index(split_method_paths, which_act)[0]
+        y_limit_max = np.max(self.x_data)
+        fig = plt.figure(figsize=(8, 6))
+
+        ax1 = plt.subplot(2, 2, 1)
+
+        ax2 = plt.subplot(2, 2, 2)
+
+        ax3 = plt.subplot(2, 2, 3)
+
+        ax4 = plt.subplot(2, 2, 4)
+
+        print(f'name of act: {actName}')
+        print(f'upper limit of x_data: {y_limit_max}')
+        print(
+            f'how many Nan in x_data: {np.count_nonzero(np.isnan(self.x_data))}')
+        print(
+            f'how many Nan in original x_data: {np.count_nonzero(np.isnan(self.x_data_ori))}')
+
     def create_trainset(self):
 
         # define length for trainset and randomly select train samples
-        self.choices_train = np.random.randint(self.x_data.shape[0], size = self.train_len)
+        self.choices_train = np.random.randint(
+            self.x_data.shape[0], size=self.train_len)
         self.x_train = self.x_data[self.choices_train]
         self.y_train = self.y_data[self.choices_train]
         print(f'x_train shape: {self.x_train.shape}')
@@ -220,10 +259,13 @@ class DynamicData():
         # if no outside testset is designated, then extract testset from trainset
         if self.testset_path is None:
             # delete train samples for test samples
-            self.remain_x_data = np.delete(self.x_data, self.choices_train, axis=0)
-            self.remain_y_data = np.delete(self.y_data, self.choices_train, axis=0)
+            self.remain_x_data = np.delete(
+                self.x_data, self.choices_train, axis=0)
+            self.remain_y_data = np.delete(
+                self.y_data, self.choices_train, axis=0)
             # randomly select test samples
-            self.choices_test = np.random.randint(self.remain_x_data.shape[0], size = self.test_len)
+            self.choices_test = np.random.randint(
+                self.remain_x_data.shape[0], size=self.test_len)
             self.x_test = self.remain_x_data[self.choices_test]
             self.y_test = self.remain_y_data[self.choices_test]
         # if outside testset is designated, then load outside testset

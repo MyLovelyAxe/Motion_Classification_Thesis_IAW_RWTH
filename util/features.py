@@ -189,7 +189,10 @@ def calc_Mean(data) -> np.array:
     type:
         mean of data along dimension of window
     """
-    return np.mean(data,axis=1)
+    Mean = np.mean(data,axis=1)
+    if np.count_nonzero(np.isnan(Mean)):
+        print(f'There is Nan in Mean')
+    return Mean
 
 def calc_Std(data) -> np.array:
     """
@@ -199,7 +202,10 @@ def calc_Std(data) -> np.array:
     type:
         standard deviation of data along dimension of window
     """
-    return np.std(data,axis=1)
+    Std = np.std(data,axis=1)
+    if np.count_nonzero(np.isnan(Std)):
+        print(f'There is Nan in Std')
+    return Std
 
 def calc_TopMean_Range(data,num=5) -> np.array:
     """
@@ -221,6 +227,15 @@ def calc_TopMean_Range(data,num=5) -> np.array:
     top_min_mean = np.mean(top_min,axis=1)
     # take range
     max_min_range = top_max_mean - top_min_mean
+
+    # check Nan
+    if np.count_nonzero(np.isnan(top_max_mean)):
+        print(f'There is Nan in top_max_mean')
+    if np.count_nonzero(np.isnan(top_min_mean)):
+        print(f'There is Nan in top_min_mean')
+    if np.count_nonzero(np.isnan(max_min_range)):
+        print(f'There is Nan in max_min_range')
+
     # return concatenated array
     return np.concatenate((top_max_mean,
                            top_min_mean,
@@ -235,7 +250,12 @@ def calc_Kurtosis(data) -> np.array:
         the concept of kurtosis:
         https://www.scribbr.com/statistics/kurtosis/#:~:text=Kurtosis%20is%20a%20measure%20of,(medium%20tails)%20are%20mesokurtic.
     """
-    return kurtosis(data,axis=1)
+    Kurtosis = kurtosis(data,axis=1)
+    if np.count_nonzero(np.isnan(Kurtosis)):
+        print(f'These windows is Nan in Kurtosis: ')
+        print(f'{np.where(np.isnan(Kurtosis))}')
+
+    return Kurtosis
 
 def calc_Skewness(data) -> np.array:
     """
@@ -246,7 +266,10 @@ def calc_Skewness(data) -> np.array:
         the concept of skewness:
         https://www.scribbr.com/statistics/skewness/
     """
-    return skew(data,axis=1)
+    Skewness = skew(data,axis=1)
+    if np.count_nonzero(np.isnan(Skewness)):
+        print(f'There is Nan in Skewness')
+    return Skewness
 
 ############################ TODO: if we need more features ######################
 
