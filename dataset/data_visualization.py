@@ -46,7 +46,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/testset_20230627',
+                    default='dataset/dynamic2_20230706',
                     help='one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
@@ -56,6 +56,7 @@ parser.add_argument('--single_data_path', type=str,
                     )
 parser.add_argument('--start_frame', type=int, default=1900, help='from which frame to start visualize')
 parser.add_argument('--end_frame', type=int, default=1950, help='to which frame to end visualize')
+parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
                     default='dataset/desired_features_trial.yaml', help='load features name from .yaml')
@@ -92,7 +93,7 @@ if __name__ == '__main__':
 
         input_paths = os.path.join(args.single_data_path,'unknown.NoHead.csv')
         split_method_paths = os.path.join(args.single_data_path,'split_method.yaml')
-        verification([input_paths],args.desired_features_trial,[split_method_paths],win_len=51)
+        verification([input_paths],args.desired_features_trial,[split_method_paths],win_len=args.wl)
         # verification([input_paths],args.desired_features_trial,[split_method_paths])
 
     if args.function == 'verify_npy':
@@ -100,4 +101,4 @@ if __name__ == '__main__':
         input_paths = [os.path.join(data_path,'unknown.NoHead.csv') for data_path in args.source_data_path]
         split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.source_data_path]
         npy_paths = [os.path.join(args.npy_root,'x_data_UpperLowerBody.npy'),os.path.join(args.npy_root,'y_data_UpperLowerBody.npy')]
-        verification(input_paths,args.desired_features,split_method_paths,npy_path=npy_paths,win_len=51)
+        verification(input_paths,args.desired_features,split_method_paths,npy_path=npy_paths,win_len=args.wl)

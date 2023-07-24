@@ -24,8 +24,8 @@ parser = argparse.ArgumentParser(description='generate dataset for training')
 ##          edit --static_output_path
 ##
 ##      2. if --type is 'dynamic'
-##          edit --static_data_path
-##          edit --static_output_path
+##          edit --dynamic_data_path
+##          edit --dynamic_output_path
 ##
 ## Attention:
 ##
