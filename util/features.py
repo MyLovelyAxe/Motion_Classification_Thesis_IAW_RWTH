@@ -359,6 +359,13 @@ def get_feature_index_dict():
     return feature_index_dict
 
 def get_metric_index(which_metric):
+    metric_idx_lst = []
+    metric_index_dict = get_metric_index_dict()
+    for metric in which_metric:
+        metric_idx_lst.append(metric_index_dict[metric])
+    return metric_idx_lst
+
+def get_metric_index_dict():
     metric_index_dict = {'mean':0,
                          'std':1,
                          'top_max_mean':2,
@@ -366,11 +373,7 @@ def get_metric_index(which_metric):
                          'max_min_range':4,
                          'kurtosis':5,
                          'skewness':6}
-    metric_idx_lst = []
-    for metric in which_metric:
-        metric_idx_lst.append(metric_index_dict[metric])
-    return metric_idx_lst
-
+    return metric_index_dict
 
 if __name__ == '__main__':
 

@@ -210,7 +210,7 @@ def angles_equal_or_not(skeleton,angle_feature,desired_angles):
         if not all_equal:
             NoEqual_index = np.argwhere(angle_dataset != angle_skeleton)
             print(f'{NoEqual_index}th frame of feature: {angle_name} in this window has difference:')
-            print(f'dist_dataset={angle_dataset[NoEqual_index]}, dist_skeleton={angle_skeleton[NoEqual_index]}')
+            print(f'angle_dataset={angle_dataset[NoEqual_index]}, angle_skeleton={angle_skeleton[NoEqual_index]}')
             print()
 
 def dynamic_plot_func(frame_id,anim_configs_lst):

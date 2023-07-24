@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_metric_index_dict, get_feature_index_dict
 
 
 class StaticData():
@@ -199,45 +199,71 @@ class DynamicData():
             assert win_range[1] <= counts[
                 label_idx], f'the desired window_range exceeds upper limit of act {aName}'
             # 3. select te segment of windows to plot
-            print(
-                f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
-            desired_windows = self.x_data[starts[label_idx] +
-                                          win_range[0]:starts[label_idx]+win_range[1], :]
-            print(
-                f'Batch of these windows have shape: {desired_windows.shape}')
+            print(f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
+            desired_windows = self.x_data[starts[label_idx]+win_range[0]:starts[label_idx]+win_range[1], :]
+            print(f'Batch of these windows have shape: {desired_windows.shape}')
             # 4. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
-            desired_windows = desired_windows.reshape(
-                self.num_win, self.num_metrics, self.num_features)
+            desired_windows = desired_windows.reshape(self.num_win, self.num_metrics, self.num_features)
             print(f'Reshaped batch have shape: {desired_windows.shape}')
             # 5. plot static plot
             for mIdx, mName in zip(metric_idx_lst, which_metric):
                 for fIdx, fName in zip(feature_idx_lst, which_feature):
-                    ax.plot(np.arange(win_range[0], win_range[1]), desired_windows[:,
-                            mIdx, fIdx], label=f'Act[{aName}]-F[{fName}]-M[{mName}]')
+                    ax.plot(np.arange(win_range[0], win_range[1]), desired_windows[:,mIdx, fIdx], label=f'Act[{aName}]-F[{fName}]-M[{mName}]')
         # Put a legend to the right of the current axis
-        ax.legend(bbox_to_anchor=(1.04, 0.5),
-                  loc="center left", borderaxespad=0)
+        ax.legend(bbox_to_anchor=(1.04, 0.5),loc="center left", borderaxespad=0)
         ax.set_xlabel('num_window')
         ax.set_title('Metrics of features for windows')
         plt.show()
 
     def plot_activity_features(self,
                                split_method_paths: list,
-                               which_act: list):
-        actName = get_act_index(split_method_paths, which_act)[0]
-        y_limit_max = np.max(self.x_data)
+                               which_act: list,
+                               which_metric:list):
+        """
+        Make sure that:
+            - which_act only contains 1 activity
+            - which_metric only contains 1 metric
+
+        """
+        actIndex = get_act_index(split_method_paths, which_act)[0]
+        mIdx = get_metric_index(which_metric)
+        feature_index_dict = get_feature_index_dict()
+        self.num_metrics = int(self.x_data.shape[1] / self.num_features)
+        # localization
+        values, starts, counts = np.unique(self.y_data, return_counts=True, return_index=True)
+        print(f'values: {values}')
+        print(f'starts: {starts}')
+        print(f'counts: {counts}')
+
+        # 1. where is beginning index of this act in self.y_data, based on 'values':
+        label_idx = np.where(values == actIndex)[0][0]
+        print(f'act: {actIndex}, label_idx: {label_idx}')
+        # 2. select te segment of this activity to plot
+        print(f'from {starts[label_idx]}th window to {starts[label_idx]+counts[label_idx]}th window')
+        desired_windows = self.x_data[starts[label_idx]:starts[label_idx]+counts[label_idx], :]
+        # 3. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
+        desired_windows = desired_windows.reshape(counts[label_idx], self.num_metrics, self.num_features)
+        print(f'Reshaped batch have shape: {desired_windows.shape}')
+        # 4. prepare feature_dict
+        feature_dicts = {'dist':{},'dist_ratio':{},'angle':{},'angle_ratio':{}}
+        for catogary,_ in feature_dicts.items():
+            for k,v in feature_index_dict.items():
+                if k.startswith(catogary):
+                    feature_dicts[catogary][k] = v
+        # 5. plot
         fig = plt.figure(figsize=(8, 6))
+        for plt_idx,(catogary,fDict) in enumerate(feature_dicts.items()):
+            ax = plt.subplot(2, 2, plt_idx+1)
+            for fName,fIdx in fDict.items():
+                ax.plot(np.arange(starts[label_idx], starts[label_idx]+counts[label_idx]), desired_windows[:,mIdx, fIdx], label=f'{fName}')
+            ax.legend(bbox_to_anchor=(1.04, 0.5),loc="center left", borderaxespad=0)
+        plt.title(f'Act: {which_act[0]}, MetaFeature: {which_metric[0]}')
+        plt.show()
 
-        ax1 = plt.subplot(2, 2, 1)
 
-        ax2 = plt.subplot(2, 2, 2)
-
-        ax3 = plt.subplot(2, 2, 3)
-
-        ax4 = plt.subplot(2, 2, 4)
-
-        print(f'name of act: {actName}')
-        print(f'upper limit of x_data: {y_limit_max}')
+        # y_limit_max = np.max(self.x_data)
+        print(f'index of act: {label_idx}')
+        # print(f'upper limit of x_data: {y_limit_max}')
         print(
             f'how many Nan in x_data: {np.count_nonzero(np.isnan(self.x_data))}')
         print(
