@@ -336,26 +336,49 @@ def get_feature_index(which_feature):
         feature_idx_lst.append(feature_index_dict[f])
     return feature_idx_lst
 
-def get_feature_index_dict():
+def get_feature_index_dict(split=False):
+    """
+    If split is True, then return dict containg 4 dicts, each containing corresponding features
+    IF split is False, then concatenate all features together in 1 dict
+    """
     feature_yaml_path = 'dataset/desired_features.yaml'
     with open(feature_yaml_path, "r") as file:
         features = yaml.safe_load(file)
     dists = features['desired_dists']
     angles = features['desired_angles']
-    feature_index_dict = {}
-    idx = 0
-    for dist_name in dists:
-        feature_index_dict[f'dist_{dist_name}']=idx
-        idx += 1
-    for dist_name in dists:
-        feature_index_dict[f'dist_ratio_{dist_name}']=idx
-        idx += 1
-    for angle_name in angles:
-        feature_index_dict[f'angle_{angle_name}']=idx
-        idx += 1
-    for angle_name in angles:
-        feature_index_dict[f'angle_ratio_{angle_name}']=idx
-        idx += 1
+
+    if not split:
+        feature_index_dict = {}
+        idx = 0
+        for dist_name in dists:
+            feature_index_dict[f'dist_{dist_name}']=idx
+            idx += 1
+        for dist_name in dists:
+            feature_index_dict[f'dist_ratio_{dist_name}']=idx
+            idx += 1
+        for angle_name in angles:
+            feature_index_dict[f'angle_{angle_name}']=idx
+            idx += 1
+        for angle_name in angles:
+            feature_index_dict[f'angle_ratio_{angle_name}']=idx
+            idx += 1
+
+    else:
+        feature_index_dict = {'dist':{},'dist_ratio':{},'angle':{},'angle_ratio':{}}
+        idx = 0
+        for dist_name in dists:
+            feature_index_dict['dist'][f'dist_{dist_name}']=idx
+            idx += 1
+        for dist_name in dists:
+            feature_index_dict['dist_ratio'][f'dist_ratio_{dist_name}']=idx
+            idx += 1
+        for angle_name in angles:
+            feature_index_dict['angle'][f'angle_{angle_name}']=idx
+            idx += 1
+        for angle_name in angles:
+            feature_index_dict['angle_ratio'][f'angle_ratio_{angle_name}']=idx
+            idx += 1
+
     return feature_index_dict
 
 def get_metric_index(which_metric):

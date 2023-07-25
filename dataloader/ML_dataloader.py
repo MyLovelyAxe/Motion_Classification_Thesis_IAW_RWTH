@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_metric_index_dict, get_feature_index_dict
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_metric_index_dict, get_feature_index_dict, get_act_index_dict
 
 
 class StaticData():
@@ -215,59 +215,78 @@ class DynamicData():
         ax.set_title('Metrics of features for windows')
         plt.show()
 
-    def plot_activity_features(self,
-                               split_method_paths: list,
-                               which_act: list,
-                               which_metric:list):
+    def plot_metric_features(self,
+                             split_method_paths: list,
+                             which_metric:list,
+                             check_content:bool=False):
         """
         Make sure that:
-            - which_act only contains 1 activity
             - which_metric only contains 1 metric
-
         """
-        actIndex = get_act_index(split_method_paths, which_act)[0]
+        ### prepare activity
+        aIdx_dict = get_act_index_dict(split_method_paths)
+        ### prepare metric
         mIdx = get_metric_index(which_metric)
-        feature_index_dict = get_feature_index_dict()
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
-        # localization
+        ### prepare features
+        feature_index_dict = get_feature_index_dict(split=True)
+        ### output content to check if anything wrong
+        if check_content:
+            print(f'Check activity:')
+            print('=========================================')
+            for aName,aIdx in aIdx_dict.items():
+                print(f'act name: {aName}, act idx: {aIdx}')
+            print()
+            print(f'Check features:')
+            print('=========================================')
+            for catogary,fIdx_dict in feature_index_dict.items():
+                print(f'catogary: {catogary}')
+                print('----------------------------------------')
+                for fName,fIdx in fIdx_dict.items():
+                    print(f'feature name: {fName}, feature idx: {fIdx}')
+        ### localization
         values, starts, counts = np.unique(self.y_data, return_counts=True, return_index=True)
         print(f'values: {values}')
         print(f'starts: {starts}')
         print(f'counts: {counts}')
-
-        # 1. where is beginning index of this act in self.y_data, based on 'values':
-        label_idx = np.where(values == actIndex)[0][0]
-        print(f'act: {actIndex}, label_idx: {label_idx}')
-        # 2. select te segment of this activity to plot
-        print(f'from {starts[label_idx]}th window to {starts[label_idx]+counts[label_idx]}th window')
-        desired_windows = self.x_data[starts[label_idx]:starts[label_idx]+counts[label_idx], :]
-        # 3. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
-        desired_windows = desired_windows.reshape(counts[label_idx], self.num_metrics, self.num_features)
-        print(f'Reshaped batch have shape: {desired_windows.shape}')
-        # 4. prepare feature_dict
-        feature_dicts = {'dist':{},'dist_ratio':{},'angle':{},'angle_ratio':{}}
-        for catogary,_ in feature_dicts.items():
-            for k,v in feature_index_dict.items():
-                if k.startswith(catogary):
-                    feature_dicts[catogary][k] = v
-        # 5. plot
-        fig = plt.figure(figsize=(8, 6))
-        for plt_idx,(catogary,fDict) in enumerate(feature_dicts.items()):
-            ax = plt.subplot(2, 2, plt_idx+1)
-            for fName,fIdx in fDict.items():
-                ax.plot(np.arange(starts[label_idx], starts[label_idx]+counts[label_idx]), desired_windows[:,mIdx, fIdx], label=f'{fName}')
-            ax.legend(bbox_to_anchor=(1.04, 0.5),loc="center left", borderaxespad=0)
-        plt.title(f'Act: {which_act[0]}, MetaFeature: {which_metric[0]}')
+        ### plotting
+        ncol = len(feature_index_dict)
+        nrow = len(aIdx_dict)
+        fig, axes = plt.subplots(nrow, ncol, figsize=(20,20))
+        for fNum,(catogary,fIdx_dict) in enumerate(feature_index_dict.items()):
+            labels = list(fName for fName,_ in fIdx_dict.items())
+            for aNum,(aName,aIdx) in enumerate(aIdx_dict.items()):
+                # 1. where is beginning index of this act in self.y_data, based on 'values':
+                label_idx = np.where(values == aIdx)[0][0]
+                # print(f'act name: {aName}, act index: {aIdx}, label_idx to locate: {label_idx}')
+                # 2. select te segment of this activity to plot
+                start_idx = starts[label_idx]
+                end_idx = start_idx+counts[label_idx]
+                # print(f'from {start_idx}th window to {end_idx}th window')
+                desired_windows = self.x_data[start_idx:end_idx, :]
+                # 3. reshape desired_windows for eaiser indexing
+                desired_windows = desired_windows.reshape(counts[label_idx], self.num_metrics, self.num_features)
+                # print(f'Reshaped batch have shape: {desired_windows.shape}')
+                # 4. plot
+                for fName,fIdx in fIdx_dict.items():
+                    axes[aNum,fNum].plot(np.arange(start_idx,end_idx), desired_windows[:,mIdx, fIdx])
+                # axes[aNum,fNum].legend(bbox_to_anchor=(1.04, 0.5),loc="center left", borderaxespad=0)
+                axes[0,fNum].legend(loc='upper left',
+                                    bbox_to_anchor=(1.04, 0.5),
+                                    labels=labels)
+                axes[0,fNum].set_title(f'feature: {catogary}')
+        fig.suptitle(f'MetaFeature: {which_metric[0]}')
+        # fig.tight_layout()
         plt.show()
 
 
-        # y_limit_max = np.max(self.x_data)
-        print(f'index of act: {label_idx}')
-        # print(f'upper limit of x_data: {y_limit_max}')
-        print(
-            f'how many Nan in x_data: {np.count_nonzero(np.isnan(self.x_data))}')
-        print(
-            f'how many Nan in original x_data: {np.count_nonzero(np.isnan(self.x_data_ori))}')
+        # # y_limit_max = np.max(self.x_data)
+        # print(f'index of act: {label_idx}')
+        # # print(f'upper limit of x_data: {y_limit_max}')
+        # print(
+        #     f'how many Nan in x_data: {np.count_nonzero(np.isnan(self.x_data))}')
+        # print(
+        #     f'how many Nan in original x_data: {np.count_nonzero(np.isnan(self.x_data_ori))}')
 
     def create_trainset(self):
 
