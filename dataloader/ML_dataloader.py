@@ -223,14 +223,17 @@ class DynamicData():
         Make sure that:
             - which_metric only contains 1 metric
         """
-        ### prepare activity
+        ### prepare basics
         aIdx_dict = get_act_index_dict(split_method_paths)
-        ### prepare metric
         mIdx = get_metric_index(which_metric)[0]
         self.num_win = self.x_data.shape[0]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
-        ### prepare features
         feature_index_dict = get_feature_index_dict(split=True)
+        ### prepare data of the metric to plot
+        shaped_x_data = self.x_data.copy()
+        shaped_x_data = shaped_x_data.reshape(self.num_win, self.num_metrics, self.num_features)
+        metric_data = shaped_x_data[:,mIdx,:]
+        del shaped_x_data
         ### output content to check if anything wrong
         if check_content:
             print(f'Check activity:')
@@ -250,50 +253,39 @@ class DynamicData():
         print(f'values: {values}')
         print(f'starts: {starts}')
         print(f'counts: {counts}')
-        ### reshape
-        shaped_x_data = self.x_data.copy()
-        shaped_x_data = shaped_x_data.reshape(self.num_win, self.num_metrics, self.num_features)
-        metric_data = shaped_x_data[:,mIdx,:]
-        del shaped_x_data
+        x_upperLim = np.max(counts)
         ### plotting
         ncol = len(feature_index_dict)
         nrow = len(aIdx_dict)
         fig, axes = plt.subplots(nrow, ncol, figsize=(40,30))
         for fNum,(catogary,fIdx_dict) in enumerate(feature_index_dict.items()):
             # labels = list(fName for fName,_ in fIdx_dict.items())
+            ## determine limits for axis
+            current_features_idx = list(f_idx for _,f_idx in fIdx_dict.items())
+            y_upperLim = np.max(metric_data[:, current_features_idx])
+            y_lowerLim = np.min(metric_data[:, current_features_idx])
             for aNum,(aName,aIdx) in enumerate(aIdx_dict.items()):
-                # 1. where is beginning index of this act in self.y_data, based on 'values':
+                ## where is beginning index of this act in self.y_data, based on 'values':
                 label_idx = np.where(values == aIdx)[0][0]
-                # print(f'act name: {aName}, act index: {aIdx}, label_idx to locate: {label_idx}')
-                # 2. select te segment of this activity to plot
+                ## select te segment of this activity to plot
                 start_idx = starts[label_idx]
                 end_idx = start_idx+counts[label_idx]
-                # print(f'from {start_idx}th window to {end_idx}th window')
                 desired_windows = metric_data[start_idx:end_idx, :]
-                # 3. reshape desired_windows for eaiser indexing
-                # desired_windows = desired_windows.reshape(counts[label_idx], self.num_metrics, self.num_features)
-                # print(f'Reshaped batch have shape: {desired_windows.shape}')
-                # 4. plot
+                ## plot
                 for fName,fIdx in fIdx_dict.items():
-                    axes[aNum,fNum].plot(np.arange(start_idx,end_idx), desired_windows[:,fIdx])
+                    axes[aNum,fNum].plot(np.arange(0,counts[label_idx]), desired_windows[:,fIdx])
                 # axes[0,fNum].legend(loc='upper left',
                 #                     bbox_to_anchor=(1.04, 0.5),
                 #                     labels=labels)
-                axes[0,fNum].set_title(f'feature: {catogary}',fontsize=30)
+                if aNum == 0:
+                    axes[aNum,fNum].set_title(f'feature: {catogary}',fontsize=20)
                 if fNum == 0:
-                    axes[aNum,fNum].set_ylabel(f'{aName}',fontsize=30)
-        fig.suptitle(f'MetaFeature: {which_metric[0]}',fontsize=50)
+                    axes[aNum,fNum].set_ylabel(f'{aName}',fontsize=20)
+                axes[aNum,fNum].set_ylim([y_lowerLim,y_upperLim])
+                axes[aNum,fNum].set_xlim([0,x_upperLim])
+        fig.suptitle(f'MetaFeature: {which_metric[0]}',fontsize=40)
         fig.tight_layout()
         plt.show()
-
-
-        # # y_limit_max = np.max(self.x_data)
-        # print(f'index of act: {label_idx}')
-        # # print(f'upper limit of x_data: {y_limit_max}')
-        # print(
-        #     f'how many Nan in x_data: {np.count_nonzero(np.isnan(self.x_data))}')
-        # print(
-        #     f'how many Nan in original x_data: {np.count_nonzero(np.isnan(self.x_data_ori))}')
 
     def create_trainset(self):
 
