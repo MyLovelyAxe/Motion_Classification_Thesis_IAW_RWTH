@@ -226,7 +226,8 @@ class DynamicData():
         ### prepare activity
         aIdx_dict = get_act_index_dict(split_method_paths)
         ### prepare metric
-        mIdx = get_metric_index(which_metric)
+        mIdx = get_metric_index(which_metric)[0]
+        self.num_win = self.x_data.shape[0]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
         ### prepare features
         feature_index_dict = get_feature_index_dict(split=True)
@@ -249,12 +250,17 @@ class DynamicData():
         print(f'values: {values}')
         print(f'starts: {starts}')
         print(f'counts: {counts}')
+        ### reshape
+        shaped_x_data = self.x_data.copy()
+        shaped_x_data = shaped_x_data.reshape(self.num_win, self.num_metrics, self.num_features)
+        metric_data = shaped_x_data[:,mIdx,:]
+        del shaped_x_data
         ### plotting
         ncol = len(feature_index_dict)
         nrow = len(aIdx_dict)
-        fig, axes = plt.subplots(nrow, ncol, figsize=(20,20))
+        fig, axes = plt.subplots(nrow, ncol, figsize=(40,30))
         for fNum,(catogary,fIdx_dict) in enumerate(feature_index_dict.items()):
-            labels = list(fName for fName,_ in fIdx_dict.items())
+            # labels = list(fName for fName,_ in fIdx_dict.items())
             for aNum,(aName,aIdx) in enumerate(aIdx_dict.items()):
                 # 1. where is beginning index of this act in self.y_data, based on 'values':
                 label_idx = np.where(values == aIdx)[0][0]
@@ -263,20 +269,21 @@ class DynamicData():
                 start_idx = starts[label_idx]
                 end_idx = start_idx+counts[label_idx]
                 # print(f'from {start_idx}th window to {end_idx}th window')
-                desired_windows = self.x_data[start_idx:end_idx, :]
+                desired_windows = metric_data[start_idx:end_idx, :]
                 # 3. reshape desired_windows for eaiser indexing
-                desired_windows = desired_windows.reshape(counts[label_idx], self.num_metrics, self.num_features)
+                # desired_windows = desired_windows.reshape(counts[label_idx], self.num_metrics, self.num_features)
                 # print(f'Reshaped batch have shape: {desired_windows.shape}')
                 # 4. plot
                 for fName,fIdx in fIdx_dict.items():
-                    axes[aNum,fNum].plot(np.arange(start_idx,end_idx), desired_windows[:,mIdx, fIdx])
-                # axes[aNum,fNum].legend(bbox_to_anchor=(1.04, 0.5),loc="center left", borderaxespad=0)
-                axes[0,fNum].legend(loc='upper left',
-                                    bbox_to_anchor=(1.04, 0.5),
-                                    labels=labels)
-                axes[0,fNum].set_title(f'feature: {catogary}')
-        fig.suptitle(f'MetaFeature: {which_metric[0]}')
-        # fig.tight_layout()
+                    axes[aNum,fNum].plot(np.arange(start_idx,end_idx), desired_windows[:,fIdx])
+                # axes[0,fNum].legend(loc='upper left',
+                #                     bbox_to_anchor=(1.04, 0.5),
+                #                     labels=labels)
+                axes[0,fNum].set_title(f'feature: {catogary}',fontsize=30)
+                if fNum == 0:
+                    axes[aNum,fNum].set_ylabel(f'{aName}',fontsize=30)
+        fig.suptitle(f'MetaFeature: {which_metric[0]}',fontsize=50)
+        fig.tight_layout()
         plt.show()
 
 
