@@ -74,23 +74,22 @@ class DynamicData():
 
     def __init__(self,
                  window_size,
-                 train_len,
-                 test_len,
+                 split_method_paths,
                  trainset_path,
                  testset_path,
+                 split_ratio,
                  trial=False):
         self.wl = window_size
-        self.train_len = train_len
-        self.test_len = test_len
+        self.aIdx_dict = get_act_index_dict(split_method_paths)
         self.trainset_path = trainset_path
         self.testset_path = testset_path
+        self.split_ratio = split_ratio
         self.trial = trial
         self.load_data()
         self.create_windows()
         self.calc_statistic_features()
         if not self.trial:
-            self.create_trainset()
-            self.create_testset()
+            self.create_train_test_set()
 
     def load_data(self):
         """
@@ -287,37 +286,34 @@ class DynamicData():
         fig.tight_layout()
         plt.show()
 
-    def create_trainset(self):
+    def create_train_test_set(self):
 
-        # define length for trainset and randomly select train samples
-        self.choices_train = np.random.randint(
-            self.x_data.shape[0], size=self.train_len)
-        self.x_train = self.x_data[self.choices_train]
-        self.y_train = self.y_data[self.choices_train]
+        ### localization
+        values, starts, counts = np.unique(self.y_data, return_counts=True, return_index=True)
+        x_train_lst = []
+        y_train_lst = []
+        x_test_lst = []
+        y_test_lst = []
+        for aNum,(aName,aIdx) in enumerate(self.aIdx_dict.items()):
+            ## where is beginning index of this act in self.y_data, based on 'values':
+            label_idx = np.where(values == aIdx)[0][0]
+            ## define indices of train and test set
+            train_start_idx = starts[label_idx]
+            train_end_idx = train_start_idx + int(counts[label_idx]*self.split_ratio)
+            test_start_idx = train_end_idx + 1
+            test_end_idx = train_start_idx + counts[label_idx]
+            ## split train and test part in each activity
+            x_train_lst.append(self.x_data[train_start_idx:train_end_idx])
+            y_train_lst.append(self.y_data[train_start_idx:train_end_idx])
+            x_test_lst.append(self.x_data[test_start_idx:test_end_idx])
+            y_test_lst.append(self.y_data[test_start_idx:test_end_idx])
+        self.x_train = np.concatenate(x_train_lst,axis=0)
+        self.y_train = np.concatenate(y_train_lst,axis=0)
+        self.x_test = np.concatenate(x_test_lst,axis=0)
+        self.y_test = np.concatenate(y_test_lst,axis=0)
+
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')
-        print()
-
-    def create_testset(self):
-
-        # if no outside testset is designated, then extract testset from trainset
-        if self.testset_path is None:
-            # delete train samples for test samples
-            self.remain_x_data = np.delete(
-                self.x_data, self.choices_train, axis=0)
-            self.remain_y_data = np.delete(
-                self.y_data, self.choices_train, axis=0)
-            # randomly select test samples
-            self.choices_test = np.random.randint(
-                self.remain_x_data.shape[0], size=self.test_len)
-            self.x_test = self.remain_x_data[self.choices_test]
-            self.y_test = self.remain_y_data[self.choices_test]
-        # if outside testset is designated, then load outside testset
-        else:
-            with open(self.testset_path[0], 'rb') as test_xf:
-                self.x_test = np.load(test_xf)
-            with open(self.testset_path[1], 'rb') as test_yf:
-                self.y_test = np.load(test_yf)
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()

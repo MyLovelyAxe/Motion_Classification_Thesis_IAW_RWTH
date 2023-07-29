@@ -1,5 +1,5 @@
 import argparse
-from model.ML_models import KNN,RandomForest,SVM
+from model.static_models import KNN,RandomForest,SVM
 
 
 parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
@@ -42,7 +42,7 @@ if __name__ == '__main__':
                                  Train_Len=args.train_len,
                                  Test_Len=args.test_len,
                                  Trainset_Path=args.trainset_path,
-                                 Testset_Path=args.testset_path
+                                #  Testset_Path=args.testset_path
                                  )
     elif args.model == 'SVM':
         cls_model = SVM(Train_Len=args.train_len,

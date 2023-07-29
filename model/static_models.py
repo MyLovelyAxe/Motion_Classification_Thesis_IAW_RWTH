@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from dataloader.ML_dataloader import StaticData
 
-class MLClassModel():
+class StaticClassModel():
     
     def __init__(self,
                  Train_Len,
@@ -39,7 +39,7 @@ class MLClassModel():
         print(f'Accuracy = {np.sum(self.T_pred == self.static_data.y_test) / len(self.T_pred)}')
         print(f'Result: {self.T_pred == self.static_data.y_test}')
 
-class KNN(MLClassModel):
+class KNN(StaticClassModel):
     
     def __init__(self,
                  N_neighbor,
@@ -58,7 +58,7 @@ class KNN(MLClassModel):
         self.P_pred = self.neigh.predict_proba(self.static_data.x_test)
         self.T_pred = self.neigh.predict(self.static_data.x_test)
         
-class RandomForest(MLClassModel):
+class RandomForest(StaticClassModel):
     
     def __init__(self,
                  Max_Depth,
@@ -81,7 +81,7 @@ class RandomForest(MLClassModel):
         self.T_pred = self.random_forest.predict(self.static_data.x_test)
         self.T_pred = np.multiply(self.T_pred,mask)
         
-class SVM(MLClassModel):
+class SVM(StaticClassModel):
     
     def __init__(self,
                  Train_Len,
