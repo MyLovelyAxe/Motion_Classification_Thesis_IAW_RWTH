@@ -289,19 +289,19 @@ class DynamicData():
     def create_train_test_set(self):
 
         ### localization
-        values, starts, counts = np.unique(self.y_data, return_counts=True, return_index=True)
+        self.values, self.starts, self.counts = np.unique(self.y_data, return_counts=True, return_index=True)
         x_train_lst = []
         y_train_lst = []
         x_test_lst = []
         y_test_lst = []
         for aNum,(aName,aIdx) in enumerate(self.aIdx_dict.items()):
             ## where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(values == aIdx)[0][0]
+            label_idx = np.where(self.values == aIdx)[0][0]
             ## define indices of train and test set
-            train_start_idx = starts[label_idx]
-            train_end_idx = train_start_idx + int(counts[label_idx]*self.split_ratio)
+            train_start_idx = self.starts[label_idx]
+            train_end_idx = train_start_idx + int(self.counts[label_idx]*self.split_ratio)
             test_start_idx = train_end_idx + 1
-            test_end_idx = train_start_idx + counts[label_idx]
+            test_end_idx = train_start_idx + self.counts[label_idx]
             ## split train and test part in each activity
             x_train_lst.append(self.x_data[train_start_idx:train_end_idx])
             y_train_lst.append(self.y_data[train_start_idx:train_end_idx])
