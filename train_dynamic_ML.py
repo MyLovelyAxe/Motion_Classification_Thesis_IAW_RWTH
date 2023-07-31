@@ -59,9 +59,6 @@ if __name__ == '__main__':
                         Split_Ratio=args.split_ratio
                         )
     cls_model.train()
-    if args.model == 'RandomForest':
-        cls_model.test(mask=False)
-    else:
-        cls_model.test()
+    cls_model.test()
     print(f'Result on {args.model}:')
     cls_model.show_result(args.model,save=False)

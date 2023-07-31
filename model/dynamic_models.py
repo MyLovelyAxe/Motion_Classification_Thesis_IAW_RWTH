@@ -96,13 +96,9 @@ class RandomForest(DynamicClassModel):
         self.random_forest = RandomForestClassifier(max_depth=Max_Depth,random_state=Random_State)
     def train(self):
         self.random_forest.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
-    def test(self,mask=True):
+    def test(self):
         self.P_pred = self.random_forest.predict_proba(self.dynamic_data.x_test)
         self.T_pred = self.random_forest.predict(self.dynamic_data.x_test)
-        if mask:
-            maximums = np.max(self.P_pred,axis=1)
-            mask = np.where(maximums < 0.4, False, True)
-            self.T_pred = np.multiply(self.T_pred,mask)
         
 class SVM(DynamicClassModel):
     
