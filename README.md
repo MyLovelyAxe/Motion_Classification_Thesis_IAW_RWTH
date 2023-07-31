@@ -345,16 +345,49 @@ With ```plot_features.ipynb```, you can try to load data with dynamic dataloader
 
 ### 4) Train model
 
+#### Machine learning model
 
+The model we choose for classification are RandomForest, KNN, and SVM.
 
-#### Members:
+#### Static model
+
+To train a model for static dataset, try:
+
+```
+python
+```
+
+#### Dynamic model
+
+To train a model for dynamic dataset, try:
+
+RandomForest:
+
+```
+python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "RandomForest" --max_depth 6 --random_state 0
+```
+
+KNN:
+
+```
+python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "KNN" --n_neighbor 20
+```
+
+SVM:
+
+```
+python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "SVM"
+```
+
+## Contact
+
+The members in this project:
 
 |Name |
 |--|
 |Jialei Li |
 |Apostolos Vrontos |
 
-## Contact
 * If you need more details of codes, please contact Email of [Jialei Li](mailto:jia.lei.li@rwth-aachen.de);
 * If you need to know background or further application development of this project, please contact Email of [Apostolos Vrontos](mailto:a.vrontos@iaw.rwth-aachen.de)
 
