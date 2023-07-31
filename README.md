@@ -1,3 +1,58 @@
+# Classification of Human Body Activities
+
+#### -- Project Status: [Active]
+
+## Project Introduction
+
+The purpose of this project is to classify human body activity with machine learning methods based on joint coordinates from [Captury Live](https://captury.com/captury-live/).
+This thesis theme is offered by M.Sc Apostolos Vrontos from [Institute of Industrial Enginering and Ergonomics (IAW)](https://www.iaw.rwth-aachen.de/go/id/ieplw/?lidx=1) at [RWTH Aachen University](https://www.rwth-aachen.de/go/id/a/?lidx=1), and the codes are created by Jialei Li, from major [Robotic System Engineering](https://www.academy.rwth-aachen.de/en/programs/masters-degree-programs/detail/msc-robotic-systems-engineering), RWTH Aachen University.
+
+### Methods Used
+
+* Spacial coordinates of body joints
+* Feature selection
+* Statistic
+* Data Visualization
+* Machine Learning
+* Classification Modelling
+
+### Technologies
+
+* Python
+* Pandas
+* Matplotlib
+* scikit-learn
+* jupyter
+
+## Project Description
+
+Human body activities can be classified based on data of joints or limbs. For example, firstly choose some critical joints which can generally and specifically define an activity (e.g. wrist, elbow, ankle, knee). Then being aware of the spacial coordinates of these joints can give a general picture of what the current activity is, which is also the basis for classification.
+
+We deploy the software and equippment from Captury Live, whose GUI directly output spacial coordinates of all pre-defined joints, to create raw dataset for training our machine learning model to classify.
+
+We preprocessed raw data from .csv file from Captury Live, including:
+
+* visualize coordinates
+* select joints
+* calculate kinematic features
+* windowlize frames (for classification of dynamic activities)
+* calculate statistic featues
+
+After the operation of preprocessing mentioned above, we split dataset into **trainset** and **testset** for model. Note that **testset** can also be provided with extra dataset instead of extracting from original dataset, which will be covered later.
+
+
+## Getting Started
+
+### #TODO (how to get raw data)
+1. Clone this repo (for help see this [tutorial](https://help.github.com/articles/cloning-a-repository/)).
+2. Raw Data is being kept [here](Repo folder containing raw data) within this repo.
+
+    
+3. Data processing/transformation scripts are being kept [here](Repo folder containing data processing scripts/notebooks)
+4. etc...
+
+*If your project is well underway and setup is fairly complicated (ie. requires installation of many packages) create another "setup.md" file and link to it here*  
+
 ### 1. Label method
 
 1. Static Activity
@@ -72,3 +127,16 @@ Wave1:
 In this way, the outliers would not enter final dataset for training.
 
 This can be improved or re-written later.
+
+
+
+#### Members:
+
+| Name |
+|--|
+| Jialei Li |
+| Apostolos Vrontos |
+
+## Contact
+* If you need more details of codes, please contact [Jialei Li](mailto:jia.lei.li@rwth-aachen.de);
+* If you need to know background or further application development of this project, please contact [Apostolos Vrontos](mailto:a.vrontos@iaw.rwth-aachen.de)
