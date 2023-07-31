@@ -221,10 +221,14 @@ All joints to be selected and corresponding index is shown below:
 |24| spine5 | 5th spinal joint from spine1 |
 |25| head | head vertex |
 
+<div>
+<img src="Archiv/joint_index.jpg" style="zoom:60%"/>
+</div>
+
 The rule of defining feature's name is as following:
 
 * distance features: joint1_joint2
-* angle features: joint1_joint2_joint3 (joint2 is vertex)
+* angle features: joint1_joint2_joint3 (joint2 is vertex of the angle)
 
 #### Step5: Verify features
 
