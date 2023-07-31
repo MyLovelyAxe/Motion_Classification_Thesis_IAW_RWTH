@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.stats import skew
 from scipy.stats import kurtosis
 from scipy.fft import fft,fftfreq
@@ -152,29 +151,29 @@ def get_angle_feature(coords,desired_angles):
             angle_feature[frame,angle_idx] = calc_angles(joints_lst,distances)
     return angle_feature
 
-def calc_ChangeRatio(features):
+def calc_ChangeRate(features):
 
     diff = features[1:,:] - features[:-1,:] # diff: [#frame-1,#feature]
     first_diff = np.expand_dims(diff[0],axis=0) # first_diff: [1,#feature]
     diff = np.concatenate((first_diff,diff),axis=0) # diff: [#frame,#feature]
-    frame_ratio = 1/60
-    change_ratio = diff / frame_ratio # change_ratio: [#frame,#feature]
+    frame_rate = 1/60
+    change_rate = diff / frame_rate # change_rate: [#frame,#feature]
 
-    return change_ratio
+    return change_rate
 
 def get_all_features(coords,desired_dists,desired_angles):
     """
     concatenate all features
     """
     dist_feature = get_dist_feature(coords,desired_dists) # dist_feature: [#frames,#desired_dist]
-    dist_ratio = calc_ChangeRatio(dist_feature) # dist_ratio with same shape of dist_feature
+    dist_rate = calc_ChangeRate(dist_feature) # dist_rate with same shape of dist_feature
     angle_feature = get_angle_feature(coords,desired_angles) # angle_feature: [#frames,#desired_angle]
-    angle_ratio = calc_ChangeRatio(angle_feature) # angle_ratio with same shape of angle_feature
+    angle_rate = calc_ChangeRate(angle_feature) # angle_rate with same shape of angle_feature
 
     all_features = np.concatenate((dist_feature,
-                                   dist_ratio,
+                                   dist_rate,
                                    angle_feature,
-                                   angle_ratio), axis=1)
+                                   angle_rate), axis=1)
     return all_features
 
 #################################################################
@@ -354,29 +353,29 @@ def get_feature_index_dict(split=False):
             feature_index_dict[f'dist_{dist_name}']=idx
             idx += 1
         for dist_name in dists:
-            feature_index_dict[f'dist_ratio_{dist_name}']=idx
+            feature_index_dict[f'dist_rate_{dist_name}']=idx
             idx += 1
         for angle_name in angles:
             feature_index_dict[f'angle_{angle_name}']=idx
             idx += 1
         for angle_name in angles:
-            feature_index_dict[f'angle_ratio_{angle_name}']=idx
+            feature_index_dict[f'angle_rate_{angle_name}']=idx
             idx += 1
 
     else:
-        feature_index_dict = {'dist':{},'dist_ratio':{},'angle':{},'angle_ratio':{}}
+        feature_index_dict = {'dist':{},'dist_rate':{},'angle':{},'angle_rate':{}}
         idx = 0
         for dist_name in dists:
             feature_index_dict['dist'][f'dist_{dist_name}']=idx
             idx += 1
         for dist_name in dists:
-            feature_index_dict['dist_ratio'][f'dist_ratio_{dist_name}']=idx
+            feature_index_dict['dist_rate'][f'dist_rate_{dist_name}']=idx
             idx += 1
         for angle_name in angles:
             feature_index_dict['angle'][f'angle_{angle_name}']=idx
             idx += 1
         for angle_name in angles:
-            feature_index_dict['angle_ratio'][f'angle_ratio_{angle_name}']=idx
+            feature_index_dict['angle_rate'][f'angle_rate_{angle_name}']=idx
             idx += 1
 
     return feature_index_dict
@@ -397,28 +396,3 @@ def get_metric_index_dict():
                          'kurtosis':5,
                          'skewness':6}
     return metric_index_dict
-
-if __name__ == '__main__':
-
-    print(yaml.__version__)
-
-    data = np.random.randint(0,24,160).reshape(2,20,4)
-    FFT = fft(data,axis=1)
-    freq = fftfreq(n=data.shape[1],d=1/800)
-    freq_index = np.argsort(freq)
-    print(f'freq index shape: {freq_index.shape}')
-    freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
-    sorted_real_FFT = np.take_along_axis(FFT.real,freq_index,axis=1)
-    freq.sort()
-    half_freq = freq[len(freq)//2:]
-    half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
-    # plot
-    fig = plt.figure(figsize=(8,6))
-    ax1 = plt.subplot(1,1,1)
-    for window in range(data.shape[0]):
-        for feature in range(data.shape[-1]):
-            ax1.plot(half_freq, half_sorted_real_FFT[window,:,feature],label=f'real window{window+1} feature{feature+1}')
-    ax1.set_title(f'fft real')
-    ax1.set_xticks(half_freq,half_freq)
-    ax1.legend()
-    plt.show()

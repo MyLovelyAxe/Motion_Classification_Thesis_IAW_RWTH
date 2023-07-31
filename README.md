@@ -116,7 +116,7 @@ As a reusult, it is difficult to directly extract data from raw .csv with Pandas
 Run this script in terminal under **root path**, to plot the segment with default arguments:
 
 ```
-python data_visualization.py --function "check_ori_data" --single_data_path "dataset/name_of_your_raw_data" --start_frame 0 --end_frame 200
+python data_visualization.py --function "check_ori_data" --single_data_path "dataset/testset_20230627" --start_frame 0 --end_frame 200
 ```
 
 Also, you can edit the arguments which you want to check:
@@ -233,7 +233,7 @@ The rule of defining feature's name is as following:
 Use features definded in ```dataset/desired_features_trial.yaml``` to verify whether calculation of features are correct by plotting, with command:
 
 ```
-python data_visualization.py --function "verify_before_output" --single_data_path "dataset/name_of_your_raw_data" --wl 51
+python data_visualization.py --function "verify_before_output" --single_data_path "dataset/testset_20230627" --wl 51
 ```
 
 Also, you can edit the arguments which you want to check:
@@ -283,7 +283,15 @@ Also, you can edit the arguments which you want to check:
 
 #### Step7: Verify dataset
 
-After generating dataset, you can still verify it to check if calculation has problems, just like **Step5: Verify features**:
+After generating dataset, you can still verify it to check if calculation has problems, just like **Step5: Verify features**.
+
+Example for static data connected by one single .csv
+
+```
+python data_visualization.py --function "verify_npy" --source_data_path "dataset/testset_20230627" --npy_root "dataset/testset_20230627"
+```
+
+Example for dynamic data connected by multiple .csv
 
 ```
 python data_visualization.py --function "verify_npy" --source_data_path "dataset/dynamic1_20230706" "dataset/dynamic2_20230706" "dataset/dynamic3_20230706" --npy_root "dataset/dynamic_dataset"
@@ -296,7 +304,48 @@ Also, you can edit the arguments which you want to check:
 | --source_data_path | str | strings of paths with the original data you want to generate dataset, can contain only one or several paths |
 | --npy_root | str | where your generated dataset is located |
 
-### 3) Train model
+### 3) Windows
+
+#### Shape of data
+
+The generated dataset has shape: **[num_frames,num_features]**, where:
+
+```
+num_frames:     the number of frames in current dataset
+num_features:   the number of features of each frame, i.e. num_dist + num_dist_rate + num_angle + num_angle_rate
+num_dist:       the number of distance features, e.g. distance between LWrist and head
+num_dist_rate:  the number of rate of change of distance features, which is equal to num_dist
+num_dist:       the number of angle features, e.g. angle of LWrist with edges passing LHandEnd and LElbow
+num_dist_rate:  the number of rate of change of angle features, which is equal to num_dist
+```
+
+In dataloader, generated dataset would be windowlized based on defined **window_size**. Then each window contains multiple frames, and metrics of all features within in each window (i.e. meta-features) would be calculated. Hence, the final shape of data into model is: **[num_win,num_features*num_metrics]**, where:
+
+```
+num_win:        the number of windows, equal to **num_frames-window_size**
+num_features:   the number of features of each frame as before
+num_metrics:    the number of meta-features which describe statistical features of each window
+```
+
+And the metrics are:
+
+| Metric | Description |
+|--|--|
+| mean | mean of specific feature in one window |
+| std | standard deviation of specific feature in one window |
+| top_max_mean | mean of N-highest maximum of specific feature in one window |
+| top_min_mean | mean of N-lowest minimum of specific feature in one window |
+| max_min_range | top_max_mean - top_min_mean |
+| kurtosis | (https://www.scribbr.com/statistics/kurtosis/#:~:text=Kurtosis%20is%20a%20measure%20of,(medium%20tails)%20are%20mesokurtic.) |
+| skewness | (https://www.scribbr.com/statistics/skewness/) |
+
+#### Plot features of window
+
+With ```plot_features.ipynb```, you can try to load data with dynamic dataloader (static case doesn't have windows). Inside the .ipynb, you can follow the instruction to see plot of each meta-features of all activities, all windows, and all featuers.
+
+### 4) Train model
+
+
 
 #### Members:
 

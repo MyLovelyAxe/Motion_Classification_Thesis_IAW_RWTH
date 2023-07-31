@@ -1,15 +1,3 @@
-# in order to get access to functions from other parent folder
-# add the current path into system variable
-# then current path inside this script is root path
-# from inspect import getsourcefile
-# import os
-# import sys
-# import argparse
-# current_path = os.path.abspath(getsourcefile(lambda:0))
-# current_dir = os.path.dirname(current_path)
-# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
-# sys.path.insert(0, parent_dir)
-
 import os
 import argparse
 from util.utils import get_feature_selection,output_dataset
