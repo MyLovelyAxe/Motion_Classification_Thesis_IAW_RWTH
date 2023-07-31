@@ -1,17 +1,18 @@
 # in order to get access to functions from other parent folder
 # add the current path into system variable
 # then current path inside this script is root path
-from inspect import getsourcefile
-import os
-import sys
-import argparse
-current_path = os.path.abspath(getsourcefile(lambda:0))
-current_dir = os.path.dirname(current_path)
-parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
-sys.path.insert(0, parent_dir)
+# from inspect import getsourcefile
+# import os
+# import sys
+# import argparse
+# current_path = os.path.abspath(getsourcefile(lambda:0))
+# current_dir = os.path.dirname(current_path)
+# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+# sys.path.insert(0, parent_dir)
 
-from util.utils import get_feature_selection
-from util.utils import output_dataset
+import os
+import argparse
+from util.utils import get_feature_selection,output_dataset
 
 parser = argparse.ArgumentParser(description='generate dataset for training')
 
@@ -34,9 +35,9 @@ parser = argparse.ArgumentParser(description='generate dataset for training')
 #############################################
 
 
-parser.add_argument('--type',type=str,default='dynamic',choices=['static','dynamic'])
+parser.add_argument('--type',type=str,default='static',choices=['static','dynamic'])
 # static dataset
-parser.add_argument('--static_data_path',type=list,
+parser.add_argument('--static_data_path',type=str,nargs="+",
                     help='the list containing all static dataset to be merged',
                     choices=['dataset/testset_20230627',
                              'dataset/chor2_20230609'
@@ -45,7 +46,7 @@ parser.add_argument('--static_data_path',type=list,
                              ])
 parser.add_argument('--static_output_path',type=str,default='dataset/testset_20230627')
 # dynamic dataset
-parser.add_argument('--dynamic_data_path',type=list,
+parser.add_argument('--dynamic_data_path',type=str,nargs="+",
                     help='the list containing all dynamic dataset to be merged',
                     choices=['dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
@@ -60,7 +61,9 @@ parser.add_argument('--dynamic_output_path',type=str,default='dataset/dynamic_da
 parser.add_argument('--output_name',type=str,default='UpperLowerBody')
 parser.add_argument('--desired_features',type=str, 
                     default='dataset/desired_features.yaml',help='load features name from .yaml')
-args = parser.parse_args([])
+
+# args = parser.parse_args([])
+args = parser.parse_args()
 
 if __name__ == '__main__':
 

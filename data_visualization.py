@@ -1,15 +1,17 @@
-# in order to get access to functions from other parent folder
-# add the current path into system variable
-# then current path inside this script is root path
-from inspect import getsourcefile
-import os
-import sys
-import argparse
-current_path = os.path.abspath(getsourcefile(lambda:0))
-current_dir = os.path.dirname(current_path)
-parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
-sys.path.insert(0, parent_dir)
+# # in order to get access to functions from other parent folder
+# # add the current path into system variable
+# # then current path inside this script is root path
+# from inspect import getsourcefile
+# import os
+# import sys
+# import argparse
+# current_path = os.path.abspath(getsourcefile(lambda:0))
+# current_dir = os.path.dirname(current_path)
+# parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+# sys.path.insert(0, parent_dir)
 
+import os
+import argparse
 from util.plots_dynamic import plot_ori_data,verification
 # from util.plots import plot_ori_data,verification
 
@@ -46,8 +48,8 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/dynamic2_20230706',
-                    help='one single dataset for function check_ori_data and verify_before_output',
+                    default='dataset/chor2_20230609',
+                    help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
                              'dataset/dynamic1_20230706',
@@ -65,7 +67,7 @@ parser.add_argument('--desired_features_trial', type=str,
 ###### function: verify_npy ######
 ##################################
 
-parser.add_argument('--source_data_path', type=str,
+parser.add_argument('--source_data_path', type=str,nargs="+",
                     default=['dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
                              'dataset/dynamic3_20230706'],
@@ -80,7 +82,8 @@ parser.add_argument('--npy_root', type=str, default='dataset/dynamic_dataset')
 parser.add_argument('--desired_features', type=str, 
                     default='dataset/desired_features.yaml', help='load features name from .yaml')
 
-args = parser.parse_args([])
+# args = parser.parse_args([])
+args = parser.parse_args()
 
 if __name__ == '__main__':
 

@@ -241,6 +241,8 @@ Also, you can edit the arguments which you want to check:
 | --single_data_path | str | edit to the path where your ```unknown.NoHead.csv``` is located |
 | --wl | int | the window size for one window, please make it as odd number |
 
+You can see corresponding message if there are incorrect calculation. But usually it shows difference as long as there are error within 10e-5, which is totally bearable for most of the cases.
+
 #### Step6: Generate dataset
 
 Firstly there is difference in static datset and dynamic dataset:
@@ -262,7 +264,7 @@ Also, you can edit the arguments which you want to check:
 
 | args | Type | Description |
 |--|--|--|
-| --static_data_path | list | a list containing all string of paths with the original data you want to generate dataset, can contain only one or several paths |
+| --static_data_path | str | strings of paths with the original data you want to generate dataset, can contain only one or several paths |
 | --static_output_path | str | output path |
 
 for dynamic dataset:
@@ -270,15 +272,27 @@ for dynamic dataset:
 ```
 python dataset_generation.py --type "dynamic" --dynamic_data_path "dataset/dynamic1_20230706" "dataset/dynamic2_20230706" "dataset/dynamic3_20230706" --dynamic_output_path "dataset/dynamic_dataset"
 ```
+Also, you can edit the arguments which you want to check:
 
 | args | Type | Description |
 |--|--|--|
-| --dynamic_data_path | list | a list containing all string of paths with the original data you want to generate dataset, can contain only one or several paths |
+| --dynamic_data_path | str |  strings of paths with the original data you want to generate dataset, can contain only one or several paths |
 | --dynamic_output_path | str | output path |
-
 
 #### Step7: Verify dataset
 
+After generating dataset, you can still verify it to check if calculation has problems, just like **Step5: Verify features**:
+
+```
+python data_visualization.py --function "verify_npy" --source_data_path "dataset/dynamic1_20230706" "dataset/dynamic2_20230706" "dataset/dynamic3_20230706" --npy_root "dataset/dynamic_dataset"
+```
+
+Also, you can edit the arguments which you want to check:
+
+| args | Type | Description |
+|--|--|--|
+| --source_data_path | str | strings of paths with the original data you want to generate dataset, can contain only one or several paths |
+| --npy_root | str | where your generated dataset is located |
 
 ### 3) Train model
 
