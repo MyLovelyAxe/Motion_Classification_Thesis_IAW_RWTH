@@ -221,9 +221,7 @@ All joints to be selected and corresponding index is shown below:
 |24| spine5 | 5th spinal joint from spine1 |
 |25| head | head vertex |
 
-<div>
-<img src="Archiv/joint_index.jpg" style="zoom:60%"/>
-</div>
+<img src="Archive/joint_index.jpg" alt="My Image" width="350" height="450">
 
 The rule of defining feature's name is as following:
 
