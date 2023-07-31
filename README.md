@@ -353,24 +353,38 @@ The model we choose for classification are RandomForest, KNN, and SVM.
 
 To train a model for static dataset, try:
 
+KNN:
+
 ```
-python
+python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLowerBody.npy" "dataset/chor2_20230609/y_data_UpperLowerBody.npy" --testset_path "dataset/testset_20230627/x_data_UpperLowerBody.npy" "dataset/testset_20230627/y_data_UpperLowerBody.npy" --train_len 10000 --test_len 100 --model "KNN" --n_neighbor 1
+```
+
+RandomForest:
+
+```
+python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLowerBody.npy" "dataset/chor2_20230609/y_data_UpperLowerBody.npy" --testset_path "dataset/testset_20230627/x_data_UpperLowerBody.npy" "dataset/testset_20230627/y_data_UpperLowerBody.npy" --train_len 10000 --test_len 100 --model "RandomForest" --max_depth 2 --random_state 0
+```
+
+SVM:
+
+```
+python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLowerBody.npy" "dataset/chor2_20230609/y_data_UpperLowerBody.npy" --testset_path "dataset/testset_20230627/x_data_UpperLowerBody.npy" "dataset/testset_20230627/y_data_UpperLowerBody.npy" --train_len 10000 --test_len 100 --model "SVM"
 ```
 
 #### Dynamic model
 
 To train a model for dynamic dataset, try:
 
-RandomForest:
-
-```
-python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "RandomForest" --max_depth 6 --random_state 0
-```
-
 KNN:
 
 ```
 python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "KNN" --n_neighbor 20
+```
+
+RandomForest:
+
+```
+python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "RandomForest" --max_depth 6 --random_state 0
 ```
 
 SVM:

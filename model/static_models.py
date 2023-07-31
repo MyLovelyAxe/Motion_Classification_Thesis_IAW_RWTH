@@ -92,8 +92,9 @@ class SVM(StaticClassModel):
                          Test_Len,
                          Trainset_Path,
                          Testset_Path)
-        self.svm = svm.SVC()
+        self.svm = svm.SVC(probability=True)
     def train(self):
         self.svm.fit(self.static_data.x_train, self.static_data.y_train)
     def test(self):
+        self.P_pred = self.svm.predict_proba(self.static_data.x_test)
         self.T_pred = self.svm.predict(self.static_data.x_test)

@@ -1,15 +1,14 @@
 import argparse
 from model.static_models import KNN,RandomForest,SVM
 
-
 parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
 ###### datasets parameters ######
-parser.add_argument('--trainset_path',type=list,
+parser.add_argument('--trainset_path',type=str,nargs='+',
                     default=['dataset/chor2_20230609/x_data_UpperLowerBody.npy',
                              'dataset/chor2_20230609/y_data_UpperLowerBody.npy'],
                     help='path of training dataset')
-parser.add_argument('--testset_path',type=list,
+parser.add_argument('--testset_path',type=str,nargs='+',
                     default=['dataset/testset_20230627/x_data_UpperLowerBody.npy',
                              'dataset/testset_20230627/y_data_UpperLowerBody.npy'],
                     help='path of extra testing dataset from outside')
@@ -25,7 +24,7 @@ parser.add_argument('--n_neighbor', type=int, default=1, help='number of neighbo
 parser.add_argument('--max_depth', type=int, default=2, help='max depth for random forest')
 parser.add_argument('--random_state', type=int, default=0, help='random state for random forest')
 
-args = parser.parse_args([])
+args = parser.parse_args()
 
 if __name__ == '__main__':
 
@@ -42,7 +41,7 @@ if __name__ == '__main__':
                                  Train_Len=args.train_len,
                                  Test_Len=args.test_len,
                                  Trainset_Path=args.trainset_path,
-                                #  Testset_Path=args.testset_path
+                                 Testset_Path=args.testset_path
                                  )
     elif args.model == 'SVM':
         cls_model = SVM(Train_Len=args.train_len,
