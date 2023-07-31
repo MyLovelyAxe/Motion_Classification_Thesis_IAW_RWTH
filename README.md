@@ -59,6 +59,8 @@ And the whole directory structure is shown as follows.
 
 ```
 └── root/
+    ├── data_visualization.py
+    ├── dataset_generation.py
     ├── train_dynamic_ML.py
     ├── train_static_ML.py
     ├── plot_features.ipynb
@@ -67,8 +69,6 @@ And the whole directory structure is shown as follows.
     ├── dataloader/
     |   └── ML_dataloader.py
     ├── datasets/
-    |   ├── data_visualization.py
-    |   ├── dataset_generation.py
     |   ├── desired_features_trial.yaml
     |   ├── desired_features.yaml
     |   └── raw_data_1/
