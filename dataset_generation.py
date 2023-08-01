@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='generate dataset for training')
 #############################################
 
 
-parser.add_argument('--type',type=str,default='static',choices=['static','dynamic'])
+parser.add_argument('--type',type=str,default='dynamic',choices=['static','dynamic'])
 # static dataset
 parser.add_argument('--static_data_path',type=str,nargs="+",
                     help='the list containing all static dataset to be merged',
@@ -39,12 +39,13 @@ parser.add_argument('--dynamic_data_path',type=str,nargs="+",
                     choices=['dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
                              'dataset/dynamic3_20230706',
+                             'dataset/dynamic_test_20230801',
+                             'dataset/agree_20230801',
+                             'dataset/agree_test_20230801'
                              ],
-                    default=['dataset/dynamic1_20230706',
-                             'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706',
+                    default=['dataset/dynamic_test_20230801'
                              ])
-parser.add_argument('--dynamic_output_path',type=str,default='dataset/dynamic_dataset')
+parser.add_argument('--dynamic_output_path',type=str,default='dataset/dynamic_test_20230801')
 # common parameters
 parser.add_argument('--output_name',type=str,default='UpperLowerBody')
 parser.add_argument('--desired_features',type=str, 

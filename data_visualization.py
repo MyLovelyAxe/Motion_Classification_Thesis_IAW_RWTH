@@ -46,8 +46,8 @@ parser.add_argument('--single_data_path', type=str,
                              'dataset/agree_20230801',
                              'dataset/agree_test_20230801']
                     )
-parser.add_argument('--start_frame', type=int, default=1200, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=1500, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=1422, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=1472, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
@@ -66,7 +66,10 @@ parser.add_argument('--source_data_path', type=str,nargs="+",
                              'dataset/testset_20230627',
                              'dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706']
+                             'dataset/dynamic3_20230706',
+                             'dataset/dynamic_test_20230801',
+                             'dataset/agree_20230801',
+                             'dataset/agree_test_20230801']
                              )
 parser.add_argument('--npy_root', type=str, default='dataset/dynamic_dataset')
 parser.add_argument('--desired_features', type=str, 
