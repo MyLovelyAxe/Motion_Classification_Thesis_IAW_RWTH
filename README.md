@@ -66,6 +66,9 @@ And the whole directory structure is shown as follows.
     ├── plot_features.ipynb
     ├── README.md
     ├── Archiv/
+    ├── bash/
+    |   ├── exp_agree.sh
+    |   └── exp_dynamic.sh
     ├── dataloader/
     |   └── ML_dataloader.py
     ├── datasets/
@@ -80,11 +83,11 @@ And the whole directory structure is shown as follows.
     |   ├── dynamic_models.py
     |   └── static_models.py
     ├── result/
-    |   ├── model_prediction_probability.png
-    |   └── static_models.py
+    |   ├── result1.png
+    |   └── result2.png
     └── util/
         ├── features.py
-        ├── plots_dynamic.py
+        ├── plots.py
         └── utils.py
 ```
 
