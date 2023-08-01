@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
-# from dataloader.ML_dataloader import DynamicData
 from dataloader.ML_dataloader_externalTest import DynamicData
 
 class DynamicClassModel():
@@ -54,21 +53,10 @@ class DynamicClassModel():
                 ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
             ax1.set_title(f'Prediction',fontsize=10)
             ax1.set_ylabel(f'Prediction Probability')
-            # ax1.legend()
             ax2.set_title(f'Truth',fontsize=10)
             ax2.set_xlabel(f'Time [sec]')
             ax2.set_ylabel(f'Prediction Probability')
-            # ax2.legend()
-            # comman setting
-            labels = list(f'{aName_dict[act_idx]}' for act_idx in self.dynamic_data.train_data.values)
-            print(labels)
-            fig.legend(bbox_to_anchor=(1.04, 0.5), # define location of legend
-                       loc="center left",
-                       borderaxespad=0,
-                       labels=labels # comman legends
-                       )
             plt.legend()
-            # fig.tight_layout()
             ### save plot
             if args.save_res:
                 plt.savefig(os.path.join(output_path,f'{title}.png'))

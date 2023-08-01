@@ -48,6 +48,7 @@ if __name__ == '__main__':
         args.test_split_method_paths = None
         args.testset_path = None
 
+    ### create model
     if args.model == 'KNN':
         cls_model = KNN(N_neighbor=args.n_neighbor,
                         Window_Size=args.window_size,
@@ -75,6 +76,8 @@ if __name__ == '__main__':
                         Testset_Path=args.testset_path,
                         Split_Ratio=args.split_ratio
                         )
+        
+    ### train & test & show result
     cls_model.train()
     cls_model.test()
     print(f'Result on {args.model}:')

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_metric_index_dict, get_feature_index_dict, get_act_index_dict
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
 
 
 class StaticData():
@@ -63,7 +63,7 @@ class StaticData():
         print()
 
 
-class DynamicData():
+class Windowlize():
 
     """
     Dynamic activities can not be easily classified with single frame,
@@ -74,22 +74,16 @@ class DynamicData():
 
     def __init__(self,
                  window_size,
-                 split_method_paths,
-                 trainset_path,
-                 testset_path,
-                 split_ratio,
-                 trial=False):
+                 data_path,
+                 split_method_paths):
         self.wl = window_size
+        self.data_path = data_path
+        self.split_method_paths = split_method_paths
         self.aIdx_dict = get_act_index_dict(split_method_paths)
-        self.trainset_path = trainset_path
-        self.testset_path = testset_path
-        self.split_ratio = split_ratio
-        self.trial = trial
         self.load_data()
         self.create_windows()
         self.calc_statistic_features()
-        if not self.trial:
-            self.create_train_test_set()
+        self.localization()
 
     def load_data(self):
         """
@@ -98,9 +92,9 @@ class DynamicData():
         y_data shape:
             original: [#frames,]
         """
-        with open(self.trainset_path[0], 'rb') as xf:
+        with open(self.data_path[0], 'rb') as xf:
             self.x_data_ori = np.load(xf)
-        with open(self.trainset_path[1], 'rb') as yf:
+        with open(self.data_path[1], 'rb') as yf:
             self.y_data_ori = np.load(yf)
         print(f'loaded original x_data shape: {self.x_data_ori.shape}')
         print(f'loaded original y_data shape: {self.y_data_ori.shape}')
@@ -150,11 +144,15 @@ class DynamicData():
         print(f'x_data with window features has shape: {self.x_data.shape}')
         print(f'y_data with window features has shape: {self.y_data.shape}')
         print()
-        if not self.trial:
-            del self.x_data_win, self.y_data_win
+        del self.x_data_win, self.y_data_win
+
+    def localization(self):
+        """
+        Get the index and counts of each label in y_data for spliting for training
+        """
+        self.values, self.starts, self.counts = np.unique(self.y_data, return_counts=True, return_index=True)
 
     def plot_window_features(self,
-                             split_method_paths: list,
                              which_activity: list,
                              win_range: list,
                              which_feature: list,
@@ -173,15 +171,13 @@ class DynamicData():
             a list containing names of desired metrics (e.g. mean, std) to plot
         """
         # prepare
-        act_idx_lst = get_act_index(split_method_paths, which_activity)
+        act_idx_lst = get_act_index(self.split_method_paths, which_activity)
         feature_idx_lst = get_feature_index(which_feature)
         metric_idx_lst = get_metric_index(which_metric)
-        # localization
-        values, starts, counts = np.unique(
-            self.y_data, return_counts=True, return_index=True)
-        print(f'values: {values}')
-        print(f'starts: {starts}')
-        print(f'counts: {counts}')
+        # show localization
+        print(f'values: {self.values}')
+        print(f'starts: {self.starts}')
+        print(f'counts: {self.counts}')
         # get shapes
         self.num_win = win_range[0] - win_range[1]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
@@ -191,15 +187,15 @@ class DynamicData():
         ax = plt.subplot(1, 1, 1)
         for aIdx, aName in zip(act_idx_lst, which_activity):
             # 1. where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(values == aIdx)[0][0]
+            label_idx = np.where(self.values == aIdx)[0][0]
             print(f'act: {aName}, label_idx: {label_idx}')
             # 2. check if the given win_range exceeds the upper limit of this act's range
-            print(f'upper limit of this act: {counts[label_idx]}')
-            assert win_range[1] <= counts[
+            print(f'upper limit of this act: {self.counts[label_idx]}')
+            assert win_range[1] <= self.counts[
                 label_idx], f'the desired window_range exceeds upper limit of act {aName}'
             # 3. select te segment of windows to plot
-            print(f'from {starts[label_idx]+win_range[0]}th window to {starts[label_idx]+win_range[1]}th window')
-            desired_windows = self.x_data[starts[label_idx]+win_range[0]:starts[label_idx]+win_range[1], :]
+            print(f'from {self.starts[label_idx]+win_range[0]}th window to {self.starts[label_idx]+win_range[1]}th window')
+            desired_windows = self.x_data[self.starts[label_idx]+win_range[0]:self.starts[label_idx]+win_range[1], :]
             print(f'Batch of these windows have shape: {desired_windows.shape}')
             # 4. based on feature_idx and metric_idx, calculate the real index on dimension of x_data.shape[1]
             desired_windows = desired_windows.reshape(self.num_win, self.num_metrics, self.num_features)
@@ -215,7 +211,6 @@ class DynamicData():
         plt.show()
 
     def plot_metric_features(self,
-                             split_method_paths: list,
                              which_metric:list,
                              check_content:bool=False):
         """
@@ -223,7 +218,7 @@ class DynamicData():
             - which_metric only contains 1 metric
         """
         ### prepare basics
-        aIdx_dict = get_act_index_dict(split_method_paths)
+        # aIdx_dict = get_act_index_dict(self.split_method_paths)
         mIdx = get_metric_index(which_metric)[0]
         self.num_win = self.x_data.shape[0]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
@@ -237,7 +232,7 @@ class DynamicData():
         if check_content:
             print(f'Check activity:')
             print('=========================================')
-            for aName,aIdx in aIdx_dict.items():
+            for aName,aIdx in self.aIdx_dict.items():
                 print(f'act name: {aName}, act idx: {aIdx}')
             print()
             print(f'Check features:')
@@ -248,14 +243,14 @@ class DynamicData():
                 for fName,fIdx in fIdx_dict.items():
                     print(f'feature name: {fName}, feature idx: {fIdx}')
         ### localization
-        values, starts, counts = np.unique(self.y_data, return_counts=True, return_index=True)
-        print(f'values: {values}')
-        print(f'starts: {starts}')
-        print(f'counts: {counts}')
-        x_upperLim = np.max(counts)
+        # show localization
+        print(f'values: {self.values}')
+        print(f'starts: {self.starts}')
+        print(f'counts: {self.counts}')
+        x_upperLim = np.max(self.counts)
         ### plotting
         ncol = len(feature_index_dict)
-        nrow = len(aIdx_dict)
+        nrow = len(self.aIdx_dict)
         fig, axes = plt.subplots(nrow, ncol, figsize=(40,30))
         for fNum,(catogary,fIdx_dict) in enumerate(feature_index_dict.items()):
             # labels = list(fName for fName,_ in fIdx_dict.items())
@@ -263,16 +258,16 @@ class DynamicData():
             current_features_idx = list(f_idx for _,f_idx in fIdx_dict.items())
             y_upperLim = np.max(metric_data[:, current_features_idx])
             y_lowerLim = np.min(metric_data[:, current_features_idx])
-            for aNum,(aName,aIdx) in enumerate(aIdx_dict.items()):
+            for aNum,(aName,aIdx) in enumerate(self.aIdx_dict.items()):
                 ## where is beginning index of this act in self.y_data, based on 'values':
-                label_idx = np.where(values == aIdx)[0][0]
+                label_idx = np.where(self.values == aIdx)[0][0]
                 ## select te segment of this activity to plot
-                start_idx = starts[label_idx]
-                end_idx = start_idx+counts[label_idx]
+                start_idx = self.starts[label_idx]
+                end_idx = start_idx+self.counts[label_idx]
                 desired_windows = metric_data[start_idx:end_idx, :]
                 ## plot
                 for fName,fIdx in fIdx_dict.items():
-                    axes[aNum,fNum].plot(np.arange(0,counts[label_idx]), desired_windows[:,fIdx])
+                    axes[aNum,fNum].plot(np.arange(0,self.counts[label_idx]), desired_windows[:,fIdx])
                 # axes[0,fNum].legend(loc='upper left',
                 #                     bbox_to_anchor=(1.04, 0.5),
                 #                     labels=labels)
@@ -286,34 +281,63 @@ class DynamicData():
         fig.tight_layout()
         plt.show()
 
-    def create_train_test_set(self):
 
-        ### localization
-        self.values, self.starts, self.counts = np.unique(self.y_data, return_counts=True, return_index=True)
-        x_train_lst = []
-        y_train_lst = []
-        x_test_lst = []
-        y_test_lst = []
-        for aNum,(aName,aIdx) in enumerate(self.aIdx_dict.items()):
-            ## where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(self.values == aIdx)[0][0]
-            ## define indices of train and test set
-            train_start_idx = self.starts[label_idx]
-            train_end_idx = train_start_idx + int(self.counts[label_idx]*self.split_ratio)
-            test_start_idx = train_end_idx + 1
-            test_end_idx = train_start_idx + self.counts[label_idx]
-            ## split train and test part in each activity
-            x_train_lst.append(self.x_data[train_start_idx:train_end_idx])
-            y_train_lst.append(self.y_data[train_start_idx:train_end_idx])
-            x_test_lst.append(self.x_data[test_start_idx:test_end_idx])
-            y_test_lst.append(self.y_data[test_start_idx:test_end_idx])
-        self.x_train = np.concatenate(x_train_lst,axis=0)
-        self.y_train = np.concatenate(y_train_lst,axis=0)
-        self.x_test = np.concatenate(x_test_lst,axis=0)
-        self.y_test = np.concatenate(y_test_lst,axis=0)
+class DynamicData():
+
+    """
+    If external testset is provided, then test with external testset;
+    If not, then extract part of trainset for testing
+    """
+    def __init__(self,
+                 window_size,
+                 train_split_method_paths,
+                 trainset_path,
+                 test_split_method_paths,
+                 testset_path,
+                 split_ratio):
+        self.train_data = Windowlize(window_size=window_size,
+                                     data_path=trainset_path,
+                                     split_method_paths=train_split_method_paths)
+        self.split_ratio = split_ratio
+        if test_split_method_paths and testset_path:
+            self.test_data = Windowlize(window_size=window_size,
+                                        data_path=testset_path,
+                                        split_method_paths=test_split_method_paths)
+            self.Internal_TrainTest()
+            # test with ouside testset, simply rewrite self.x_test and self.y_test
+            self.x_test = self.test_data.x_data
+            self.y_test = self.test_data.y_data
+        else:
+            self.Internal_TrainTest()
 
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()
+
+    def Internal_TrainTest(self):
+        """
+        Create trainset and test set with one signle dataset
+        """
+        x_train_lst = []
+        y_train_lst = []
+        x_test_lst = []
+        y_test_lst = []
+        for aNum,(aName,aIdx) in enumerate(self.train_data.aIdx_dict.items()):
+            ## where is beginning index of this act in self.y_data, based on 'values':
+            label_idx = np.where(self.train_data.values == aIdx)[0][0]
+            ## define indices of train and test set
+            train_start_idx = self.train_data.starts[label_idx]
+            train_end_idx = train_start_idx + int(self.train_data.counts[label_idx]*self.split_ratio)
+            test_start_idx = train_end_idx + 1
+            test_end_idx = train_start_idx + self.train_data.counts[label_idx]
+            ## split train and test part in each activity
+            x_train_lst.append(self.train_data.x_data[train_start_idx:train_end_idx])
+            y_train_lst.append(self.train_data.y_data[train_start_idx:train_end_idx])
+            x_test_lst.append(self.train_data.x_data[test_start_idx:test_end_idx])
+            y_test_lst.append(self.train_data.y_data[test_start_idx:test_end_idx])
+        self.x_train = np.concatenate(x_train_lst,axis=0)
+        self.y_train = np.concatenate(y_train_lst,axis=0)
+        self.x_test = np.concatenate(x_test_lst,axis=0)
+        self.y_test = np.concatenate(y_test_lst,axis=0)
