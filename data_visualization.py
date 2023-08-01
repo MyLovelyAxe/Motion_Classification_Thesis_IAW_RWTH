@@ -1,6 +1,6 @@
 import os
 import argparse
-from util.plots_dynamic import plot_ori_data,verification
+from util.plots import plot_ori_data,verification
 
 ############################# Attention ###########################
 ##
@@ -23,7 +23,7 @@ from util.plots_dynamic import plot_ori_data,verification
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='verify_npy',
+                    default='check_ori_data',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
@@ -35,16 +35,19 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/chor2_20230609',
+                    default='dataset/dynamic_test_20230801',
                     help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
                              'dataset/dynamic1_20230706',
                              'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706']
+                             'dataset/dynamic3_20230706',
+                             'dataset/dynamic_test_20230801',
+                             'dataset/agree_20230801',
+                             'dataset/agree_test_20230801']
                     )
-parser.add_argument('--start_frame', type=int, default=1900, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=1950, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=1200, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=1500, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
