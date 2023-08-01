@@ -1,0 +1,32 @@
+Ball1:
+  start: 200
+  end: 620
+  label: 1
+ExtendArm1:
+  start: 770
+  end: 900
+  label: 2
+RetractArm1:
+  start: 900
+  end: 1030
+  label: 3
+ExtendArm2:
+  start: 1030
+  end: 1160
+  label: 2
+RetractArm2:
+  start: 1160
+  end: 1300
+  label: 3
+ExtendArm3:
+  start: 1300
+  end: 1430
+  label: 2
+RetractArm3:
+  start: 1430
+  end: 1550
+  label: 3
+Squating1:
+  start: 1570
+  end: 2120
+  label: 4

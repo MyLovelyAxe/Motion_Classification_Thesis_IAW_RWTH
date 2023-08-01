@@ -6,7 +6,7 @@ HandAway1:
   start: 3900
   end: 7200
   label: 2
-HandOverHead:
+HandOverHead1:
   start: 7400
   end: 10700
   label: 3

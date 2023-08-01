@@ -230,7 +230,7 @@ The rule of defining feature's name is as following:
 
 #### Step5: Verify features
 
-Use features definded in ```dataset/desired_features_trial.yaml``` to verify whether calculation of features are correct by plotting, with command:
+Use features definded in ```dataset/desired_features_trial.yaml``` to verify whether calculation of features are correct by plotting, and check the fft of randomly selected windows, with command:
 
 ```
 python data_visualization.py --function "verify_before_output" --single_data_path "dataset/testset_20230627" --wl 51
@@ -283,7 +283,7 @@ Also, you can edit the arguments which you want to check:
 
 #### Step7: Verify dataset
 
-After generating dataset, you can still verify it to check if calculation has problems, just like **Step5: Verify features**.
+After generating dataset, you can still verify it to check if calculation has problems, and check the fft of randomly selected windows, just like **Step5: Verify features**.
 
 Example for static data connected by one single .csv
 
@@ -392,6 +392,13 @@ SVM:
 ```
 python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "SVM"
 ```
+
+You can also set the following argument optionaly:
+
+| args | Type | Description |
+|--|--|--|
+| --outside_test | bool | determine whether to use external testset for testing, True: use; False: not use |
+| --save_res | bool | determine whether to save plots of classification result, True: save; False: not save |
 
 ## Contact
 
