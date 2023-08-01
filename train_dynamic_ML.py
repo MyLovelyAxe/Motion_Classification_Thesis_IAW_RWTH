@@ -24,7 +24,7 @@ parser.add_argument('--testset_path',type=str,nargs='+',
 parser.add_argument('--split_ratio', type=float, default=0.8, help='the ratio for number of samples in trainset')
 parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
 
-parser.add_argument('--outside_test',type=bool,default=True,help='True: use extra testset; False: extract testset from trainset')
+parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
 parser.add_argument('--save_res',type=bool,default=False,help='True: save plot; False: show plot')
 
 ###### models configuration ######

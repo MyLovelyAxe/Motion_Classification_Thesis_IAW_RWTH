@@ -373,32 +373,24 @@ python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLo
 
 #### Dynamic model
 
-To train a model for dynamic dataset, try:
-
-KNN:
+You can run the script files in ```/bash``` to directly run trainings. For example, to run the prepared example **dynamic**, you can run by:
 
 ```
-python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "KNN" --n_neighbor 20
+bash exp_dynamic.sh KNN 0 200
 ```
 
-RandomForest:
+where the 3 passed arguments mean:
+
+* **KNN**:  use KNN model
+* **0**:    0 means not use external testset for testing, change to 1 to use external testset
+* **200**:  window size
+
+Similar for **RandomForest** and **SVM**:
 
 ```
-python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "RandomForest" --max_depth 6 --random_state 0
+bash exp_dynamic.sh RandomForest 1 200
+bash exp_dynamic.sh SVM 0 200
 ```
-
-SVM:
-
-```
-python train_dynamic_ML.py --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" --split_method_paths "dataset/dynamic1_20230706/split_method.yaml" "dataset/dynamic2_20230706/split_method.yaml" "dataset/dynamic3_20230706/split_method.yaml" --split_ratio 0.8 --window_size 250 --model "SVM"
-```
-
-You can also set the following argument optionaly:
-
-| args | Type | Description |
-|--|--|--|
-| --outside_test | bool | determine whether to use external testset for testing, True: use; False: not use |
-| --save_res | bool | determine whether to save plots of classification result, True: save; False: not save |
 
 ## Contact
 
