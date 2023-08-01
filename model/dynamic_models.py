@@ -4,53 +4,77 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
-from dataloader.ML_dataloader import DynamicData
+# from dataloader.ML_dataloader import DynamicData
+from dataloader.ML_dataloader_externalTest import DynamicData
 
 class DynamicClassModel():
     
     def __init__(self,
                  Window_Size,
-                 Split_Method_Paths,
+                 Train_Split_Method_Paths,
                  Trainset_Path,
+                 Test_Split_Method_Paths=None,
                  Testset_Path=None,
                  Split_Ratio=0.8):
         self.T_pred = None
         self.P_pred = None
         self.dynamic_data = DynamicData(window_size=Window_Size,
-                                        split_method_paths=Split_Method_Paths,
+                                        train_split_method_paths=Train_Split_Method_Paths,
                                         trainset_path=Trainset_Path,
+                                        test_split_method_paths=Test_Split_Method_Paths,
                                         testset_path=Testset_Path,
                                         split_ratio=Split_Ratio
                                         )
 
-    def show_result(self,modle_name,save=True):
+    def show_result(self,args,save=True):
+
         print(f'predicted target: {self.T_pred}')
         if not self.P_pred is None:
-            # define output path
+            ### define output path
             output_path = 'result'
             if not os.path.exists(output_path):
                 os.mkdir(output_path)
             self.P_pred = (self.P_pred).astype(np.float32)
-            # Generate x-axis values
+            ### Generate x-axis values
             frame_rate=60 # Hz
             sample_numbers = np.arange(self.P_pred.shape[0])/frame_rate
-            # prepare act names
+            ### prepare act names
             aName_dict = {}
-            for k,v in self.dynamic_data.aIdx_dict.items():
+            for k,v in self.dynamic_data.train_data.aIdx_dict.items():
                 aName_dict[v] = k
-            # Plotting
-            fig = plt.figure(figsize=(8,6))
-            for idx,act_idx in enumerate(self.dynamic_data.values):
-                plt.plot(sample_numbers, self.P_pred[:, idx], label=f'{aName_dict[act_idx]}')
-            plt.title(f'Testing on model {modle_name}')
-            plt.xlabel(f'Time [sec]')
-            plt.ylabel(f'Prediction Probability')
-            plt.legend(loc='upper left',bbox_to_anchor=(1.04, 1.0))
-            plt.tight_layout()
+            ### Plotting
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
+            use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
+            title = f'Testing: Dynamic_{args.model}_wl{args.window_size} {use_ext_test}'
+            fig.suptitle(title,fontsize=15)
+            # prediction & truth plot
+            for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
+                ax1.plot(sample_numbers, self.P_pred[:, idx], label=f'{aName_dict[act_idx]}')
+                truth = np.where(self.dynamic_data.y_test==act_idx,1,0)
+                ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
+            ax1.set_title(f'Prediction',fontsize=10)
+            ax1.set_ylabel(f'Prediction Probability')
+            # ax1.legend()
+            ax2.set_title(f'Truth',fontsize=10)
+            ax2.set_xlabel(f'Time [sec]')
+            ax2.set_ylabel(f'Prediction Probability')
+            # ax2.legend()
+            # comman setting
+            labels = list(f'{aName_dict[act_idx]}' for act_idx in self.dynamic_data.train_data.values)
+            print(labels)
+            fig.legend(bbox_to_anchor=(1.04, 0.5), # define location of legend
+                       loc="center left",
+                       borderaxespad=0,
+                       labels=labels # comman legends
+                       )
+            plt.legend()
+            # fig.tight_layout()
+            ### save plot
             if save:
-                plt.savefig(os.path.join(output_path,f'Dynamic_{modle_name}.png'))
+                plt.savefig(os.path.join(output_path,f'{title}.png'))
             else:
                 plt.show()
+            ### print out results
             print(f'P_pred: type: {type(self.P_pred)}, shape: {self.P_pred.shape}')
             print(f'probability of predicted target: {self.P_pred}')
         print(f'true target: {self.dynamic_data.y_test}')
@@ -62,13 +86,15 @@ class KNN(DynamicClassModel):
     def __init__(self,
                  N_neighbor,
                  Window_Size,
-                 Split_Method_Paths,
+                 Train_Split_Method_Paths,
                  Trainset_Path,
+                 Test_Split_Method_Paths=None,
                  Testset_Path=None,
                  Split_Ratio=0.8):
         super().__init__(Window_Size,
-                         Split_Method_Paths,
+                         Train_Split_Method_Paths,
                          Trainset_Path,
+                         Test_Split_Method_Paths,
                          Testset_Path,
                          Split_Ratio)
         self.neigh = KNeighborsClassifier(n_neighbors=N_neighbor)
@@ -84,13 +110,15 @@ class RandomForest(DynamicClassModel):
                  Max_Depth,
                  Random_State,
                  Window_Size,
-                 Split_Method_Paths,
+                 Train_Split_Method_Paths,
                  Trainset_Path,
+                 Test_Split_Method_Paths=None,
                  Testset_Path=None,
                  Split_Ratio=0.8):
         super().__init__(Window_Size,
-                         Split_Method_Paths,
+                         Train_Split_Method_Paths,
                          Trainset_Path,
+                         Test_Split_Method_Paths,
                          Testset_Path,
                          Split_Ratio)
         self.random_forest = RandomForestClassifier(max_depth=Max_Depth,random_state=Random_State)
@@ -104,13 +132,15 @@ class SVM(DynamicClassModel):
     
     def __init__(self,
                  Window_Size,
-                 Split_Method_Paths,
+                 Train_Split_Method_Paths,
                  Trainset_Path,
+                 Test_Split_Method_Paths=None,
                  Testset_Path=None,
                  Split_Ratio=0.8):
         super().__init__(Window_Size,
-                         Split_Method_Paths,
+                         Train_Split_Method_Paths,
                          Trainset_Path,
+                         Test_Split_Method_Paths,
                          Testset_Path,
                          Split_Ratio)
         self.svm = svm.SVC(probability=True)
