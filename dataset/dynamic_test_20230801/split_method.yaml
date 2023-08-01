@@ -1,0 +1,44 @@
+JumpJack1:
+  start: 220
+  end: 500
+  label: 9
+Squating1:
+  start: 500
+  end: 950
+  label: 3
+Waving1:
+  start: 980
+  end: 1470
+  label: 4
+Jumping1:
+  start: 1510
+  end: 1760
+  label: 2
+Walking1:
+  start: 1760
+  end: 2040
+  label: 1
+Reaching1:
+  start: 2080
+  end: 2600
+  label: 5
+Drinking1:
+  start: 2620
+  end: 3160
+  label: 6
+Jumping2:
+  start: 3160
+  end: 3450
+  label: 2
+Walking2:
+  start: 3460
+  end: 3740
+  label: 1
+Bicep1:
+  start: 3790
+  end: 4280
+  label: 8
+Boxing1:
+  start: 4340
+  end: 4600
+  label: 7
