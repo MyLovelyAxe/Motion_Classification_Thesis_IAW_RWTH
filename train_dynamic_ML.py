@@ -1,7 +1,6 @@
 import argparse
 from model.dynamic_models import KNN,RandomForest,SVM
 
-
 parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
 ###### datasets parameters ######
@@ -16,7 +15,6 @@ parser.add_argument('--trainset_path',type=str,nargs='+',
                              'dataset/dynamic_dataset/y_data_UpperLowerBody.npy'],
                     help='path of training dataset')
 
-parser.add_argument('--outside_test',type=bool,default=True,help='True: use extra testset; False: extract testset from trainset')
 parser.add_argument('--test_split_method_paths', type=str,nargs='+',
                     default=['dataset/dynamic_test_20230801/split_method.yaml'],
                     help='split method for extracting labels and names of activities')
@@ -27,6 +25,9 @@ parser.add_argument('--testset_path',type=str,nargs='+',
 
 parser.add_argument('--split_ratio', type=float, default=0.8, help='the ratio for number of samples in trainset')
 parser.add_argument('--window_size', type=int, default=200, help='the ratio for number of samples in trainset')
+
+parser.add_argument('--outside_test',type=bool,default=True,help='True: use extra testset; False: extract testset from trainset')
+parser.add_argument('--save_res',type=bool,default=False,help='True: save plot; False: show plot')
 
 ###### models configuration ######
 
@@ -77,4 +78,4 @@ if __name__ == '__main__':
     cls_model.train()
     cls_model.test()
     print(f'Result on {args.model}:')
-    cls_model.show_result(args,save=True)
+    cls_model.show_result(args)

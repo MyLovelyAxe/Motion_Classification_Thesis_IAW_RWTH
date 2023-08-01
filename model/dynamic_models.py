@@ -26,7 +26,7 @@ class DynamicClassModel():
                                         split_ratio=Split_Ratio
                                         )
 
-    def show_result(self,args,save=True):
+    def show_result(self,args):
 
         print(f'predicted target: {self.T_pred}')
         if not self.P_pred is None:
@@ -70,7 +70,7 @@ class DynamicClassModel():
             plt.legend()
             # fig.tight_layout()
             ### save plot
-            if save:
+            if args.save_res:
                 plt.savefig(os.path.join(output_path,f'{title}.png'))
             else:
                 plt.show()
