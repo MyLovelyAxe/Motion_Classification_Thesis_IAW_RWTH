@@ -21,7 +21,8 @@ if [[ $model == "KNN" ]]; then
         --window_size $wl \
         --model "KNN" \
         --n_neighbor 20 \
-        --outside_test $ext
+        --outside_test $ext \
+        --save_res 1
 
 elif [[ $model == "RandomForest" ]]; then
 
@@ -37,7 +38,8 @@ elif [[ $model == "RandomForest" ]]; then
         --model "RandomForest" \
         --max_depth 6 \
         --random_state 0 \
-        --outside_test $ext
+        --outside_test $ext \
+        --save_res 1
 
 elif [[ $model == "SVM" ]]; then
 
@@ -51,6 +53,7 @@ elif [[ $model == "SVM" ]]; then
         --split_ratio 0.8 \
         --window_size $wl \
         --model "SVM" \
-        --outside_test $ext
+        --outside_test $ext \
+        --save_res 1
 
 fi
