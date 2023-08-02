@@ -14,12 +14,17 @@ class StaticData():
     def __init__(self,
                  train_len,
                  test_len,
+                 train_split_method_paths,
                  trainset_path,
+                 test_split_method_paths,
                  testset_path):
         self.train_len = train_len
         self.test_len = test_len
         self.trainset_path = trainset_path
         self.testset_path = testset_path
+        self.train_aIdx_dict = get_act_index_dict(train_split_method_paths)
+        if test_split_method_paths:
+            self.test_aIdx_dict = get_act_index_dict(test_split_method_paths)
         self.create_trainset()
         self.create_testset()
 
