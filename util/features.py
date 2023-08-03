@@ -1,3 +1,4 @@
+import re
 import numpy as np
 from scipy.stats import skew
 from scipy.stats import kurtosis
@@ -324,8 +325,11 @@ def get_act_index_dict(split_method_paths):
             split_method = yaml.safe_load(file)
         for act_name,config in split_method.items():
             _,_,label = list(i for _,i in config.items())
-            if not act_name[:-1] in act_index_dict:
-                act_index_dict[act_name[:-1]] = label
+            # extract label name without digits
+            act_name = re.findall(r'[a-zA-Z]+', act_name)[0]
+            # act_name = act_name[:-1]
+            if not act_name in act_index_dict:
+                act_index_dict[act_name] = label
     return act_index_dict
 
 def get_feature_index(which_feature):

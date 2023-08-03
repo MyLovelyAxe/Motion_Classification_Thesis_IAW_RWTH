@@ -6,25 +6,27 @@ parser = argparse.ArgumentParser(description='Machine learning method on classif
 ###### datasets parameters ######
 
 parser.add_argument('--train_split_method_paths', type=str,nargs='+',
-                    default=['dataset/agree_20230801/split_method.yaml'],
+                    default=['dataset/dynamic1_20230706/split_method.yaml',
+                             'dataset/dynamic2_20230706/split_method.yaml',
+                             'dataset/dynamic3_20230706/split_method.yaml'],
                     help='split method for extracting labels and names of activities')
 parser.add_argument('--trainset_path',type=str,nargs='+',
-                    default=['dataset/agree_20230801/x_data_UpperLowerBody.npy',
-                             'dataset/agree_20230801/y_data_UpperLowerBody.npy'],
+                    default=['dataset/dynamic_dataset/x_data_UpperLowerBody.npy',
+                             'dataset/dynamic_dataset/y_data_UpperLowerBody.npy'],
                     help='path of training dataset')
 
 parser.add_argument('--test_split_method_paths', type=str,nargs='+',
-                    default=['dataset/agree_test_20230801/split_method.yaml'],
+                    default=['dataset/dynamic_test_20230801/split_method.yaml'],
                     help='split method for extracting labels and names of activities')
 parser.add_argument('--testset_path',type=str,nargs='+',
-                    default=['dataset/agree_test_20230801/x_data_UpperLowerBody.npy',
-                             'dataset/agree_test_20230801/y_data_UpperLowerBody.npy'],
+                    default=['dataset/dynamic_test_20230801/x_data_UpperLowerBody.npy',
+                             'dataset/dynamic_test_20230801/y_data_UpperLowerBody.npy'],
                     help='path of extra testing dataset from outside')
 
 parser.add_argument('--split_ratio', type=float, default=0.8, help='the ratio for number of samples in trainset')
-parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
+parser.add_argument('--window_size', type=int, default=200, help='the ratio for number of samples in trainset')
 
-parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
+parser.add_argument('--outside_test',type=int,default=0,help='1: use extra testset; 0: extract testset from trainset')
 parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
 
 ###### models configuration ######
