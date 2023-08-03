@@ -22,7 +22,7 @@ parser.add_argument('--testset_path',type=str,nargs='+',
 parser.add_argument('--train_len', type=int, default=10000, help='length of train set')
 parser.add_argument('--test_len', type=int, default=100, help='length of test set, only useful when there is no outside testset')
 
-parser.add_argument('--outside_test',type=int,default=0,help='1: use extra testset; 0: extract testset from trainset')
+parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
 parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
 
 ###### models configuration ######

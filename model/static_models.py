@@ -30,6 +30,7 @@ class StaticClassModel():
     def show_result(self,args):
 
         print(f'predicted target: {self.T_pred}')
+        acc = np.sum(self.T_pred == self.static_data.y_test) / len(self.T_pred)
         if not self.P_pred is None:
             print(f'self.P_pred shape: {self.P_pred.shape}')
             ### define output path
@@ -44,34 +45,44 @@ class StaticClassModel():
             values = np.unique(self.static_data.y_test)
 
             # Plotting
-            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13,13))
             use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
-            title = f'Testing: Static_{args.model} {use_ext_test}'
+            title = f'Testing: Static_{args.model} {use_ext_test} acc={acc}'
             fig.suptitle(title,fontsize=15)
 
-            # for i in range(self.P_pred.shape[1]):
-            if not args.outside_test:
-                aName_dict = {}
-                for k,v in self.static_data.train_aIdx_dict.items():
-                    aName_dict[v] = k
-                print(f'aName_dict: {aName_dict}')
-                # for idx in range(self.P_pred.shape[1]):
-                for idx,act_idx in enumerate(values):
-                    ax1.plot(sample_numbers, self.P_pred[:, idx])
-                    truth = np.where(self.static_data.y_test==act_idx,1,0)
-                    ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
-            else:
-                # values= np.unique(self.static_data.y_test)
-                values = np.roll(values,-1)
-                aName_dict = {}
-                for k,v in self.static_data.test_aIdx_dict.items():
-                    aName_dict[v] = k
-                print(f'aName_dict: {aName_dict}')
-                for i in range(self.P_pred.shape[1]):
-                    ax1.plot(sample_numbers, self.P_pred[:, i])
-                for idx,act_idx in enumerate(values):
-                    truth = np.where(self.static_data.y_test==act_idx,1,0)
-                    ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
+            aName_dict = {}
+            for k,v in self.static_data.train_aIdx_dict.items():
+                aName_dict[v] = k
+            print(f'aName_dict: {aName_dict}')
+            # for idx in range(self.P_pred.shape[1]):
+            for idx,act_idx in enumerate(values):
+                ax1.plot(sample_numbers, self.P_pred[:, idx])
+                truth = np.where(self.static_data.y_test==act_idx,1,0)
+                ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
+
+            # # for i in range(self.P_pred.shape[1]):
+            # if not args.outside_test:
+            #     aName_dict = {}
+            #     for k,v in self.static_data.train_aIdx_dict.items():
+            #         aName_dict[v] = k
+            #     print(f'aName_dict: {aName_dict}')
+            #     # for idx in range(self.P_pred.shape[1]):
+            #     for idx,act_idx in enumerate(values):
+            #         ax1.plot(sample_numbers, self.P_pred[:, idx])
+            #         truth = np.where(self.static_data.y_test==act_idx,1,0)
+            #         ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
+            # else:
+            #     # values= np.unique(self.static_data.y_test)
+            #     values = np.roll(values,-1)
+            #     aName_dict = {}
+            #     for k,v in self.static_data.test_aIdx_dict.items():
+            #         aName_dict[v] = k
+            #     print(f'aName_dict: {aName_dict}')
+            #     for i in range(self.P_pred.shape[1]):
+            #         ax1.plot(sample_numbers, self.P_pred[:, i])
+            #     for idx,act_idx in enumerate(values):
+            #         truth = np.where(self.static_data.y_test==act_idx,1,0)
+            #         ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
 
             ax1.set_title(f'Prediction',fontsize=10)
             ax1.set_ylabel(f'Prediction Probability')
@@ -88,7 +99,7 @@ class StaticClassModel():
             print(f'type of P_pred: {type(self.P_pred)}')
             print(f'probability of predicted target: {self.P_pred}')
         print(f'true target: {self.static_data.y_test}')
-        print(f'Accuracy = {np.sum(self.T_pred == self.static_data.y_test) / len(self.T_pred)}')
+        print(f'Accuracy = {acc}')
         print(f'Result: {self.T_pred == self.static_data.y_test}')
 
 class KNN(StaticClassModel):
@@ -112,7 +123,8 @@ class KNN(StaticClassModel):
         self.neigh.fit(self.static_data.x_train, self.static_data.y_train)
     def test(self):
         self.P_pred = self.neigh.predict_proba(self.static_data.x_test)
-        self.T_pred = self.neigh.predict(self.static_data.x_test)
+        self.T_pred = np.argmax(self.P_pred,axis=1)
+        # self.T_pred = self.neigh.predict(self.static_data.x_test)
         
 class RandomForest(StaticClassModel):
     
@@ -136,10 +148,11 @@ class RandomForest(StaticClassModel):
         self.random_forest.fit(self.static_data.x_train, self.static_data.y_train)
     def test(self):
         self.P_pred = self.random_forest.predict_proba(self.static_data.x_test)
-        maximums = np.max(self.P_pred,axis=1)
-        mask = np.where(maximums < 0.4, False, True)
-        self.T_pred = self.random_forest.predict(self.static_data.x_test)
-        self.T_pred = np.multiply(self.T_pred,mask)
+        self.T_pred = np.argmax(self.P_pred,axis=1)
+        # maximums = np.max(self.P_pred,axis=1)
+        # mask = np.where(maximums < 0.4, False, True)
+        # self.T_pred = self.random_forest.predict(self.static_data.x_test)
+        # self.T_pred = np.multiply(self.T_pred,mask)
         
 class SVM(StaticClassModel):
     
@@ -161,4 +174,5 @@ class SVM(StaticClassModel):
         self.svm.fit(self.static_data.x_train, self.static_data.y_train)
     def test(self):
         self.P_pred = self.svm.predict_proba(self.static_data.x_test)
-        self.T_pred = self.svm.predict(self.static_data.x_test)
+        # self.T_pred = self.svm.predict(self.static_data.x_test)
+        self.T_pred = np.argmax(self.P_pred,axis=1)

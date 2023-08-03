@@ -23,7 +23,7 @@ from util.plots import plot_ori_data,verification
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='verify_npy',
+                    default='check_ori_data',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
@@ -35,7 +35,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/agree_20230801',
+                    default='dataset/chor2_20230609',
                     help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',

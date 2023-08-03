@@ -1,19 +1,39 @@
+None1:
+  start: 0
+  end: 200
+  label: 0
 HandNear1:
   start: 200
   end: 3700
   label: 1
+None2:
+  start: 3700
+  end: 3900
+  label: 0
 HandAway1:
   start: 3900
   end: 7200
   label: 2
+None3:
+  start: 7200
+  end: 7400
+  label: 0
 HandOverHead1:
   start: 7400
   end: 10700
   label: 3
+None4:
+  start: 10700
+  end: 10900
+  label: 0
 PhoneLH1:
   start: 10900
   end: 14400
   label: 4
+None5:
+  start: 14400
+  end: 14600
+  label: 0
 PhoneRH1:
   start: 14600
   end: 18000
