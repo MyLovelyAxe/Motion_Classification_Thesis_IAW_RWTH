@@ -1,5 +1,5 @@
 # Under current path, run this:
-# $ bash exp_dynamic.sh KNN 1 250
+# $ bash exp_dynamic.sh KNN 1 200
 # the example means to use model KNN, use test with external testset, with window_siye=250
 
 cd .. # go back to root path
@@ -23,6 +23,7 @@ if [[ $model == "KNN" ]]; then
         --window_size $wl \
         --model "KNN" \
         --n_neighbor 20 \
+        --exp_group "Dynamic" \
         --outside_test $ext \
         --save_res 1
 
@@ -42,6 +43,7 @@ elif [[ $model == "RandomForest" ]]; then
         --model "RandomForest" \
         --max_depth 6 \
         --random_state 0 \
+        --exp_group "Dynamic" \
         --outside_test $ext \
         --save_res 1
 
@@ -59,6 +61,7 @@ elif [[ $model == "SVM" ]]; then
         --split_ratio 0.8 \
         --window_size $wl \
         --model "SVM" \
+        --exp_group "Dynamic" \
         --outside_test $ext \
         --save_res 1
 

@@ -1,3 +1,4 @@
+import re
 import os
 import yaml
 import pandas as pd
@@ -65,11 +66,12 @@ def output_dataset(ori_data_paths,
         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
         for act_name,config in split_method.items():
             start,end,label = list(i for _,i in config.items())
-            if not act_name[:-1] in out_dict:
-                out_dict[act_name[:-1]] = {'x_data':[],'y_data':[],'skeleton':[]}
-            out_dict[act_name[:-1]]['x_data'].append(all_features[start:end])
-            out_dict[act_name[:-1]]['y_data'].append(np.full((end-start),label))
-            out_dict[act_name[:-1]]['skeleton'].append(coords[start:end])
+            act_name = re.findall(r'[a-zA-Z]+', act_name)[0]
+            if not act_name in out_dict:
+                out_dict[act_name] = {'x_data':[],'y_data':[],'skeleton':[]}
+            out_dict[act_name]['x_data'].append(all_features[start:end])
+            out_dict[act_name]['y_data'].append(np.full((end-start),label))
+            out_dict[act_name]['skeleton'].append(coords[start:end])
     # concatenate all activities
     x_data_lst = []
     y_data_lst = []

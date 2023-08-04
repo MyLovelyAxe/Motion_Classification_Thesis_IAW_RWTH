@@ -28,6 +28,7 @@ class DynamicClassModel():
     def show_result(self,args):
 
         print(f'predicted target: {self.T_pred}')
+        acc = np.sum(self.T_pred == self.dynamic_data.y_test) / len(self.T_pred)
         if not self.P_pred is None:
             ### define output path
             output_path = 'result'
@@ -44,7 +45,7 @@ class DynamicClassModel():
             ### Plotting
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
             use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
-            title = f'Testing: Dynamic_{args.model}_wl{args.window_size} {use_ext_test}'
+            title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
             fig.suptitle(title,fontsize=15)
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
@@ -66,7 +67,7 @@ class DynamicClassModel():
             print(f'P_pred: type: {type(self.P_pred)}, shape: {self.P_pred.shape}')
             print(f'probability of predicted target: {self.P_pred}')
         print(f'true target: {self.dynamic_data.y_test}')
-        print(f'Accuracy = {np.sum(self.T_pred == self.dynamic_data.y_test) / len(self.T_pred)}')
+        print(f'Accuracy = {acc}')
         print(f'Result: {self.T_pred == self.dynamic_data.y_test}')
 
 class KNN(DynamicClassModel):
@@ -90,7 +91,8 @@ class KNN(DynamicClassModel):
         self.neigh.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
     def test(self):
         self.P_pred = self.neigh.predict_proba(self.dynamic_data.x_test)
-        self.T_pred = self.neigh.predict(self.dynamic_data.x_test)
+        self.T_pred = np.argmax(self.P_pred,axis=1)
+        # self.T_pred = self.neigh.predict(self.dynamic_data.x_test)
         
 class RandomForest(DynamicClassModel):
     
@@ -114,7 +116,8 @@ class RandomForest(DynamicClassModel):
         self.random_forest.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
     def test(self):
         self.P_pred = self.random_forest.predict_proba(self.dynamic_data.x_test)
-        self.T_pred = self.random_forest.predict(self.dynamic_data.x_test)
+        self.T_pred = np.argmax(self.P_pred,axis=1)
+        # self.T_pred = self.random_forest.predict(self.dynamic_data.x_test)
         
 class SVM(DynamicClassModel):
     
@@ -136,4 +139,5 @@ class SVM(DynamicClassModel):
         self.svm.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
     def test(self):
         self.P_pred = self.svm.predict_proba(self.dynamic_data.x_test)
-        self.T_pred = self.svm.predict(self.dynamic_data.x_test)
+        self.T_pred = np.argmax(self.P_pred,axis=1)
+        # self.T_pred = self.svm.predict(self.dynamic_data.x_test)
