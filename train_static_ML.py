@@ -19,9 +19,9 @@ parser.add_argument('--testset_path',type=str,nargs='+',
                     default=['dataset/testset_20230627/x_data_UpperLowerBody.npy',
                              'dataset/testset_20230627/y_data_UpperLowerBody.npy'],
                     help='path of extra testing dataset from outside')
-parser.add_argument('--train_len', type=int, default=10000, help='length of train set')
-parser.add_argument('--test_len', type=int, default=100, help='length of test set, only useful when there is no outside testset')
 
+parser.add_argument('--split_ratio', type=float, default=0.9, help='split trian data into trainset and testset')
+parser.add_argument('--exp_group',type=str,default='Static',help='Name for groups of experiments')
 parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
 parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
 
@@ -46,30 +46,28 @@ if __name__ == '__main__':
     ### create model
     if args.model == 'KNN':
         cls_model = KNN(N_neighbor=args.n_neighbor,
-                        Train_Len=args.train_len,
-                        Test_Len=args.test_len,
                         Train_Split_Method_Paths=args.train_split_method_paths,
                         Trainset_Path=args.trainset_path,
                         Test_Split_Method_Paths=args.test_split_method_paths,
-                        Testset_Path=args.testset_path
+                        Testset_Path=args.testset_path,
+                        Split_Ratio=args.split_ratio
                         )
     elif args.model == 'RandomForest':
         cls_model = RandomForest(Max_Depth=args.max_depth,
                                  Random_State=args.random_state,
-                                 Train_Len=args.train_len,
-                                 Test_Len=args.test_len,
                                  Train_Split_Method_Paths=args.train_split_method_paths,
                                  Trainset_Path=args.trainset_path,
                                  Test_Split_Method_Paths=args.test_split_method_paths,
-                                 Testset_Path=args.testset_path
+                                 Testset_Path=args.testset_path,
+                                 Split_Ratio=args.split_ratio
                                  )
     elif args.model == 'SVM':
-        cls_model = SVM(Train_Len=args.train_len,
-                        Test_Len=args.test_len,
+        cls_model = SVM(
                         Train_Split_Method_Paths=args.train_split_method_paths,
                         Trainset_Path=args.trainset_path,
                         Test_Split_Method_Paths=args.test_split_method_paths,
-                        Testset_Path=args.testset_path
+                        Testset_Path=args.testset_path,
+                        Split_Ratio=args.split_ratio
                         )
         
     ### train & test & show result
