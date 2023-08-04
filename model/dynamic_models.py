@@ -45,7 +45,7 @@ class DynamicClassModel():
             ### Plotting
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
             use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
-            title = f'Testing: Dynamic_{args.model}_wl{args.window_size} {use_ext_test} acc={acc}'
+            title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
             fig.suptitle(title,fontsize=15)
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
