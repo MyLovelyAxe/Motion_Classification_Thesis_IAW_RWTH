@@ -24,6 +24,14 @@ class StaticClassModel():
                                       testset_path=Testset_Path,
                                       split_ratio=Split_Ratio)
 
+    def misclass_index(self):
+        """
+        record the indices of frames which are misclassified
+        """
+        self.mis_index = np.where(self.T_pred!=self.static_data.y_test)[0]
+        print(f'These frames are misclassified:')
+        print(f'{self.mis_index}')
+
     def show_result(self,args):
 
         print(f'predicted target: {self.T_pred}')

@@ -80,7 +80,10 @@ if __name__ == '__main__':
     if args.function == 'check_ori_data':
 
         input_path = os.path.join(args.single_data_path,'unknown.NoHead.csv')
-        plot_ori_data(input_path,args)
+        plot_ori_data(data_path=args.single_data_path,
+                      start_frame=args.start_frame,
+                      end_frame=args.end_frame,
+                      output_anim=args.output_anim)
 
     if args.function == 'verify_before_output':
 

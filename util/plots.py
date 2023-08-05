@@ -121,14 +121,15 @@ def plot_func(frame_id,ax1,joints_dict,coords_ori,high_1,low_1,title_1,ax2,dist_
     plot_func_3d(frame_id,ax1,joints_dict,coords_ori,high_1,low_1,title_1)
     plot_func_2d(frame_id,ax2,dist_plots,dist_time,title_2)
 
-def plot_ori_data(input_path,args):
+def plot_ori_data(data_path,start_frame,end_frame,output_anim):
     """
     plot original data without cutting and selecting
     """
     ### prepare ###
-    coords,dist_time = prepare_for_plot(input_path,frame_range=[args.start_frame,args.end_frame])
+    input_path = os.path.join(data_path,'unknown.NoHead.csv')
+    coords,dist_time = prepare_for_plot(input_path,frame_range=[start_frame,end_frame])
     joints_dict = get_links_dict()
-    N_frames = args.end_frame - args.start_frame
+    N_frames = end_frame - start_frame
     ### plot ###
     fig = plt.figure(figsize=(16,8))
     fig.tight_layout()
@@ -136,21 +137,21 @@ def plot_ori_data(input_path,args):
     ax1 = fig.add_subplot(1, 2, 1, projection='3d')
     ax1.view_init(30, 150)
     high_1, low_1 = calc_axis_limit(coords) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
-    title_1 = f'Original coordinates in frames {args.start_frame}-{args.end_frame}'
+    title_1 = f'Original coordinates in frames {start_frame}-{end_frame}'
     #### ax2: distance changing in 2D ###
     ax2 = fig.add_subplot(1, 2, 2)
     x = np.arange(N_frames)
     dist_plots = [ax2.plot(x, dist_time[idx],label=f'{links}')[0] for idx,(links,joints) in enumerate(joints_dict.items())]
     plt.legend()
-    title_2 = f'Distances of limbs in frames {args.start_frame}-{args.end_frame}'
+    title_2 = f'Distances of limbs in frames {start_frame}-{end_frame}'
     ### animation ###
     ani1 = animation.FuncAnimation(fig,plot_func,frames=N_frames,fargs=(ax1,joints_dict,coords,high_1,low_1,title_1,
                                                                         ax2,dist_plots,dist_time,title_2),interval=17)
     plt.show()
     #### save animation.gif ###
-    if args.output_anim:
+    if output_anim:
         writergif = animation.PillowWriter(fps=30) 
-        ani1.save(os.path.join(args.data_path,f"anim_{dt.now().strftime('%d-%h-%H-%M')}_{args.data_path.split('/')[1]}.gif"), writer=writergif)
+        ani1.save(os.path.join(data_path,f"anim_{dt.now().strftime('%d-%h-%H-%M')}_{data_path.split('/')[1]}.gif"), writer=writergif)
 
 ##########################################################
 ###### verify dataset to be output by visualization ######
