@@ -162,14 +162,26 @@ Oringinal data only have coordinates of joints, without label. Manually labellin
 According the examples above, you need to customized your own ```split_method.yaml```, which is vital when split orginal data and labelling. Check this example from one ```split_method.yaml```:
 
 ```
+None1:            # None class is for unexplicit or transitional movement between defined classes
+  start: 0        # starts from the "end" of previous class
+  end: 220        # ends from the "start" of next class
+  label: 0        # label as 0
 Boxing1:          # Name = Abbreviation(from above) + x-th segment with same activity
   start: 220      # start: from which frame belong to this segment of activity
   end: 480        # end: to which frame belong to this segment of activity
   label: 7        # label: customized label of this activity
+None2:
+  start: 480
+  end: 680
+  label: 0
 Boxing2:
   start: 680
   end: 860
   label: 7
+None3:
+  start: 860
+  end: 1770
+  label: 0
 Bicep1:
   start: 1770
   end: 2160
@@ -352,31 +364,31 @@ With ```plot_features.ipynb```, you can try to load data with dynamic dataloader
 
 The model we choose for classification are RandomForest, KNN, and SVM.
 
+You can run the script files in ```/bash``` to directly run trainings.
+
 #### Static model
 
-To train a model for static dataset, try:
-
-KNN:
+To run the prepared **static experiments**, you can run by:
 
 ```
-python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLowerBody.npy" "dataset/chor2_20230609/y_data_UpperLowerBody.npy" --testset_path "dataset/testset_20230627/x_data_UpperLowerBody.npy" "dataset/testset_20230627/y_data_UpperLowerBody.npy" --train_len 10000 --test_len 100 --model "KNN" --n_neighbor 1
+bash exp_static.sh KNN 1
 ```
 
-RandomForest:
+where the 3 passed arguments mean:
+
+* **KNN**:  use KNN model
+* **1**:    0 means not use external testset for testing, change to 1 to use external testset
+
+Similar for **RandomForest** and **SVM**:
 
 ```
-python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLowerBody.npy" "dataset/chor2_20230609/y_data_UpperLowerBody.npy" --testset_path "dataset/testset_20230627/x_data_UpperLowerBody.npy" "dataset/testset_20230627/y_data_UpperLowerBody.npy" --train_len 10000 --test_len 100 --model "RandomForest" --max_depth 2 --random_state 0
-```
-
-SVM:
-
-```
-python train_static_ML.py --trainset_path "dataset/chor2_20230609/x_data_UpperLowerBody.npy" "dataset/chor2_20230609/y_data_UpperLowerBody.npy" --testset_path "dataset/testset_20230627/x_data_UpperLowerBody.npy" "dataset/testset_20230627/y_data_UpperLowerBody.npy" --train_len 10000 --test_len 100 --model "SVM"
+bash exp_static.sh RandomForest 1
+bash exp_static.sh SVM 1
 ```
 
 #### Dynamic model
 
-You can run the script files in ```/bash``` to directly run trainings. For example, to run the prepared example **dynamic**, you can run by:
+To run the prepared **dynamic experiments**, you can run by:
 
 ```
 bash exp_dynamic.sh KNN 0 200
@@ -394,6 +406,14 @@ Similar for **RandomForest** and **SVM**:
 bash exp_dynamic.sh RandomForest 1 200
 bash exp_dynamic.sh SVM 0 200
 ```
+
+**PS**: ```exp_dynamic.sh``` and ```exp_agree.sh``` both belong to **dynamic experiments**.
+
+### 5) Post processing
+
+You can check the misclassified frames (for static experiments) or windows (for dynamic experiments) with ```PostProcess.ipynb```.
+
+Inside ```PostProcess.ipynb```, choose the desired experiments to train, and get the misclassified indices. With these indices, go to ```data_visualization.py``` to plot the corresponding frames or windows.
 
 ## Contact
 
