@@ -38,6 +38,7 @@ class StaticClassModel():
         acc = np.sum(self.T_pred == self.static_data.y_test) / len(self.T_pred)
         if not self.P_pred is None:
             print(f'self.P_pred shape: {self.P_pred.shape}')
+            
             ### define output path
             output_path = 'result'
             if not os.path.exists(output_path):

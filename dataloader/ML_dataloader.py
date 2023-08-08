@@ -126,8 +126,10 @@ class Windowlize():
             original: [#frames,]
             with windows: [#win,]
         """
-        self.x_data_win_lst = []
-        self.y_data_win_lst = []
+        x_data_win_lst = []
+        y_data_win_lst = []
+        # record index of current selected labels, for later examination
+        y_MisClsExm_lst = []
         _, start_index, counts = np.unique(
             self.y_data_ori, return_counts=True, return_index=True)
         counts = counts[start_index.argsort()]
@@ -135,11 +137,14 @@ class Windowlize():
         for start, count in zip(start_index, counts):
             for step in range(count-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl), :]
-                label = self.y_data_ori[int(start+step+self.wl/2)]
-                self.x_data_win_lst.append(np.expand_dims(window, axis=0))
-                self.y_data_win_lst.append(np.expand_dims(label, axis=0))
-        self.x_data_win = np.concatenate(self.x_data_win_lst, axis=0)
-        self.y_data_win = np.concatenate(self.y_data_win_lst, axis=0)
+                label_idx = int(start+step+self.wl/2)
+                label = self.y_data_ori[label_idx]
+                x_data_win_lst.append(np.expand_dims(window, axis=0))
+                y_data_win_lst.append(np.expand_dims(label, axis=0))
+                y_MisClsExm_lst.append(np.expand_dims(label_idx, axis=0))
+        self.x_data_win = np.concatenate(x_data_win_lst, axis=0)
+        self.y_data_win = np.concatenate(y_data_win_lst, axis=0)
+        self.y_MisClsExm = np.concatenate(y_MisClsExm_lst, axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
