@@ -30,18 +30,19 @@ class DynamicClassModel():
         """
         record the indices of frames which are misclassified
         """
-        mis_index = np.where(self.T_pred!=self.dynamic_data.y_test)[0]
-        true_labels = self.dynamic_data.y_test[mis_index]
-        pred_labels = self.T_pred[mis_index]
-        mis_index_ori = self.dynamic_data.test_data.y_MisClsExm[mis_index]
+        self.mis_index = np.where(self.T_pred!=self.dynamic_data.y_test)[0]
+        # true_labels = self.dynamic_data.test_data.y_data_ori[self.mis_index]
+        pred_labels = self.T_pred[self.mis_index]
+        mis_index_ori = self.dynamic_data.test_data.y_MisClsExm[self.mis_index]
+        true_labels = self.dynamic_data.test_data.y_data_ori[mis_index_ori]
         Exm_start_frames = mis_index_ori - int(self.wl/2)
         Exm_end_frames = mis_index_ori + int(self.wl/2)
-        Exm_indices = np.vstack((Exm_start_frames,Exm_end_frames)).T
-        print(f'The misclassified windows has shape: {Exm_indices.shape}')
+        self.Exm_indices = np.vstack((Exm_start_frames,Exm_end_frames)).T
+        print(f'The misclassified windows has shape: {self.Exm_indices.shape}')
         print(f'Examine the windows with these indices in data_visualization.py:')
-        print(f'[start_frame, end_frame]  truth  prediction')
-        for exm_idxs,tru,pre in zip(Exm_indices,true_labels,pred_labels):
-            print(f'{exm_idxs} {tru} {pre}')
+        print(f'idx of misclassified window | check on dataset with:[start_frame, end_frame] | truth | prediction')
+        for mis_idx,exm_idxs,tru,pre in zip(self.mis_index,self.Exm_indices,true_labels,pred_labels):
+            print(f'{mis_idx} | {exm_idxs} | {tru} | {pre}')
 
     def show_result(self,args):
 

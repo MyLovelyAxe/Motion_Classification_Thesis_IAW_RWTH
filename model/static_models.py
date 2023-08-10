@@ -29,8 +29,13 @@ class StaticClassModel():
         record the indices of frames which are misclassified
         """
         self.mis_index = np.where(self.T_pred!=self.static_data.y_test)[0]
-        print(f'These frames are misclassified:')
-        print(f'{self.mis_index}')
+        true_labels = self.static_data.y_test[self.mis_index]
+        pred_labels = self.T_pred[self.mis_index]
+        print(f'The misclassified windows has shape: {self.mis_index.shape}')
+        print(f'Examine the windows with these indices in data_visualization.py:')
+        print(f'[start_frame, end_frame]  truth  prediction')
+        for exm_idx,tru,pre in zip(self.mis_index,true_labels,pred_labels):
+            print(f'{exm_idx} {tru} {pre}')
 
     def show_result(self,args):
 

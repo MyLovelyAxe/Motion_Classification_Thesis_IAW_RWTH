@@ -29,7 +29,7 @@ def default_args():
     parser.add_argument('--window_size', type=int, default=200, help='the ratio for number of samples in trainset')
 
     parser.add_argument('--exp_group',type=str,default='Dynamic',help='Name for groups of experiments')
-    parser.add_argument('--outside_test',type=int,default=0,help='1: use extra testset; 0: extract testset from trainset')
+    parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
 
     ###### models configuration ######

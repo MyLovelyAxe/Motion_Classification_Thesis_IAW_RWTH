@@ -306,6 +306,24 @@ def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,wi
     ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,),interval=17)
     plt.show()
 
+def show_misclassified_frames(skeleton,MisCls_frames):
+
+    start_frame, end_frame = MisCls_frames
+    skeleton = skeleton[start_frame:end_frame]
+    fig = plt.figure(figsize=(16,8))
+    ax1 = fig.add_subplot(1, 1, 1, projection='3d')
+    ax1.view_init(30, 150)
+    joints_dict = get_links_dict()
+    high, low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
+    title = f'Misclassified frames {start_frame}-{end_frame}'
+    mis_ani = animation.FuncAnimation(fig,
+                                      plot_func_3d,
+                                      frames=end_frame-start_frame,
+                                      fargs=(ax1,joints_dict,skeleton,high,low,title),
+                                      interval=17)
+    fig.tight_layout()
+    plt.show()
+
 if __name__ == '__main__':
 
     skeleton = np.random.randint(0,24,24).reshape(2,3,4) # [#frames,xyz,#features]
