@@ -125,9 +125,9 @@ if __name__ == '__main__':
         split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.examine_data_path]
         dists,angles = get_feature_selection(args.desired_features)
 
-        _,_,skeleton = output_dataset(ori_data_paths=input_paths,
-                       desired_dists=dists,
-                       desired_angles=angles,
-                       split_method_paths=split_method_paths)
+        _,_,skeleton,_ = output_dataset(ori_data_paths=input_paths,
+                                        desired_dists=dists,
+                                        desired_angles=angles,
+                                        split_method_paths=split_method_paths)
         
         show_misclassified_frames(skeleton,args.misclassified_frames)
