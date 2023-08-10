@@ -30,7 +30,7 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='post_process',
+                    default='check_ori_data',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
@@ -42,7 +42,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/dynamic_test_20230801',
+                    default='dataset/testset_20230627',
                     help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
@@ -53,8 +53,8 @@ parser.add_argument('--single_data_path', type=str,
                              'dataset/agree_20230801',
                              'dataset/agree_test_20230801']
                     )
-parser.add_argument('--start_frame', type=int, default=0, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=250, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=800, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=1000, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
@@ -85,13 +85,13 @@ parser.add_argument('--desired_features', type=str,
 ####################################
 
 parser.add_argument('--examine_data_path', type=str,nargs="+",
-                    default=['dataset/dynamic_test_20230801'],
+                    default=['dataset/testset_20230627'],
                     help='location of examined data for misclassified labels, only external testset',
                     choices=['dataset/testset_20230627',
                              'dataset/dynamic_test_20230801',
                              'dataset/agree_test_20230801']
                              )
-parser.add_argument('--misclassified_frames', type=list,default=[2791,2991],help='check misclassified frames')
+parser.add_argument('--misclassified_frames', type=list,default=[961,961+1],help='check misclassified frames')
 
 args = parser.parse_args()
 
