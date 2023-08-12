@@ -4,79 +4,79 @@ import matplotlib.pyplot as plt
 from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
 from util.plots import get_feature_selection, output_dataset
 
-class StaticData():
+# class StaticData():
 
-    """
-    Static activity means the movemnt whose features defining its class
-    can be classified with only one singel frame,
-    i.e. the movement without concept of time accumulation
-    """
+#     """
+#     Static activity means the movemnt whose features defining its class
+#     can be classified with only one singel frame,
+#     i.e. the movement without concept of time accumulation
+#     """
 
-    def __init__(self,
-                 train_split_method_paths,
-                 trainset_path,
-                 test_split_method_paths,
-                 testset_path,
-                 split_ratio=0.9):
-        self.trainset_path = trainset_path
-        self.split_ratio = split_ratio
-        self.train_aIdx_dict = get_act_index_dict(train_split_method_paths)
-        self.load_data()
-        self.Internal_TrainTest()
+#     def __init__(self,
+#                  train_split_method_paths,
+#                  trainset_path,
+#                  test_split_method_paths,
+#                  testset_path,
+#                  split_ratio=0.9):
+#         self.trainset_path = trainset_path
+#         self.split_ratio = split_ratio
+#         self.train_aIdx_dict = get_act_index_dict(train_split_method_paths)
+#         self.load_data()
+#         self.Internal_TrainTest()
 
-        if test_split_method_paths and testset_path:
-            self.testset_path = testset_path
-            self.test_aIdx_dict = get_act_index_dict(test_split_method_paths)
-            self.External_Test()
+#         if test_split_method_paths and testset_path:
+#             self.testset_path = testset_path
+#             self.test_aIdx_dict = get_act_index_dict(test_split_method_paths)
+#             self.External_Test()
 
-        print(f'x_train shape: {self.x_train.shape}')
-        print(f'y_train shape: {self.y_train.shape}')
-        print(f'x_test shape: {self.x_test.shape}')
-        print(f'y_test shape: {self.y_test.shape}')
-        print()
+#         print(f'x_train shape: {self.x_train.shape}')
+#         print(f'y_train shape: {self.y_train.shape}')
+#         print(f'x_test shape: {self.x_test.shape}')
+#         print(f'y_test shape: {self.y_test.shape}')
+#         print()
 
-    def load_data(self):
+#     def load_data(self):
 
-        with open(self.trainset_path[0], 'rb') as xf:
-            self.x_data = np.load(xf)
-        with open(self.trainset_path[1], 'rb') as yf:
-            self.y_data = np.load(yf)
-        self.values, self.starts, self.counts = np.unique(self.y_data, return_counts=True, return_index=True)
+#         with open(self.trainset_path[0], 'rb') as xf:
+#             self.x_data = np.load(xf)
+#         with open(self.trainset_path[1], 'rb') as yf:
+#             self.y_data = np.load(yf)
+#         self.values, self.starts, self.counts = np.unique(self.y_data, return_counts=True, return_index=True)
 
-    def Internal_TrainTest(self):
-        """
-        Create trainset and test set with one signle dataset
-        """
-        x_train_lst = []
-        y_train_lst = []
-        x_test_lst = []
-        y_test_lst = []
-        for aNum,(aName,aIdx) in enumerate(self.train_aIdx_dict.items()):
-            ## where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(self.values == aIdx)[0][0]
-            ## define indices of train and test set
-            train_start_idx = self.starts[label_idx]
-            train_end_idx = train_start_idx + int(self.counts[label_idx]*self.split_ratio)
-            test_start_idx = train_end_idx + 1
-            test_end_idx = train_start_idx + self.counts[label_idx]
-            ## split train and test part in each activity
-            x_train_lst.append(self.x_data[train_start_idx:train_end_idx])
-            y_train_lst.append(self.y_data[train_start_idx:train_end_idx])
-            x_test_lst.append(self.x_data[test_start_idx:test_end_idx])
-            y_test_lst.append(self.y_data[test_start_idx:test_end_idx])
-        self.x_train = np.concatenate(x_train_lst,axis=0)
-        self.y_train = np.concatenate(y_train_lst,axis=0)
-        self.x_test = np.concatenate(x_test_lst,axis=0)
-        self.y_test = np.concatenate(y_test_lst,axis=0)
+#     def Internal_TrainTest(self):
+#         """
+#         Create trainset and test set with one signle dataset
+#         """
+#         x_train_lst = []
+#         y_train_lst = []
+#         x_test_lst = []
+#         y_test_lst = []
+#         for aNum,(aName,aIdx) in enumerate(self.train_aIdx_dict.items()):
+#             ## where is beginning index of this act in self.y_data, based on 'values':
+#             label_idx = np.where(self.values == aIdx)[0][0]
+#             ## define indices of train and test set
+#             train_start_idx = self.starts[label_idx]
+#             train_end_idx = train_start_idx + int(self.counts[label_idx]*self.split_ratio)
+#             test_start_idx = train_end_idx + 1
+#             test_end_idx = train_start_idx + self.counts[label_idx]
+#             ## split train and test part in each activity
+#             x_train_lst.append(self.x_data[train_start_idx:train_end_idx])
+#             y_train_lst.append(self.y_data[train_start_idx:train_end_idx])
+#             x_test_lst.append(self.x_data[test_start_idx:test_end_idx])
+#             y_test_lst.append(self.y_data[test_start_idx:test_end_idx])
+#         self.x_train = np.concatenate(x_train_lst,axis=0)
+#         self.y_train = np.concatenate(y_train_lst,axis=0)
+#         self.x_test = np.concatenate(x_test_lst,axis=0)
+#         self.y_test = np.concatenate(y_test_lst,axis=0)
 
-    def External_Test(self):
-        """
-        Create testset with extra dataset, then replace self.x_test and self.y_test
-        """
-        with open(self.testset_path[0], 'rb') as test_xf:
-            self.x_test = np.load(test_xf)
-        with open(self.testset_path[1], 'rb') as test_yf:
-            self.y_test = np.load(test_yf)
+#     def External_Test(self):
+#         """
+#         Create testset with extra dataset, then replace self.x_test and self.y_test
+#         """
+#         with open(self.testset_path[0], 'rb') as test_xf:
+#             self.x_test = np.load(test_xf)
+#         with open(self.testset_path[1], 'rb') as test_yf:
+#             self.y_test = np.load(test_yf)
 
 
 class Windowlize():
