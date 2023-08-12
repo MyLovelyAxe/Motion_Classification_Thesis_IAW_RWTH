@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
-from dataloader.ML_dataloader_order import DynamicData
+from dataloader.ML_dataloader import DynamicData
 
 class DynamicClassModel():
     

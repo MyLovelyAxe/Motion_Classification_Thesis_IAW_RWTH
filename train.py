@@ -1,5 +1,5 @@
 import argparse
-from model.dynamic_models_order import KNN,RandomForest,SVM
+from model.ML_models import KNN,RandomForest,SVM
 
 def default_args():
 
