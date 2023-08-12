@@ -72,12 +72,21 @@ class DynamicClassModel():
             title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
             fig.suptitle(title,fontsize=15)
             # reconstruct back to initial index
-            if np.count_nonzero(self.dynamic_data.test_data.y_ori_idx_win) > 1:
-                plot_truth = self.dynamic_data.y_test[(self.dynamic_data.test_data.y_ori_idx_win).argsort()]
-                plot_pred = self.P_pred[self.dynamic_data.test_data.y_ori_idx_win.argsort()]
-            else:
-                plot_truth = self.dynamic_data.y_test
-                plot_pred = self.P_pred
+            # if np.count_nonzero(self.dynamic_data.test_data.y_ori_idx_win) > 1:
+            # if np.count_nonzero(self.dynamic_data.y_ori_idx_win) > 1:
+
+            # if args.outside_test == 1:
+            #     plot_truth = self.dynamic_data.y_test[(self.dynamic_data.y_ori_idx_win).argsort()]
+            #     plot_pred = self.P_pred[self.dynamic_data.y_ori_idx_win.argsort()]
+            # else:
+            #     plot_truth = self.dynamic_data.y_test
+            #     plot_pred = self.P_pred
+
+
+            plot_truth = self.dynamic_data.y_test[(self.dynamic_data.y_ori_idx_win).argsort()]
+            plot_pred = self.P_pred[self.dynamic_data.y_ori_idx_win.argsort()]
+
+
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
                 ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{aName_dict[act_idx]}')
@@ -128,7 +137,6 @@ class KNN(DynamicClassModel):
     def test(self):
         self.P_pred = self.neigh.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
-        # self.T_pred = self.neigh.predict(self.dynamic_data.x_test)
         
 class RandomForest(DynamicClassModel):
     
@@ -155,7 +163,6 @@ class RandomForest(DynamicClassModel):
     def test(self):
         self.P_pred = self.random_forest.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
-        # self.T_pred = self.random_forest.predict(self.dynamic_data.x_test)
         
 class SVM(DynamicClassModel):
     
@@ -180,4 +187,3 @@ class SVM(DynamicClassModel):
     def test(self):
         self.P_pred = self.svm.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
-        # self.T_pred = self.svm.predict(self.dynamic_data.x_test)

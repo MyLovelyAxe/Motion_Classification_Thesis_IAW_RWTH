@@ -12,11 +12,12 @@ python train.py \
     --train_split_method_paths "dataset/dynamic1_20230706/split_method.yaml" \
                                 "dataset/dynamic2_20230706/split_method.yaml" \
                                 "dataset/dynamic3_20230706/split_method.yaml" \
-    --trainset_path "dataset/dynamic_dataset/x_data_UpperLowerBody.npy" \
-                    "dataset/dynamic_dataset/y_data_UpperLowerBody.npy" \
+    --trainset_path "dataset/dynamic1_20230706/unknown.NoHead.csv" \
+                    "dataset/dynamic2_20230706/unknown.NoHead.csv" \
+                    "dataset/dynamic3_20230706/unknown.NoHead.csv" \
     --test_split_method_paths "dataset/dynamic_test_20230801/split_method.yaml" \
     --testset_path "dataset/dynamic_test_20230801/unknown.NoHead.csv" \
-    --split_ratio 0.8 \
+    --split_ratio 0.9 \
     --window_size $wl \
     --model $model \
     --max_depth 6 \

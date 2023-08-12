@@ -23,11 +23,14 @@ class Windowlize():
         self.split_method_paths = split_method_paths
         self.desired_features = desired_features
         self.aIdx_dict = get_act_index_dict(split_method_paths)
-        if not self.desired_features:
-            self.load_data()
-            self.y_ori_idx = np.zeros_like(self.y_data_ori)
-        else:
-            self.load_ext_data()
+
+        # if not self.desired_features:
+        #     self.load_data()
+        #     self.y_ori_idx = np.zeros_like(self.y_data_ori)
+        # else:
+        #     self.load_ext_data()
+
+        self.load_ext_data()
         self.create_windows()
         self.calc_statistic_features()
         self.localization()
@@ -277,7 +280,7 @@ class DynamicData():
         self.train_data = Windowlize(window_size=window_size,
                                      data_path=trainset_path,
                                      split_method_paths=train_split_method_paths,
-                                     desired_features=None)
+                                     desired_features=desired_features)
         self.split_ratio = split_ratio
         if test_split_method_paths and testset_path and desired_features:
             self.test_data = Windowlize(window_size=window_size,
@@ -288,6 +291,7 @@ class DynamicData():
             # test with ouside testset, simply rewrite self.x_test and self.y_test
             self.x_test = self.test_data.x_data
             self.y_test = self.test_data.y_data
+            self.y_ori_idx_win = self.test_data.y_ori_idx_win
         else:
             self.Internal_TrainTest()
 
@@ -305,6 +309,7 @@ class DynamicData():
         y_train_lst = []
         x_test_lst = []
         y_test_lst = []
+        y_ori_idx_win_lst = []
         for aNum,(aName,aIdx) in enumerate(self.train_data.aIdx_dict.items()):
             ## where is beginning index of this act in self.y_data, based on 'values':
             label_idx = np.where(self.train_data.values == aIdx)[0][0]
@@ -318,7 +323,10 @@ class DynamicData():
             y_train_lst.append(self.train_data.y_data[train_start_idx:train_end_idx])
             x_test_lst.append(self.train_data.x_data[test_start_idx:test_end_idx])
             y_test_lst.append(self.train_data.y_data[test_start_idx:test_end_idx])
+            y_ori_idx_win_lst.append(self.train_data.y_ori_idx_win[test_start_idx:test_end_idx])
         self.x_train = np.concatenate(x_train_lst,axis=0)
         self.y_train = np.concatenate(y_train_lst,axis=0)
         self.x_test = np.concatenate(x_test_lst,axis=0)
         self.y_test = np.concatenate(y_test_lst,axis=0)
+        self.y_ori_idx_win = np.concatenate(y_ori_idx_win_lst,axis=0)
+        del x_train_lst,y_train_lst,x_test_lst,y_test_lst,y_ori_idx_win_lst
