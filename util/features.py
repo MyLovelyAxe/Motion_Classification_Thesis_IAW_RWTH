@@ -254,6 +254,7 @@ def calc_Kurtosis(data) -> np.array:
     if np.count_nonzero(np.isnan(Kurtosis)):
         print(f'These windows is Nan in Kurtosis: ')
         print(f'{np.where(np.isnan(Kurtosis))}')
+        Kurtosis = np.where(np.isnan(Kurtosis),0,Kurtosis)
 
     return Kurtosis
 
@@ -268,7 +269,10 @@ def calc_Skewness(data) -> np.array:
     """
     Skewness = skew(data,axis=1)
     if np.count_nonzero(np.isnan(Skewness)):
-        print(f'There is Nan in Skewness')
+        print(f'These windows is Nan in Skewness: ')
+        print(f'{np.where(np.isnan(Skewness))}')
+        Skewness = np.where(np.isnan(Skewness),0,Skewness)
+
     return Skewness
 
 ############################ TODO: if we need more features ######################
