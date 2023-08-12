@@ -42,7 +42,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/testset_20230627',
+                    default='dataset/dynamic1_20230706',
                     help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=['dataset/chor2_20230609',
                              'dataset/testset_20230627',
@@ -53,8 +53,8 @@ parser.add_argument('--single_data_path', type=str,
                              'dataset/agree_20230801',
                              'dataset/agree_test_20230801']
                     )
-parser.add_argument('--start_frame', type=int, default=800, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=1000, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=0, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=300, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 

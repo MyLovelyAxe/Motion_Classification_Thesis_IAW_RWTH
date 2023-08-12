@@ -251,6 +251,8 @@ def calc_Kurtosis(data) -> np.array:
         https://www.scribbr.com/statistics/kurtosis/#:~:text=Kurtosis%20is%20a%20measure%20of,(medium%20tails)%20are%20mesokurtic.
     """
     Kurtosis = kurtosis(data,axis=1)
+    # in the case of classification of static movements, window_size is relatively small, which leads to that some of features
+    # are almost or exactly the same within one window, which causes Kurtosis a NaN. Just set Kurtosis=0 in such cases.
     if np.count_nonzero(np.isnan(Kurtosis)):
         print(f'These windows is Nan in Kurtosis: ')
         print(f'{np.where(np.isnan(Kurtosis))}')
@@ -268,6 +270,8 @@ def calc_Skewness(data) -> np.array:
         https://www.scribbr.com/statistics/skewness/
     """
     Skewness = skew(data,axis=1)
+    # in the case of classification of static movements, window_size is relatively small, which leads to that some of features
+    # are almost or exactly the same within one window, which causes Skewness a NaN. Just set Skewness=0 in such cases.
     if np.count_nonzero(np.isnan(Skewness)):
         print(f'These windows is Nan in Skewness: ')
         print(f'{np.where(np.isnan(Skewness))}')

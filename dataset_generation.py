@@ -41,13 +41,13 @@ parser.add_argument('--dynamic_data_path',type=str,nargs="+",
                              'dataset/dynamic3_20230706',
                              'dataset/dynamic_test_20230801',
                              'dataset/agree_20230801',
-                             'dataset/agree_test_20230801'
+                             'dataset/agree_test_20230801',
+                             'dataset/chor2_20230609,'
+                             'dataset/testset_20230627'
                              ],
-                    default=['dataset/dynamic1_20230706',
-                             'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706'
+                    default=['dataset/testset_20230627'
                              ])
-parser.add_argument('--dynamic_output_path',type=str,default='dataset/dynamic_dataset')
+parser.add_argument('--dynamic_output_path',type=str,default='dataset/testset_20230627')
 # common parameters
 parser.add_argument('--output_name',type=str,default='UpperLowerBody')
 parser.add_argument('--desired_features',type=str, 
