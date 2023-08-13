@@ -60,25 +60,36 @@ And the whole directory structure is shown as follows.
 ```
 └── root/
     ├── data_visualization.py
-    ├── dataset_generation.py
-    ├── train_dynamic_ML.py
-    ├── train_static_ML.py
+    ├── train.py
     ├── plot_features.ipynb
     ├── README.md
     ├── Archiv/
     ├── bash/
     |   ├── exp_agree.sh
-    |   └── exp_dynamic.sh
+    |   ├── exp_dynamic.sh
+    |   └── exp_static.sh
     ├── dataloader/
     |   └── ML_dataloader.py
     ├── datasets/
     |   ├── desired_features_trial.yaml
     |   ├── desired_features.yaml
-    |   └── raw_data_1/
-    |       ├── split_method.yaml
-    |       ├── unknown.NoHead.csv
-    |       ├── x_data_UpperLowerBody.npy
-    |       └── y_data_UpperLowerBody.npy
+    |   ├── Agree/
+    |   ├── Static/
+    |   └── Dynamic/
+    |       ├── testset/
+    |       |   └── dynamic_test_20230801/
+    |       |       ├── split_method.yaml
+    |       |       └── unknown.NoHead.csv
+    |       └── trainset/
+    |           ├── dynamic1_20230706/
+    |           |   ├── split_method.yaml
+    |           |   └── unknown.NoHead.csv
+    |           ├── dynamic2_20230706/
+    |           |   ├── split_method.yaml
+    |           |   └── unknown.NoHead.csv
+    |           └── dynamic3_20230706/
+    |               ├── split_method.yaml
+    |               └── unknown.NoHead.csv
     ├── model/
     |   ├── dynamic_models.py
     |   └── static_models.py
@@ -91,7 +102,14 @@ And the whole directory structure is shown as follows.
         └── utils.py
 ```
 
-### 2) Generate dataset
+Inside, the paths ```dataset/Static``` and ```dataset/Agree``` has similar structure as ```dataset/Dynamic```. Here to simplify, just show details inside ```dataset/Dynamic```. When create new datasets, please follow the **naming-rule**:
+
+* Give the group experiment (i.e. new datasets) a specific name
+* Save train data and test data separately
+* If multiple ```.csv``` exist, keep them with own ```splid_method.yaml``` in corresponding folder
+* Please keep all ```.csv``` named as ```unknown.NoHead.csv```, and all .yaml for splitting named as ```split_method.yaml```
+
+### 2) Check data
 
 The dataset can be customized based on raw data from .csv from Captury Live. Feel free to research on which **features** to select for dataset, which is directly used to train model.
 
@@ -119,7 +137,7 @@ As a reusult, it is difficult to directly extract data from raw .csv with Pandas
 Run this script in terminal under **root path**, to plot the segment with default arguments:
 
 ```
-python data_visualization.py --function "check_ori_data" --single_data_path "dataset/testset_20230627" --start_frame 0 --end_frame 200
+python data_visualization.py --function "check_ori_data" --single_data_path "dataset/Agree/trainset/agree_20230801" --start_frame 0 --end_frame 200
 ```
 
 Also, you can edit the arguments which you want to check:
@@ -248,7 +266,7 @@ The rule of defining feature's name is as following:
 Use features definded in ```dataset/desired_features_trial.yaml``` to verify whether calculation of features are correct by plotting, and check the fft of randomly selected windows, with command:
 
 ```
-python data_visualization.py --function "verify_before_output" --single_data_path "dataset/testset_20230627" --wl 51
+python data_visualization.py --function "verify_before_output" --single_data_path "dataset/Agree/trainset/agree_20230801" --wl 51
 ```
 
 Also, you can edit the arguments which you want to check:
@@ -259,65 +277,6 @@ Also, you can edit the arguments which you want to check:
 | --wl | int | the window size for one window, please make it as odd number |
 
 You can see corresponding message if there are incorrect calculation. But usually it shows difference as long as there are error within 10e-5, which is totally bearable for most of the cases.
-
-#### Step6: Generate dataset
-
-Firstly there is difference in static datset and dynamic dataset:
-
-| Dataset Type | Description | Example |
-|--|--|--|
-| static | classification can implement with only one frame | HandNear in Step3: Create split_method.yaml - 1. Static Activity |
-| dynamic | classification need several sequential frames, i.e. window | Walking in Step3: Create split_method.yaml - 2. Dynamic Activity |
-
-Then Use features definded in ```dataset/desired_features.yaml``` (please follow **Step4: Edit desired_features.yaml** to define which features are to output for training) to generate dataset:
-
-for static dataset:
-
-```
-python dataset_generation.py --type "static" --static_data_path "dataset/testset_20230627" --static_output_path "dataset/testset_20230627"
-```
-
-Also, you can edit the arguments which you want to check:
-
-| args | Type | Description |
-|--|--|--|
-| --static_data_path | str | strings of paths with the original data you want to generate dataset, can contain only one or several paths |
-| --static_output_path | str | output path |
-
-for dynamic dataset:
-
-```
-python dataset_generation.py --type "dynamic" --dynamic_data_path "dataset/dynamic1_20230706" "dataset/dynamic2_20230706" "dataset/dynamic3_20230706" --dynamic_output_path "dataset/dynamic_dataset"
-```
-Also, you can edit the arguments which you want to check:
-
-| args | Type | Description |
-|--|--|--|
-| --dynamic_data_path | str |  strings of paths with the original data you want to generate dataset, can contain only one or several paths |
-| --dynamic_output_path | str | output path |
-
-#### Step7: Verify dataset
-
-After generating dataset, you can still verify it to check if calculation has problems, and check the fft of randomly selected windows, just like **Step5: Verify features**.
-
-Example for static data connected by one single .csv
-
-```
-python data_visualization.py --function "verify_npy" --source_data_path "dataset/testset_20230627" --npy_root "dataset/testset_20230627"
-```
-
-Example for dynamic data connected by multiple .csv
-
-```
-python data_visualization.py --function "verify_npy" --source_data_path "dataset/dynamic1_20230706" "dataset/dynamic2_20230706" "dataset/dynamic3_20230706" --npy_root "dataset/dynamic_dataset"
-```
-
-Also, you can edit the arguments which you want to check:
-
-| args | Type | Description |
-|--|--|--|
-| --source_data_path | str | strings of paths with the original data you want to generate dataset, can contain only one or several paths |
-| --npy_root | str | where your generated dataset is located |
 
 ### 3) Windows
 
@@ -366,32 +325,10 @@ The model we choose for classification are RandomForest, KNN, and SVM.
 
 You can run the script files in ```/bash``` to directly run trainings.
 
-#### Static model
-
-To run the prepared **static experiments**, you can run by:
+We take example of **Dynamic** group, you can run by:
 
 ```
-bash exp_static.sh KNN 1
-```
-
-where the 3 passed arguments mean:
-
-* **KNN**:  use KNN model
-* **1**:    0 means not use external testset for testing, change to 1 to use external testset
-
-Similar for **RandomForest** and **SVM**:
-
-```
-bash exp_static.sh RandomForest 1
-bash exp_static.sh SVM 1
-```
-
-#### Dynamic model
-
-To run the prepared **dynamic experiments**, you can run by:
-
-```
-bash exp_dynamic.sh KNN 0 200
+bash exp_dynamic.sh KNN 1 200
 ```
 
 where the 3 passed arguments mean:
@@ -407,11 +344,11 @@ bash exp_dynamic.sh RandomForest 1 200
 bash exp_dynamic.sh SVM 0 200
 ```
 
-**PS**: ```exp_dynamic.sh``` and ```exp_agree.sh``` both belong to **dynamic experiments**.
+**PS**: some other parameters for specific model can be edited inside ```.sh```, e.g. ```n_neighbor``` for **KNN**, ```max_depth``` for **RandomForest**.
 
 ### 5) Post processing
 
-You can check the misclassified frames (for static experiments) or windows (for dynamic experiments) with ```PostProcess.ipynb```.
+You can check the misclassified windows with ```PostProcess.ipynb```.
 
 Inside ```PostProcess.ipynb```, choose the desired experiments to train, and get the misclassified indices. With these indices, go to ```data_visualization.py``` to plot the corresponding frames or windows.
 

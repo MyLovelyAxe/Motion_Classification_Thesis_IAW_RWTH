@@ -47,7 +47,8 @@ parser.add_argument('--single_data_path', type=str,
                              'dataset/Dynamic/trainset/dynamic3_20230706',
                              'dataset/Dynamic/testset/dynamic_test_20230801',
                              'dataset/Agree/trainset/agree_20230801',
-                             'dataset/Agree/testset/agree_test_20230801']
+                             'dataset/Agree/testset/agree_test_20230801',
+                             ]
                     )
 parser.add_argument('--start_frame', type=int, default=0, help='from which frame to start visualize')
 parser.add_argument('--end_frame', type=int, default=300, help='to which frame to end visualize')
@@ -63,10 +64,11 @@ parser.add_argument('--desired_features_trial', type=str,
 parser.add_argument('--examine_data_path', type=str,nargs="+",
                     default=['dataset/testset_20230627'],
                     help='location of examined data for misclassified labels, only external testset',
-                    choices=['dataset/testset_20230627',
-                             'dataset/dynamic_test_20230801',
-                             'dataset/agree_test_20230801']
-                             )
+                    choices=['dataset/Static/testset/testset_20230627',
+                             'dataset/Dynamic/testset/dynamic_test_20230801',
+                             'dataset/Agree/testset/agree_test_20230801',
+                             ]
+                    )
 parser.add_argument('--misclassified_frames', type=list,default=[961,961+1],help='check misclassified frames')
 
 args = parser.parse_args()
