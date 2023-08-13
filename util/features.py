@@ -326,6 +326,12 @@ def get_act_index(split_method_paths,which_activity):
         act_idx_lst.append(act_index_dict[f])
     return act_idx_lst
 
+def get_ActName(act_name):
+    """
+    Extract only letters from a string containing both letters and digits
+    """
+    return re.findall(r'[a-zA-Z]+', act_name)[0]
+
 def get_act_index_dict(split_method_paths):
     act_index_dict = {}
     for split_path in split_method_paths:
@@ -334,7 +340,7 @@ def get_act_index_dict(split_method_paths):
         for act_name,config in split_method.items():
             _,_,label = list(i for _,i in config.items())
             # extract label name without digits
-            act_name = re.findall(r'[a-zA-Z]+', act_name)[0]
+            act_name = get_ActName(act_name)
             # act_name = act_name[:-1]
             if not act_name in act_index_dict:
                 act_index_dict[act_name] = label

@@ -12,11 +12,7 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 ##              edit --start_frame
 ##              edit --end_frame
 ##
-##      2. if --function is verify_npy
-##              edit --source_data_path
-##              edit --npy_root
-##
-##      3. if --function is post_process
+##      2. if --function is post_process
 ##              edit --examine_data_path
 ##              edit --misclassified_frames
 ##
@@ -30,11 +26,11 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='check_ori_data',
+                    default='verify_before_output',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
-                    choices=['check_ori_data','verify_before_output','verify_npy','post_process']
+                    choices=['check_ori_data','verify_before_output','post_process']
                     )
 
 ##############################################################
@@ -42,16 +38,16 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/dynamic1_20230706',
+                    default='dataset/Agree/trainset/agree_20230801',
                     help='only one single dataset for function check_ori_data and verify_before_output',
-                    choices=['dataset/chor2_20230609',
-                             'dataset/testset_20230627',
-                             'dataset/dynamic1_20230706',
-                             'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706',
-                             'dataset/dynamic_test_20230801',
-                             'dataset/agree_20230801',
-                             'dataset/agree_test_20230801']
+                    choices=['dataset/Static/trainset/chor2_20230609',
+                             'dataset/Static/testset/testset_20230627',
+                             'dataset/Dynamic/trainset/dynamic1_20230706',
+                             'dataset/Dynamic/trainset/dynamic2_20230706',
+                             'dataset/Dynamic/trainset/dynamic3_20230706',
+                             'dataset/Dynamic/testset/dynamic_test_20230801',
+                             'dataset/Agree/trainset/agree_20230801',
+                             'dataset/Agree/testset/agree_test_20230801']
                     )
 parser.add_argument('--start_frame', type=int, default=0, help='from which frame to start visualize')
 parser.add_argument('--end_frame', type=int, default=300, help='to which frame to end visualize')
@@ -59,26 +55,6 @@ parser.add_argument('--wl', type=int, default=51, help='window length for datase
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
                     default='dataset/desired_features_trial.yaml', help='load features name from .yaml')
-
-##################################
-###### function: verify_npy ######
-##################################
-
-parser.add_argument('--source_data_path', type=str,nargs="+",
-                    default=['dataset/agree_test_20230801'],
-                    help='original source of generated dataset for function verify_npy',
-                    choices=['dataset/chor2_20230609',
-                             'dataset/testset_20230627',
-                             'dataset/dynamic1_20230706',
-                             'dataset/dynamic2_20230706',
-                             'dataset/dynamic3_20230706',
-                             'dataset/dynamic_test_20230801',
-                             'dataset/agree_20230801',
-                             'dataset/agree_test_20230801']
-                             )
-parser.add_argument('--npy_root', type=str, default='dataset/agree_test_20230801')
-parser.add_argument('--desired_features', type=str, 
-                    default='dataset/desired_features.yaml', help='load features name from .yaml')
 
 ####################################
 ###### function: post_process ######
@@ -110,14 +86,6 @@ if __name__ == '__main__':
         input_paths = os.path.join(args.single_data_path,'unknown.NoHead.csv')
         split_method_paths = os.path.join(args.single_data_path,'split_method.yaml')
         verification([input_paths],args.desired_features_trial,[split_method_paths],win_len=args.wl)
-        # verification([input_paths],args.desired_features_trial,[split_method_paths])
-
-    if args.function == 'verify_npy':
-
-        input_paths = [os.path.join(data_path,'unknown.NoHead.csv') for data_path in args.source_data_path]
-        split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.source_data_path]
-        npy_paths = [os.path.join(args.npy_root,'x_data_UpperLowerBody.npy'),os.path.join(args.npy_root,'y_data_UpperLowerBody.npy')]
-        verification(input_paths,args.desired_features,split_method_paths,npy_path=npy_paths,win_len=args.wl)
 
     if args.function == 'post_process':
 

@@ -236,32 +236,18 @@ def crossLine(start,start_index,end_index,win_len):
     cross = False if closest_dist >= win_len else True
     return cross
 
-def verification(ori_data_paths,feature_path,split_method_paths,npy_path=None,win_len=1):
+def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
     """
     verify whether output datasets have wrong calculated values, and whether the label is correct
     """
     ### get data
     desired_dists,desired_angles = get_feature_selection(feature_path)
-    if not npy_path is None:
-        x_data_path, y_data_path = npy_path[0], npy_path[1]
-        with open(x_data_path, 'rb') as xf:
-            x_data = np.load(xf)
-        with open(y_data_path, 'rb') as yf:
-            y_data = np.load(yf)
-        _,_,skeletons,_ = output_dataset(ori_data_paths,
-                                         split_method_paths,
-                                         desired_dists,
-                                         desired_angles)
-        assert x_data.shape[1] == 2*(len(desired_dists) + len(desired_angles)), 'Number of features of loaded dataset is different from verified features'
-        print(f'Loaded x_data with shape {x_data.shape}')
-        print(f'Loaded y_data with shape {y_data.shape}')
-    else:
-        x_data,y_data,skeletons,_ = output_dataset(ori_data_paths,
-                                                   split_method_paths,
-                                                   desired_dists,
-                                                   desired_angles)
-        print(f'Trial x_data with shape {x_data.shape}')
-        print(f'Trial y_data with shape {y_data.shape}')
+    x_data,y_data,skeletons,_ = output_dataset(ori_data_paths,
+                                               split_method_paths,
+                                               desired_dists,
+                                               desired_angles)
+    print(f'Trial x_data with shape {x_data.shape}')
+    print(f'Trial y_data with shape {y_data.shape}')
 
     ### select random frames
     choice_starts = np.random.randint(x_data.shape[0], size = 4)

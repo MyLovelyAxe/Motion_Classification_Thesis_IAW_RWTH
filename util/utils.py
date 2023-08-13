@@ -3,7 +3,7 @@ import os
 import yaml
 import pandas as pd
 import numpy as np
-from util.features import get_all_features
+from util.features import get_all_features,get_ActName
 
 def extract_path(group_path,train_or_test):
     """
@@ -92,9 +92,7 @@ def get_splilt_method(yaml_path,show=False):
 def output_dataset(ori_data_paths,
                    split_method_paths,
                    desired_dists,
-                   desired_angles,
-                   output_path=None,
-                   output_name='UpperBody'):
+                   desired_angles):
     out_dict = {}
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
         _,coords = get_ori_data(data_path)
@@ -103,7 +101,7 @@ def output_dataset(ori_data_paths,
         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
         for act_name,config in split_method.items():
             start,end,label = list(i for _,i in config.items())
-            act_name = re.findall(r'[a-zA-Z]+', act_name)[0]
+            act_name = get_ActName(act_name)
             if not act_name in out_dict:
                 out_dict[act_name] = {'x_data':[],'y_data':[],'y_ori_idx':[],'skeleton':[]}
             out_dict[act_name]['x_data'].append(all_features[start:end])
@@ -130,14 +128,14 @@ def output_dataset(ori_data_paths,
     skeletons = np.concatenate(skeletons_lst,axis=0)
     del x_data_lst,y_data_lst,y_ori_idx_lst,skeletons_lst,x_data_tmp,y_data_tmp,y_ori_idx_tmp,skeleton_tmp,out_dict
 
-    if not output_path is None:
-        # skeleton is only used for varification
-        # so don't output skeleton
-        if not os.path.exists(output_path):
-            os.mkdir(output_path)
-        print(f'type: {type(x_data)}, shape: {x_data.shape}')
-        np.save(os.path.join(output_path,f'x_data_{output_name}.npy'),x_data)
-        print(f'type: {type(y_data)}, shape: {y_data.shape}')
-        np.save(os.path.join(output_path,f'y_data_{output_name}.npy'),y_data)
-    else:
-        return x_data,y_data,skeletons,y_ori_idx
+    # if not output_path is None:
+    #     # skeleton is only used for varification
+    #     # so don't output skeleton
+    #     if not os.path.exists(output_path):
+    #         os.mkdir(output_path)
+    #     print(f'type: {type(x_data)}, shape: {x_data.shape}')
+    #     np.save(os.path.join(output_path,f'x_data_{output_name}.npy'),x_data)
+    #     print(f'type: {type(y_data)}, shape: {y_data.shape}')
+    #     np.save(os.path.join(output_path,f'y_data_{output_name}.npy'),y_data)
+    # else:
+    return x_data,y_data,skeletons,y_ori_idx
