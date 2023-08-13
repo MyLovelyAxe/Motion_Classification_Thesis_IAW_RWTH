@@ -1,5 +1,5 @@
 # Under current path, run this:
-# $ bash exp_dynamic.sh KNN 1 200
+# $ bash exp_dynamic.sh RandomForest 1 200
 # the example means to use model KNN, use test with external testset, with window_siye=250
 
 cd .. # go back to root path
@@ -9,20 +9,12 @@ ext="$2" # 0: not use external testset, 1: use external testset
 wl="$3" # window size
 
 python train.py \
-    --train_split_method_paths "dataset/dynamic1_20230706/split_method.yaml" \
-                                "dataset/dynamic2_20230706/split_method.yaml" \
-                                "dataset/dynamic3_20230706/split_method.yaml" \
-    --trainset_path "dataset/dynamic1_20230706/unknown.NoHead.csv" \
-                    "dataset/dynamic2_20230706/unknown.NoHead.csv" \
-                    "dataset/dynamic3_20230706/unknown.NoHead.csv" \
-    --test_split_method_paths "dataset/dynamic_test_20230801/split_method.yaml" \
-    --testset_path "dataset/dynamic_test_20230801/unknown.NoHead.csv" \
+    --exp_group "Dynamic" \
     --split_ratio 0.9 \
     --window_size $wl \
-    --model $model \
-    --max_depth 6 \
-    --random_state 0 \
-    --n_neighbor 20 \
-    --exp_group "Dynamic" \
     --outside_test $ext \
-    --save_res 1
+    --save_res 1 \
+    --model $model \
+    --n_neighbor 20 \
+    --max_depth 6 \
+    --random_state 0

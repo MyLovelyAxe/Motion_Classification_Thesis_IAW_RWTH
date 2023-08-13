@@ -5,6 +5,43 @@ import pandas as pd
 import numpy as np
 from util.features import get_all_features
 
+def extract_path(group_path,train_or_test):
+    """
+    param:
+        group_path: string, the root path of current group of experiment
+        train_or_test: string, 'train' or 'test'
+    """
+    # trainset
+    set_path = os.path.join(group_path,train_or_test)
+    set_path_lst = os.listdir(set_path)
+    set_path_lst.sort()
+    split_method_paths = []
+    data_paths = []
+    for train_path in set_path_lst:
+        split_method_paths.append(os.path.join(set_path,train_path,'split_method.yaml'))
+        data_paths.append(os.path.join(set_path,train_path,'unknown.NoHead.csv'))
+    return split_method_paths,data_paths
+
+def get_paths(exp_group,outside_test):
+    """
+    One group of experiment consists of:
+        - trainset from N .csv files
+        - testset from M .csv files
+        (N>=1, M>=1)
+    """
+
+    group_path = os.path.join('dataset',exp_group)
+    # trainset
+    train_split_method_paths,trainset_paths = extract_path(group_path=group_path,train_or_test='trainset')
+    # testset
+    test_split_method_paths,testset_paths = extract_path(group_path=group_path,train_or_test='testset')
+    # whether use testset outside from trainset or not
+    if not outside_test:
+        test_split_method_paths = None
+        testset_paths = None
+
+    return train_split_method_paths,trainset_paths,test_split_method_paths,testset_paths
+
 #########################################
 ###### load original skeleton data ######
 #########################################
@@ -51,54 +88,6 @@ def get_splilt_method(yaml_path,show=False):
     if show:
         print(f'split method: {split_method}')
     return split_method
-
-# def output_dataset(ori_data_paths,
-#                    split_method_paths,
-#                    desired_dists,
-#                    desired_angles,
-#                    output_path=None,
-#                    output_name='UpperBody'):
-#     out_dict = {}
-#     for split_path,data_path in zip(split_method_paths,ori_data_paths):
-#         _,coords = get_ori_data(data_path)
-#         split_method = get_splilt_method(split_path)
-#         all_features = get_all_features(coords,desired_dists,desired_angles)
-#         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
-#         for act_name,config in split_method.items():
-#             start,end,label = list(i for _,i in config.items())
-#             act_name = re.findall(r'[a-zA-Z]+', act_name)[0]
-#             if not act_name in out_dict:
-#                 out_dict[act_name] = {'x_data':[],'y_data':[],'skeleton':[]}
-#             out_dict[act_name]['x_data'].append(all_features[start:end])
-#             out_dict[act_name]['y_data'].append(np.full((end-start),label))
-#             out_dict[act_name]['skeleton'].append(coords[start:end])
-#     # concatenate all activities
-#     x_data_lst = []
-#     y_data_lst = []
-#     skeletons_lst = []
-#     for act,data in out_dict.items():
-#         x_data_tmp = np.concatenate(data['x_data'],axis=0)
-#         y_data_tmp = np.concatenate(data['y_data'],axis=0)
-#         skeleton_tmp = np.concatenate(data['skeleton'],axis=0)
-#         x_data_lst.append(x_data_tmp)
-#         y_data_lst.append(y_data_tmp)
-#         skeletons_lst.append(skeleton_tmp)
-#     x_data = np.concatenate(x_data_lst,axis=0)
-#     y_data = np.concatenate(y_data_lst,axis=0)
-#     skeletons = np.concatenate(skeletons_lst,axis=0)
-#     del x_data_lst,y_data_lst,skeletons_lst,x_data_tmp,y_data_tmp,skeleton_tmp,out_dict
-
-#     if not output_path is None:
-#         # skeleton is only used for varification
-#         # so don't output skeleton
-#         if not os.path.exists(output_path):
-#             os.mkdir(output_path)
-#         print(f'type: {type(x_data)}, shape: {x_data.shape}')
-#         np.save(os.path.join(output_path,f'x_data_{output_name}.npy'),x_data)
-#         print(f'type: {type(y_data)}, shape: {y_data.shape}')
-#         np.save(os.path.join(output_path,f'y_data_{output_name}.npy'),y_data)
-#     else:
-#         return x_data,y_data,skeletons
 
 def output_dataset(ori_data_paths,
                    split_method_paths,

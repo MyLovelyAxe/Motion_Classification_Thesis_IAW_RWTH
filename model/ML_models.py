@@ -11,9 +11,9 @@ class DynamicClassModel():
     def __init__(self,
                  Window_Size,
                  Train_Split_Method_Paths,
-                 Trainset_Path,
+                 Trainset_Paths,
                  Test_Split_Method_Paths=None,
-                 Testset_Path=None,
+                 Testset_Paths=None,
                  Split_Ratio=0.8,
                  Desired_Features=None):
         self.T_pred = None
@@ -21,9 +21,9 @@ class DynamicClassModel():
         self.wl = Window_Size
         self.dynamic_data = DynamicData(window_size=Window_Size,
                                         train_split_method_paths=Train_Split_Method_Paths,
-                                        trainset_path=Trainset_Path,
+                                        trainset_paths=Trainset_Paths,
                                         test_split_method_paths=Test_Split_Method_Paths,
-                                        testset_path=Testset_Path,
+                                        testset_paths=Testset_Paths,
                                         split_ratio=Split_Ratio,
                                         desired_features=Desired_Features
                                         )
@@ -65,27 +65,16 @@ class DynamicClassModel():
             for k,v in self.dynamic_data.train_data.aIdx_dict.items():
                 aName_dict[v] = k
 
+            ### re-index result to match original order
+            plot_truth = self.dynamic_data.y_test[(self.dynamic_data.y_ori_idx_win).argsort()]
+            plot_pred = self.P_pred[self.dynamic_data.y_ori_idx_win.argsort()]
+
             ### Plotting
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
             use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
             acc = np.sum(self.T_pred == self.dynamic_data.y_test) / len(self.T_pred)
             title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
             fig.suptitle(title,fontsize=15)
-            # reconstruct back to initial index
-            # if np.count_nonzero(self.dynamic_data.test_data.y_ori_idx_win) > 1:
-            # if np.count_nonzero(self.dynamic_data.y_ori_idx_win) > 1:
-
-            # if args.outside_test == 1:
-            #     plot_truth = self.dynamic_data.y_test[(self.dynamic_data.y_ori_idx_win).argsort()]
-            #     plot_pred = self.P_pred[self.dynamic_data.y_ori_idx_win.argsort()]
-            # else:
-            #     plot_truth = self.dynamic_data.y_test
-            #     plot_pred = self.P_pred
-
-
-            plot_truth = self.dynamic_data.y_test[(self.dynamic_data.y_ori_idx_win).argsort()]
-            plot_pred = self.P_pred[self.dynamic_data.y_ori_idx_win.argsort()]
-
 
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
@@ -119,16 +108,16 @@ class KNN(DynamicClassModel):
                  N_neighbor,
                  Window_Size,
                  Train_Split_Method_Paths,
-                 Trainset_Path,
+                 Trainset_Paths,
                  Test_Split_Method_Paths=None,
-                 Testset_Path=None,
+                 Testset_Paths=None,
                  Split_Ratio=0.8,
                  Desired_Features=None):
         super().__init__(Window_Size,
                          Train_Split_Method_Paths,
-                         Trainset_Path,
+                         Trainset_Paths,
                          Test_Split_Method_Paths,
-                         Testset_Path,
+                         Testset_Paths,
                          Split_Ratio,
                          Desired_Features)
         self.neigh = KNeighborsClassifier(n_neighbors=N_neighbor)
@@ -145,16 +134,16 @@ class RandomForest(DynamicClassModel):
                  Random_State,
                  Window_Size,
                  Train_Split_Method_Paths,
-                 Trainset_Path,
+                 Trainset_Paths,
                  Test_Split_Method_Paths=None,
-                 Testset_Path=None,
+                 Testset_Paths=None,
                  Split_Ratio=0.8,
                  Desired_Features=None):
         super().__init__(Window_Size,
                          Train_Split_Method_Paths,
-                         Trainset_Path,
+                         Trainset_Paths,
                          Test_Split_Method_Paths,
-                         Testset_Path,
+                         Testset_Paths,
                          Split_Ratio,
                          Desired_Features)
         self.random_forest = RandomForestClassifier(max_depth=Max_Depth,random_state=Random_State)
@@ -169,16 +158,16 @@ class SVM(DynamicClassModel):
     def __init__(self,
                  Window_Size,
                  Train_Split_Method_Paths,
-                 Trainset_Path,
+                 Trainset_Paths,
                  Test_Split_Method_Paths=None,
-                 Testset_Path=None,
+                 Testset_Paths=None,
                  Split_Ratio=0.8,
                  Desired_Features=None):
         super().__init__(Window_Size,
                          Train_Split_Method_Paths,
-                         Trainset_Path,
+                         Trainset_Paths,
                          Test_Split_Method_Paths,
-                         Testset_Path,
+                         Testset_Paths,
                          Split_Ratio,
                          Desired_Features)
         self.svm = svm.SVC(probability=True)

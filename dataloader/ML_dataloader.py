@@ -15,11 +15,11 @@ class Windowlize():
 
     def __init__(self,
                  window_size,
-                 data_path,
+                 data_paths,
                  split_method_paths,
                  desired_features=None):
         self.wl = window_size
-        self.data_path = data_path
+        self.data_paths = data_paths
         self.split_method_paths = split_method_paths
         self.desired_features = desired_features
         self.aIdx_dict = get_act_index_dict(split_method_paths)
@@ -42,9 +42,9 @@ class Windowlize():
         y_data shape:
             original: [#frames,]
         """
-        with open(self.data_path[0], 'rb') as xf:
+        with open(self.data_paths[0], 'rb') as xf:
             self.x_data_ori = np.load(xf)
-        with open(self.data_path[1], 'rb') as yf:
+        with open(self.data_paths[1], 'rb') as yf:
             self.y_data_ori = np.load(yf)
         print(f'loaded original x_data shape: {self.x_data_ori.shape}')
         print(f'loaded original y_data shape: {self.y_data_ori.shape}')
@@ -68,7 +68,7 @@ class Windowlize():
                 # ie. order instead of real value
         """
         dists,angles = get_feature_selection(self.desired_features)
-        self.x_data_ori,self.y_data_ori,_,self.y_ori_idx = output_dataset(ori_data_paths=self.data_path,
+        self.x_data_ori,self.y_data_ori,_,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
                                                                           desired_dists=dists,
                                                                           desired_angles=angles,
                                                                           split_method_paths=self.split_method_paths)
@@ -272,19 +272,19 @@ class DynamicData():
     def __init__(self,
                  window_size,
                  train_split_method_paths,
-                 trainset_path,
+                 trainset_paths,
                  test_split_method_paths,
-                 testset_path,
+                 testset_paths,
                  split_ratio,
                  desired_features):
         self.train_data = Windowlize(window_size=window_size,
-                                     data_path=trainset_path,
+                                     data_paths=trainset_paths,
                                      split_method_paths=train_split_method_paths,
                                      desired_features=desired_features)
         self.split_ratio = split_ratio
-        if test_split_method_paths and testset_path and desired_features:
+        if test_split_method_paths and testset_paths and desired_features:
             self.test_data = Windowlize(window_size=window_size,
-                                        data_path=testset_path,
+                                        data_paths=testset_paths,
                                         split_method_paths=test_split_method_paths,
                                         desired_features=desired_features)
             self.Internal_TrainTest()
