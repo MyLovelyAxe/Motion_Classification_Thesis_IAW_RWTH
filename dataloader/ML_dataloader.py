@@ -24,37 +24,14 @@ class Windowlize():
         self.desired_features = desired_features
         self.aIdx_dict = get_act_index_dict(split_method_paths)
 
-        # if not self.desired_features:
-        #     self.load_data()
-        #     self.y_ori_idx = np.zeros_like(self.y_data_ori)
-        # else:
-        #     self.load_ext_data()
-
-        self.load_ext_data()
+        self.load_data()
         self.create_windows()
         self.calc_statistic_features()
         self.localization()
 
     def load_data(self):
         """
-        x_data shape:
-            original: [#frames,#features]
-        y_data shape:
-            original: [#frames,]
-        """
-        with open(self.data_paths[0], 'rb') as xf:
-            self.x_data_ori = np.load(xf)
-        with open(self.data_paths[1], 'rb') as yf:
-            self.y_data_ori = np.load(yf)
-        print(f'loaded original x_data shape: {self.x_data_ori.shape}')
-        print(f'loaded original y_data shape: {self.y_data_ori.shape}')
-        print()
-        print(f'how many zeros are there in x_data? {np.count_nonzero(np.isnan(self.x_data_ori))}')
-        self.num_features = self.x_data_ori.shape[1]
-
-    def load_ext_data(self):
-        """
-        in order to plot result of external testset in original order,
+        in order to plot result of testset in original order,
         it is necessary to save the index from original dataset,
         then load data and output dataset inside dataloader instead of save in .npy.
         the process is:
@@ -72,6 +49,10 @@ class Windowlize():
                                                                           desired_dists=dists,
                                                                           desired_angles=angles,
                                                                           split_method_paths=self.split_method_paths)
+        print(f'loaded original x_data shape: {self.x_data_ori.shape}')
+        print(f'loaded original y_data shape: {self.y_data_ori.shape}')
+        print()
+        self.num_features = self.x_data_ori.shape[1]
 
     def create_windows(self):
         """
