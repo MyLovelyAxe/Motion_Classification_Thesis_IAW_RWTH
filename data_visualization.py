@@ -1,6 +1,5 @@
 import os
 import argparse
-import numpy as np
 from util.plots import plot_ori_data,verification,output_dataset,get_feature_selection,show_misclassified_frames
 
 ############################# Attention ###########################
@@ -18,7 +17,6 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 ##
 ###################################################################
 
-
 ####################################
 ###### get general parameters ######
 ####################################
@@ -26,7 +24,7 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='verify_before_output',
+                    default='post_process',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
@@ -40,7 +38,8 @@ parser.add_argument('--function', type=str,
 parser.add_argument('--single_data_path', type=str,
                     default='dataset/Agree/trainset/agree_20230801',
                     help='only one single dataset for function check_ori_data and verify_before_output',
-                    choices=['dataset/Static/trainset/chor2_20230609',
+                    choices=[
+                             'dataset/Static/trainset/chor2_20230609',
                              'dataset/Static/testset/testset_20230627',
                              'dataset/Dynamic/trainset/dynamic1_20230706',
                              'dataset/Dynamic/trainset/dynamic2_20230706',
@@ -62,14 +61,24 @@ parser.add_argument('--desired_features_trial', type=str,
 ####################################
 
 parser.add_argument('--examine_data_path', type=str,nargs="+",
-                    default=['dataset/testset_20230627'],
-                    help='location of examined data for misclassified labels, only external testset',
-                    choices=['dataset/Static/testset/testset_20230627',
+                    default=[
                              'dataset/Dynamic/testset/dynamic_test_20230801',
+                             ],
+                    help='location of examined data for misclassified labels, only external testset',
+                    choices=[
+                             'dataset/Static/trainset/chor2_20230609',
+                             'dataset/Static/testset/testset_20230627',
+                             'dataset/Dynamic/trainset/dynamic1_20230706',
+                             'dataset/Dynamic/trainset/dynamic2_20230706',
+                             'dataset/Dynamic/trainset/dynamic3_20230706',
+                             'dataset/Dynamic/testset/dynamic_test_20230801',
+                             'dataset/Agree/trainset/agree_20230801',
                              'dataset/Agree/testset/agree_test_20230801',
                              ]
                     )
-parser.add_argument('--misclassified_frames', type=list,default=[961,961+1],help='check misclassified frames')
+parser.add_argument('--misclassified_frames', type=list,default=[2589,2789],help='check misclassified frames')
+parser.add_argument('--desired_features', type=str, 
+                    default='dataset/desired_features.yaml', help='load features name from .yaml')
 
 args = parser.parse_args()
 

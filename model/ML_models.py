@@ -33,17 +33,26 @@ class DynamicClassModel():
         record the indices of frames which are misclassified
         """
         self.mis_index = np.where(self.T_pred!=self.dynamic_data.y_test)[0]
-        # true_labels = self.dynamic_data.test_data.y_data_ori[self.mis_index]
         pred_labels = self.T_pred[self.mis_index]
-        mis_index_ori = self.dynamic_data.test_data.y_MisClsExm[self.mis_index]
-        true_labels = self.dynamic_data.test_data.y_data_ori[mis_index_ori]
+        mis_index_ori = self.dynamic_data.y_MisClsExm[self.mis_index]
+        true_labels = self.dynamic_data.y_data_ori[mis_index_ori]
         Exm_start_frames = mis_index_ori - int(self.wl/2)
         Exm_end_frames = mis_index_ori + int(self.wl/2)
         self.Exm_indices = np.vstack((Exm_start_frames,Exm_end_frames)).T
+
+        # because the result plot is converted back to orignal order
+        # but to examine windows has to be in generated dataset, i.e. the one which was already split and concatenated
+        # so plot_MisIdx is only for intuitive presentation on result plot, i.e. original data
+        # and self.Exm_indices is to check windows on split&concat data
+        tmp_idx = self.dynamic_data.y_ori_idx_win.copy()
+        tmp_idx[self.mis_index] = -1 # -1 is just a label, to label where is misclassified
+        new = tmp_idx[self.dynamic_data.y_ori_idx_win.argsort()]
+        plot_MisIdx = np.where(new==-1)[0]
+
         print(f'The misclassified windows has shape: {self.Exm_indices.shape}')
         print(f'Examine the windows with these indices in data_visualization.py:')
         print(f'idx of misclassified window | check on dataset with:[start_frame, end_frame] | truth | prediction')
-        for mis_idx,exm_idxs,tru,pre in zip(self.mis_index,self.Exm_indices,true_labels,pred_labels):
+        for mis_idx,exm_idxs,tru,pre in zip(plot_MisIdx,self.Exm_indices,true_labels,pred_labels):
             print(f'{mis_idx} | {exm_idxs} | {tru} | {pre}')
 
     def show_result(self,args):
@@ -57,8 +66,8 @@ class DynamicClassModel():
             self.P_pred = (self.P_pred).astype(np.float32)
 
             ### Generate x-axis values
-            frame_rate=60 # Hz
-            sample_numbers = np.arange(self.P_pred.shape[0])/frame_rate
+            self.frame_rate=60 # Hz
+            self.sample_numbers = np.arange(self.P_pred.shape[0])/self.frame_rate
             
             ### prepare act names
             aName_dict = {}
@@ -78,9 +87,9 @@ class DynamicClassModel():
 
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
-                ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{aName_dict[act_idx]}')
+                ax1.plot(self.sample_numbers, plot_pred[:, idx], label=f'{aName_dict[act_idx]}')
                 truth = np.where(plot_truth==act_idx,1,0)
-                ax2.plot(sample_numbers, truth, label=f'{aName_dict[act_idx]}')
+                ax2.plot(self.sample_numbers, truth, label=f'{aName_dict[act_idx]}')
             ax1.set_title(f'Prediction',fontsize=10)
             ax1.set_ylabel(f'Prediction Probability')
             ax2.set_title(f'Truth',fontsize=10)

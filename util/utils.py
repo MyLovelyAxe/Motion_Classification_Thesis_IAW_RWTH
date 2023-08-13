@@ -94,6 +94,7 @@ def output_dataset(ori_data_paths,
                    desired_dists,
                    desired_angles):
     out_dict = {}
+    AccCount = 0 # accumulated counts
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
         _,coords = get_ori_data(data_path)
         split_method = get_splilt_method(split_path)
@@ -106,8 +107,9 @@ def output_dataset(ori_data_paths,
                 out_dict[act_name] = {'x_data':[],'y_data':[],'y_ori_idx':[],'skeleton':[]}
             out_dict[act_name]['x_data'].append(all_features[start:end])
             out_dict[act_name]['y_data'].append(np.full((end-start),label))
-            out_dict[act_name]['y_ori_idx'].append(np.arange(start,end))
+            out_dict[act_name]['y_ori_idx'].append(np.arange(start+AccCount,end+AccCount))
             out_dict[act_name]['skeleton'].append(coords[start:end])
+        AccCount += len(coords)
     # concatenate all activities
     x_data_lst = []
     y_data_lst = []
@@ -128,14 +130,4 @@ def output_dataset(ori_data_paths,
     skeletons = np.concatenate(skeletons_lst,axis=0)
     del x_data_lst,y_data_lst,y_ori_idx_lst,skeletons_lst,x_data_tmp,y_data_tmp,y_ori_idx_tmp,skeleton_tmp,out_dict
 
-    # if not output_path is None:
-    #     # skeleton is only used for varification
-    #     # so don't output skeleton
-    #     if not os.path.exists(output_path):
-    #         os.mkdir(output_path)
-    #     print(f'type: {type(x_data)}, shape: {x_data.shape}')
-    #     np.save(os.path.join(output_path,f'x_data_{output_name}.npy'),x_data)
-    #     print(f'type: {type(y_data)}, shape: {y_data.shape}')
-    #     np.save(os.path.join(output_path,f'y_data_{output_name}.npy'),y_data)
-    # else:
     return x_data,y_data,skeletons,y_ori_idx

@@ -263,18 +263,21 @@ class DynamicData():
                                      split_method_paths=train_split_method_paths,
                                      desired_features=desired_features)
         self.split_ratio = split_ratio
+        self.Internal_TrainTest()
         if test_split_method_paths and testset_paths and desired_features:
             self.test_data = Windowlize(window_size=window_size,
                                         data_paths=testset_paths,
                                         split_method_paths=test_split_method_paths,
                                         desired_features=desired_features)
-            self.Internal_TrainTest()
             # test with ouside testset, simply rewrite self.x_test and self.y_test
+            self.y_data_ori = self.test_data.y_data_ori
             self.x_test = self.test_data.x_data
             self.y_test = self.test_data.y_data
+            self.y_MisClsExm = self.test_data.y_MisClsExm
             self.y_ori_idx_win = self.test_data.y_ori_idx_win
         else:
-            self.Internal_TrainTest()
+            self.y_data_ori = self.train_data.y_data_ori
+            self.y_MisClsExm = self.train_data.y_MisClsExm
 
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')
