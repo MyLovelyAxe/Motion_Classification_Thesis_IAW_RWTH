@@ -426,14 +426,11 @@ def calc_height_rate(skeleton):
 
     ### calculate length of spine
     spines = ['spine1_spine2','spine2_spine3','spine3_spine4','spine4_spine5'] # len(spines) = 4
-    spine_features = get_dist_feature(all_distances,spines) # spine_features: [1,4]
-    len_spine = np.sum(spine_features)
+    len_spine = np.sum(get_dist_feature(all_distances,spines))
 
     ### calculate height without head, because distance spine5_head changes along with frames
     legs = ['RAnkle_RKnee','RKnee_RHip','LAnkle_LKnee','LKnee_LHip'] # len(legs) = 4
-    leg_features = get_dist_feature(all_distances,legs) # spine_features: [1,4]
-    len_leg = np.sum(leg_features) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
-    height = len_spine + len_leg
+    height = len_spine + np.sum(get_dist_feature(all_distances,legs)) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
 
     ### standard rate
     std_height = 1.3 # unit: m, heigt without head and neck # 1.3 ??
@@ -445,4 +442,5 @@ def calc_height_rate(skeleton):
         'len_spine_rate': len_spine/std_spine,
         'height_rate': height/std_height
     }
+    del all_distances
     return scale_elements
