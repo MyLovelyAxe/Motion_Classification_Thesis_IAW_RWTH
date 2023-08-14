@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict, calc_height_rate
 from util.plots import get_feature_selection, output_dataset
 
 
@@ -45,14 +45,23 @@ class Windowlize():
                 # ie. order instead of real value
         """
         dists,angles = get_feature_selection(self.desired_features)
-        self.x_data_ori,self.y_data_ori,_,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
-                                                                          desired_dists=dists,
-                                                                          desired_angles=angles,
-                                                                          split_method_paths=self.split_method_paths)
+        self.x_data_ori,self.y_data_ori,self.skeleton,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
+                                                                                      desired_dists=dists,
+                                                                                      desired_angles=angles,
+                                                                                      split_method_paths=self.split_method_paths)
         print(f'loaded original x_data shape: {self.x_data_ori.shape}')
         print(f'loaded original y_data shape: {self.y_data_ori.shape}')
         print()
         self.num_features = self.x_data_ori.shape[1]
+
+    def standarization(self):
+        """
+        because different people have different height,
+        i.e. distance-related features like distance, velocity
+        necessary to standarize
+        """
+        self.scale_elements = calc_height_rate(self.skeleton)
+        del self.skeleton
 
     def create_windows(self):
         """

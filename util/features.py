@@ -2,7 +2,7 @@ import re
 import numpy as np
 from scipy.stats import skew
 from scipy.stats import kurtosis
-from scipy.fft import fft,fftfreq
+# from scipy.fft import fft,fftfreq
 import yaml
 
 ########################################################
@@ -281,21 +281,21 @@ def calc_Skewness(data) -> np.array:
 
 ############################ TODO: if we need more features ######################
 
-def calc_FFT(data):
-    """
-    calculate the fft of each window
-    only return the real part and the half with positive frequencies
-    """
-    FFT = fft(data,axis=1)
-    freq = fftfreq(n=data.shape[1],d=1/200)
-    freq_index = np.argsort(freq)
-    print(f'freq index shape: {freq_index.shape}')
-    freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
-    sorted_real_FFT = np.take_along_axis(FFT.real,freq_index,axis=1)
-    freq.sort()
-    half_freq = freq[len(freq)//2:]
-    half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
-    return half_freq,half_sorted_real_FFT
+# def calc_FFT(data):
+#     """
+#     calculate the fft of each window
+#     only return the real part and the half with positive frequencies
+#     """
+#     FFT = fft(data,axis=1)
+#     freq = fftfreq(n=data.shape[1],d=1/200)
+#     freq_index = np.argsort(freq)
+#     print(f'freq index shape: {freq_index.shape}')
+#     freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
+#     sorted_real_FFT = np.take_along_axis(FFT.real,freq_index,axis=1)
+#     freq.sort()
+#     half_freq = freq[len(freq)//2:]
+#     half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
+#     return half_freq,half_sorted_real_FFT
 
 # def select_FFT(Freq,FFT):
 #     pass
@@ -414,3 +414,15 @@ def get_metric_index_dict():
                          'kurtosis':5,
                          'skewness':6}
     return metric_index_dict
+
+def calc_height_rate(skeleton):
+    """
+    use skeleton data to calculate scaling values for standarization of distance-related features, i.e. distance, velocity
+    """
+    scale_elements = {
+        'len_spine': 0,
+        'height': 0,
+        'len_spine_rate': 0,
+        'height_rate': 0
+    }
+    return scale_elements
