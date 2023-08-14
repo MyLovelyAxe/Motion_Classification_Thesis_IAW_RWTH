@@ -180,7 +180,6 @@ class Windowlize():
             - which_metric only contains 1 metric
         """
         ### prepare basics
-        # aIdx_dict = get_act_index_dict(self.split_method_paths)
         mIdx = get_metric_index(which_metric)[0]
         self.num_win = self.x_data.shape[0]
         self.num_metrics = int(self.x_data.shape[1] / self.num_features)
