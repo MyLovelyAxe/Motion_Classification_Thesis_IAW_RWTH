@@ -2,7 +2,7 @@ import re
 import numpy as np
 from scipy.stats import skew
 from scipy.stats import kurtosis
-# from scipy.fft import fft,fftfreq
+from scipy.fft import fft,fftfreq
 import yaml
 
 ########################################################
@@ -62,17 +62,15 @@ def examine_distance(coords,frame,joint_1,joint_2):
     print(f'distance calculated from coordinates: {dist_calculated}')
     print(f'wehther the same: {dist_from_array == dist_calculated}')
 
-def get_dist_feature(coords,desired_dists):
+def get_dist_feature(all_distances,desired_dists):
     """
     extract desired distance features from all distances
     """
-    all_distances = calc_all_distances(coords)
     joint_index_dict = get_joint_index()
     dist_feature = np.zeros((all_distances.shape[0],len(desired_dists)))
     for idx,desired_dist in enumerate(desired_dists):
         joint1,joint2 = desired_dist.split('_')
         dist_feature[:,idx] = all_distances[:,joint_index_dict[joint1],joint_index_dict[joint2]]
-    del all_distances
     return dist_feature
 
 ####################################################
@@ -138,11 +136,10 @@ def calc_angles(joints_lst,distances):
     B = np.round(B.astype(np.float32),decimals=5)
     return B
 
-def get_angle_feature(coords,desired_angles):
+def get_angle_feature(all_distances,desired_angles):
     """
     get desired angle features
     """
-    all_distances = calc_all_distances(coords)
     angle_pairs_dict = get_angle_pairs(desired_angles)
     num_frames = all_distances.shape[0]
     num_angles = len(angle_pairs_dict)
@@ -166,15 +163,18 @@ def get_all_features(coords,desired_dists,desired_angles):
     """
     concatenate all features
     """
-    dist_feature = get_dist_feature(coords,desired_dists) # dist_feature: [#frames,#desired_dist]
+    all_distances = calc_all_distances(coords)
+    dist_feature = get_dist_feature(all_distances,desired_dists) # dist_feature: [#frames,#desired_dist]
     dist_rate = calc_ChangeRate(dist_feature) # dist_rate with same shape of dist_feature
-    angle_feature = get_angle_feature(coords,desired_angles) # angle_feature: [#frames,#desired_angle]
+    angle_feature = get_angle_feature(all_distances,desired_angles) # angle_feature: [#frames,#desired_angle]
     angle_rate = calc_ChangeRate(angle_feature) # angle_rate with same shape of angle_feature
 
     all_features = np.concatenate((dist_feature,
                                    dist_rate,
                                    angle_feature,
                                    angle_rate), axis=1)
+    
+    del all_distances
     return all_features
 
 #################################################################
@@ -281,21 +281,21 @@ def calc_Skewness(data) -> np.array:
 
 ############################ TODO: if we need more features ######################
 
-# def calc_FFT(data):
-#     """
-#     calculate the fft of each window
-#     only return the real part and the half with positive frequencies
-#     """
-#     FFT = fft(data,axis=1)
-#     freq = fftfreq(n=data.shape[1],d=1/200)
-#     freq_index = np.argsort(freq)
-#     print(f'freq index shape: {freq_index.shape}')
-#     freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
-#     sorted_real_FFT = np.take_along_axis(FFT.real,freq_index,axis=1)
-#     freq.sort()
-#     half_freq = freq[len(freq)//2:]
-#     half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
-#     return half_freq,half_sorted_real_FFT
+def calc_FFT(data):
+    """
+    calculate the fft of each window
+    only return the real part and the half with positive frequencies
+    """
+    FFT = fft(data,axis=1)
+    freq = fftfreq(n=data.shape[1],d=1/200)
+    freq_index = np.argsort(freq)
+    print(f'freq index shape: {freq_index.shape}')
+    freq_index = np.expand_dims(np.expand_dims(freq_index,axis=0),axis=-1)
+    sorted_real_FFT = np.take_along_axis(FFT.real,freq_index,axis=1)
+    freq.sort()
+    half_freq = freq[len(freq)//2:]
+    half_sorted_real_FFT = sorted_real_FFT[:,len(freq)//2:,:]
+    return half_freq,half_sorted_real_FFT
 
 # def select_FFT(Freq,FFT):
 #     pass
@@ -419,10 +419,30 @@ def calc_height_rate(skeleton):
     """
     use skeleton data to calculate scaling values for standarization of distance-related features, i.e. distance, velocity
     """
+
+    ### only use 1st frame to calculate, because these features never change during the process
+    coords = np.expand_dims(skeleton[0],axis=0) # coords: [1,3,26]
+    all_distances = calc_all_distances(coords) # all_distances: [1.26,26]
+
+    ### calculate length of spine
+    spines = ['spine1_spine2','spine2_spine3','spine3_spine4','spine4_spine5'] # len(spines) = 4
+    spine_features = get_dist_feature(all_distances,spines) # spine_features: [1,4]
+    len_spine = np.sum(spine_features)
+
+    ### calculate height without head, because distance spine5_head changes along with frames
+    legs = ['RAnkle_RKnee','RKnee_RHip','LAnkle_LKnee','LKnee_LHip'] # len(legs) = 4
+    leg_features = get_dist_feature(all_distances,legs) # spine_features: [1,4]
+    len_leg = np.sum(leg_features) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
+    height = len_spine + len_leg
+
+    ### standard rate
+    std_height = 1.3 # unit: m, heigt without head and neck # 1.3 ??
+    std_spine = 0.4 # unit: m # 0.43 ??
+
     scale_elements = {
-        'len_spine': 0,
-        'height': 0,
-        'len_spine_rate': 0,
-        'height_rate': 0
+        'len_spine': len_spine,
+        'height': height,
+        'len_spine_rate': len_spine/std_spine,
+        'height_rate': height/std_height
     }
     return scale_elements

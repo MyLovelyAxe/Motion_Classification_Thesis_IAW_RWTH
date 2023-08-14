@@ -25,6 +25,7 @@ class Windowlize():
         self.aIdx_dict = get_act_index_dict(split_method_paths)
 
         self.load_data()
+        self.standarization()
         self.create_windows()
         self.calc_statistic_features()
         self.localization()
@@ -49,8 +50,8 @@ class Windowlize():
                                                                                       desired_dists=dists,
                                                                                       desired_angles=angles,
                                                                                       split_method_paths=self.split_method_paths)
-        print(f'loaded original x_data shape: {self.x_data_ori.shape}')
-        print(f'loaded original y_data shape: {self.y_data_ori.shape}')
+        print(f'original x_data shape: {self.x_data_ori.shape}')
+        print(f'original y_data shape: {self.y_data_ori.shape}')
         print()
         self.num_features = self.x_data_ori.shape[1]
 
@@ -61,6 +62,7 @@ class Windowlize():
         necessary to standarize
         """
         self.scale_elements = calc_height_rate(self.skeleton)
+        print(f'scale_elements: {self.scale_elements}')
         del self.skeleton
 
     def create_windows(self):

@@ -7,12 +7,12 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic',
+    parser.add_argument('--exp_group',type=str,default='Agree',
                         choices=['Dynamic','Agree','Static'],
                         help='Select one group of training & testing')
     parser.add_argument('--desired_features',type=str,default='dataset/desired_features.yaml',help='load features name from .yaml')
     parser.add_argument('--split_ratio', type=float, default=0.9, help='the ratio for number of samples in trainset')
-    parser.add_argument('--window_size', type=int, default=200, help='the ratio for number of samples in trainset')
+    parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
     parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
 
