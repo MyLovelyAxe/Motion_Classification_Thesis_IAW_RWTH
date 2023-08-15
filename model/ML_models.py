@@ -8,25 +8,12 @@ from dataloader.ML_dataloader import DynamicData
 
 class DynamicClassModel():
     
-    def __init__(self,
-                 Window_Size,
-                 Train_Split_Method_Paths,
-                 Trainset_Paths,
-                 Test_Split_Method_Paths=None,
-                 Testset_Paths=None,
-                 Split_Ratio=0.8,
-                 Desired_Features=None):
+    def __init__(self,args):
+
         self.T_pred = None
         self.P_pred = None
-        self.wl = Window_Size
-        self.dynamic_data = DynamicData(window_size=Window_Size,
-                                        train_split_method_paths=Train_Split_Method_Paths,
-                                        trainset_paths=Trainset_Paths,
-                                        test_split_method_paths=Test_Split_Method_Paths,
-                                        testset_paths=Testset_Paths,
-                                        split_ratio=Split_Ratio,
-                                        desired_features=Desired_Features
-                                        )
+        self.wl = args.window_size
+        self.dynamic_data = DynamicData(args)
 
     def misclass_index(self):
         """
@@ -113,75 +100,39 @@ class DynamicClassModel():
 
 class KNN(DynamicClassModel):
     
-    def __init__(self,
-                 N_neighbor,
-                 Window_Size,
-                 Train_Split_Method_Paths,
-                 Trainset_Paths,
-                 Test_Split_Method_Paths=None,
-                 Testset_Paths=None,
-                 Split_Ratio=0.8,
-                 Desired_Features=None):
-        super().__init__(Window_Size,
-                         Train_Split_Method_Paths,
-                         Trainset_Paths,
-                         Test_Split_Method_Paths,
-                         Testset_Paths,
-                         Split_Ratio,
-                         Desired_Features)
-        self.neigh = KNeighborsClassifier(n_neighbors=N_neighbor)
+    def __init__(self,args):
+        super().__init__(args)
+        self.neigh = KNeighborsClassifier(n_neighbors=args.n_neighbor)
+
     def train(self):
         self.neigh.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
+
     def test(self):
         self.P_pred = self.neigh.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
         
 class RandomForest(DynamicClassModel):
     
-    def __init__(self,
-                 Max_Depth,
-                 Random_State,
-                 Window_Size,
-                 Train_Split_Method_Paths,
-                 Trainset_Paths,
-                 Test_Split_Method_Paths=None,
-                 Testset_Paths=None,
-                 Split_Ratio=0.8,
-                 Desired_Features=None):
-        super().__init__(Window_Size,
-                         Train_Split_Method_Paths,
-                         Trainset_Paths,
-                         Test_Split_Method_Paths,
-                         Testset_Paths,
-                         Split_Ratio,
-                         Desired_Features)
-        self.random_forest = RandomForestClassifier(max_depth=Max_Depth,random_state=Random_State)
+    def __init__(self,args):
+        super().__init__(args)
+        self.random_forest = RandomForestClassifier(max_depth=args.max_depth,random_state=args.random_state)
+
     def train(self):
         self.random_forest.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
+
     def test(self):
         self.P_pred = self.random_forest.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
         
 class SVM(DynamicClassModel):
     
-    def __init__(self,
-                 Window_Size,
-                 Train_Split_Method_Paths,
-                 Trainset_Paths,
-                 Test_Split_Method_Paths=None,
-                 Testset_Paths=None,
-                 Split_Ratio=0.8,
-                 Desired_Features=None):
-        super().__init__(Window_Size,
-                         Train_Split_Method_Paths,
-                         Trainset_Paths,
-                         Test_Split_Method_Paths,
-                         Testset_Paths,
-                         Split_Ratio,
-                         Desired_Features)
+    def __init__(self,args):
+        super().__init__(args)
         self.svm = svm.SVC(probability=True)
+
     def train(self):
         self.svm.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
+
     def test(self):
         self.P_pred = self.svm.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)

@@ -62,7 +62,11 @@ class Windowlize():
         necessary to standarize
         """
         self.scale_elements = calc_height_rate(self.skeleton)
-        print(f'scale_elements: {self.scale_elements}')
+        print(f'----------------------------------')
+        print(f'scale_elements:')
+        print('\n'.join(f'{k}: {v}' for k, v in self.scale_elements.items()))
+        print(f'----------------------------------')
+        
         del self.skeleton
 
     def create_windows(self):
@@ -260,25 +264,19 @@ class DynamicData():
     If external testset is provided, then test with external testset;
     If not, then extract part of trainset for testing
     """
-    def __init__(self,
-                 window_size,
-                 train_split_method_paths,
-                 trainset_paths,
-                 test_split_method_paths,
-                 testset_paths,
-                 split_ratio,
-                 desired_features):
-        self.train_data = Windowlize(window_size=window_size,
-                                     data_paths=trainset_paths,
-                                     split_method_paths=train_split_method_paths,
-                                     desired_features=desired_features)
-        self.split_ratio = split_ratio
+    def __init__(self,args):
+        
+        self.train_data = Windowlize(window_size=args.window_size,
+                                     data_paths=args.trainset_paths,
+                                     split_method_paths=args.train_split_method_paths,
+                                     desired_features=args.desired_features)
+        self.split_ratio = args.split_ratio
         self.Internal_TrainTest()
-        if test_split_method_paths and testset_paths and desired_features:
-            self.test_data = Windowlize(window_size=window_size,
-                                        data_paths=testset_paths,
-                                        split_method_paths=test_split_method_paths,
-                                        desired_features=desired_features)
+        if args.test_split_method_paths and args.testset_paths and args.desired_features:
+            self.test_data = Windowlize(window_size=args.window_size,
+                                        data_paths=args.testset_paths,
+                                        split_method_paths=args.test_split_method_paths,
+                                        desired_features=args.desired_features)
             # test with ouside testset, simply rewrite self.x_test and self.y_test
             self.y_data_ori = self.test_data.y_data_ori
             self.x_test = self.test_data.x_data

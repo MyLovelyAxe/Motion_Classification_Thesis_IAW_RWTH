@@ -22,7 +22,7 @@ def extract_path(group_path,train_or_test):
         data_paths.append(os.path.join(set_path,train_path,'unknown.NoHead.csv'))
     return split_method_paths,data_paths
 
-def get_paths(exp_group,outside_test):
+def get_paths(args):
     """
     One group of experiment consists of:
         - trainset from N .csv files
@@ -30,17 +30,17 @@ def get_paths(exp_group,outside_test):
         (N>=1, M>=1)
     """
 
-    group_path = os.path.join('dataset',exp_group)
+    group_path = os.path.join('dataset',args.exp_group)
     # trainset
-    train_split_method_paths,trainset_paths = extract_path(group_path=group_path,train_or_test='trainset')
+    args.train_split_method_paths,args.trainset_paths = extract_path(group_path=group_path,train_or_test='trainset')
     # testset
-    test_split_method_paths,testset_paths = extract_path(group_path=group_path,train_or_test='testset')
+    args.test_split_method_paths,args.testset_paths = extract_path(group_path=group_path,train_or_test='testset')
     # whether use testset outside from trainset or not
-    if not outside_test:
-        test_split_method_paths = None
-        testset_paths = None
+    if not args.outside_test:
+        args.test_split_method_paths = None
+        args.testset_paths = None
 
-    return train_split_method_paths,trainset_paths,test_split_method_paths,testset_paths
+    return args
 
 #########################################
 ###### load original skeleton data ######

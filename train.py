@@ -10,11 +10,20 @@ def default_args():
     parser.add_argument('--exp_group',type=str,default='Agree',
                         choices=['Dynamic','Agree','Static'],
                         help='Select one group of training & testing')
+    parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
+    parser.add_argument('--trainset_paths', type=list, help='paths of data for trainset')
+    parser.add_argument('--test_split_method_paths', type=list, help='paths of split methods for testset')
+    parser.add_argument('--testset_paths', type=list, help='paths of data for testset')
+    
+    ###### training configuration ######
     parser.add_argument('--desired_features',type=str,default='dataset/desired_features.yaml',help='load features name from .yaml')
     parser.add_argument('--split_ratio', type=float, default=0.9, help='the ratio for number of samples in trainset')
     parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
-    parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
+    parser.add_argument('--outside_test',type=int,default=0,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
+    parser.add_argument('--standard', type=str, default='height',
+                         choices={'len_spine','height','len_spine_rate','height_rate'},
+                         help='standarize with which scaling factor')
 
     ###### models configuration ######
     # select a model
@@ -44,39 +53,17 @@ def main(ext_args=None):
         args = ext_args
 
     ### get paths for current experiment
-    train_split_method_paths,trainset_paths,test_split_method_paths,testset_paths = get_paths(args.exp_group,args.outside_test)
+    args = get_paths(args)
 
     ### create model
     if args.model == 'KNN':
-        cls_model = KNN(N_neighbor=args.n_neighbor,
-                        Window_Size=args.window_size,
-                        Train_Split_Method_Paths=train_split_method_paths,
-                        Trainset_Paths=trainset_paths,
-                        Test_Split_Method_Paths=test_split_method_paths,
-                        Testset_Paths=testset_paths,
-                        Split_Ratio=args.split_ratio,
-                        Desired_Features=args.desired_features
-                        )
+        cls_model = KNN(args)
+
     elif args.model == 'RandomForest':
-        cls_model = RandomForest(Max_Depth=args.max_depth,
-                                 Random_State=args.random_state,
-                                 Window_Size=args.window_size,
-                                 Train_Split_Method_Paths=train_split_method_paths,
-                                 Trainset_Paths=trainset_paths,
-                                 Test_Split_Method_Paths=test_split_method_paths,
-                                 Testset_Paths=testset_paths,
-                                 Split_Ratio=args.split_ratio,
-                                 Desired_Features=args.desired_features
-                                 )
+        cls_model = RandomForest(args)
+
     elif args.model == 'SVM':
-        cls_model = SVM(Window_Size=args.window_size,
-                        Train_Split_Method_Paths=train_split_method_paths,
-                        Trainset_Paths=trainset_paths,
-                        Test_Split_Method_Paths=test_split_method_paths,
-                        Testset_Paths=testset_paths,
-                        Split_Ratio=args.split_ratio,
-                        Desired_Features=args.desired_features
-                        )
+        cls_model = SVM(args)
         
     ### train & test & show result
     cls_model.train()
