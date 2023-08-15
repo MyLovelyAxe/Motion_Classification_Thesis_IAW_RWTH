@@ -13,6 +13,7 @@ python train.py \
     --split_ratio 0.9 \
     --window_size $wl \
     --outside_test $ext \
+    --standard 'no_scale' \
     --save_res 1 \
     --model $model \
     --n_neighbor 20 \

@@ -177,15 +177,9 @@ def calc_height_rate(frame):
     legs = ['RAnkle_RKnee','RKnee_RHip','LAnkle_LKnee','LKnee_LHip'] # len(legs) = 4
     height = len_spine + np.sum(get_dist_feature(distances,legs)) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
 
-    ### standard rate
-    std_height = 1.3 # unit: m, heigt without head and neck # 1.3 ??
-    std_spine = 0.4 # unit: m # 0.43 ??
-
     scale_elements = {
         'len_spine': 1.0/len_spine,
         'height': 1.0/height,
-        'len_spine_rate': len_spine/std_spine,
-        'height_rate': height/std_height,
         'no_scale': 1.0
     }
     del distances

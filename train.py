@@ -22,7 +22,7 @@ def default_args():
     parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
     parser.add_argument('--standard', type=str, default='height',
-                         choices={'len_spine','height','len_spine_rate','height_rate','no_scale'},
+                         choices={'len_spine','height','no_scale'},
                          help='standarize with which scaling factor')
 
     ###### models configuration ######
