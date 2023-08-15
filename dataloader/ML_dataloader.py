@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict, calc_height_rate
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
 from util.plots import get_feature_selection, output_dataset
 
 
@@ -17,15 +17,18 @@ class Windowlize():
                  window_size,
                  data_paths,
                  split_method_paths,
-                 desired_features=None):
+                 standard,
+                 desired_features=None
+                 ):
         self.wl = window_size
         self.data_paths = data_paths
         self.split_method_paths = split_method_paths
+        self.standard = standard
         self.desired_features = desired_features
         self.aIdx_dict = get_act_index_dict(split_method_paths)
 
         self.load_data()
-        self.standarization()
+        # self.standarization()
         self.create_windows()
         self.calc_statistic_features()
         self.localization()
@@ -49,25 +52,26 @@ class Windowlize():
         self.x_data_ori,self.y_data_ori,self.skeleton,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
                                                                                       desired_dists=dists,
                                                                                       desired_angles=angles,
-                                                                                      split_method_paths=self.split_method_paths)
+                                                                                      split_method_paths=self.split_method_paths,
+                                                                                      standard=self.standard)
         print(f'original x_data shape: {self.x_data_ori.shape}')
         print(f'original y_data shape: {self.y_data_ori.shape}')
         print()
         self.num_features = self.x_data_ori.shape[1]
 
-    def standarization(self):
-        """
-        because different people have different height,
-        i.e. distance-related features like distance, velocity
-        necessary to standarize
-        """
-        self.scale_elements = calc_height_rate(self.skeleton)
-        print(f'----------------------------------')
-        print(f'scale_elements:')
-        print('\n'.join(f'{k}: {v}' for k, v in self.scale_elements.items()))
-        print(f'----------------------------------')
+    # def standarization(self):
+    #     """
+    #     because different people have different height,
+    #     i.e. distance-related features like distance, velocity
+    #     necessary to standarize
+    #     """
+    #     self.scale_elements = calc_height_rate(self.skeleton)
+    #     print(f'----------------------------------')
+    #     print(f'scale_elements:')
+    #     print('\n'.join(f'{k}: {v}' for k, v in self.scale_elements.items()))
+    #     print(f'----------------------------------')
         
-        del self.skeleton
+    #     del self.skeleton
 
     def create_windows(self):
         """
@@ -269,6 +273,7 @@ class DynamicData():
         self.train_data = Windowlize(window_size=args.window_size,
                                      data_paths=args.trainset_paths,
                                      split_method_paths=args.train_split_method_paths,
+                                     standard=args.standard,
                                      desired_features=args.desired_features)
         self.split_ratio = args.split_ratio
         self.Internal_TrainTest()
@@ -276,6 +281,7 @@ class DynamicData():
             self.test_data = Windowlize(window_size=args.window_size,
                                         data_paths=args.testset_paths,
                                         split_method_paths=args.test_split_method_paths,
+                                        standard=args.standard,
                                         desired_features=args.desired_features)
             # test with ouside testset, simply rewrite self.x_test and self.y_test
             self.y_data_ori = self.test_data.y_data_ori

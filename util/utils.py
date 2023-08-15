@@ -89,16 +89,60 @@ def get_splilt_method(yaml_path,show=False):
         print(f'split method: {split_method}')
     return split_method
 
+# def output_dataset(ori_data_paths,
+#                    split_method_paths,
+#                    desired_dists,
+#                    desired_angles):
+#     out_dict = {}
+#     AccCount = 0 # accumulated counts
+#     for split_path,data_path in zip(split_method_paths,ori_data_paths):
+#         _,coords = get_ori_data(data_path)
+#         split_method = get_splilt_method(split_path)
+#         all_features = get_all_features(coords,desired_dists,desired_angles)
+#         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
+#         for act_name,config in split_method.items():
+#             start,end,label = list(i for _,i in config.items())
+#             act_name = get_ActName(act_name)
+#             if not act_name in out_dict:
+#                 out_dict[act_name] = {'x_data':[],'y_data':[],'y_ori_idx':[],'skeleton':[]}
+#             out_dict[act_name]['x_data'].append(all_features[start:end])
+#             out_dict[act_name]['y_data'].append(np.full((end-start),label))
+#             out_dict[act_name]['y_ori_idx'].append(np.arange(start+AccCount,end+AccCount))
+#             out_dict[act_name]['skeleton'].append(coords[start:end])
+#         AccCount += len(coords)
+#     # concatenate all activities
+#     x_data_lst = []
+#     y_data_lst = []
+#     y_ori_idx_lst = []
+#     skeletons_lst = []
+#     for act,data in out_dict.items():
+#         x_data_tmp = np.concatenate(data['x_data'],axis=0)
+#         y_data_tmp = np.concatenate(data['y_data'],axis=0)
+#         y_ori_idx_tmp = np.concatenate(data['y_ori_idx'],axis=0)
+#         skeleton_tmp = np.concatenate(data['skeleton'],axis=0)
+#         x_data_lst.append(x_data_tmp)
+#         y_data_lst.append(y_data_tmp)
+#         y_ori_idx_lst.append(y_ori_idx_tmp)
+#         skeletons_lst.append(skeleton_tmp)
+#     x_data = np.concatenate(x_data_lst,axis=0)
+#     y_data = np.concatenate(y_data_lst,axis=0)
+#     y_ori_idx = np.concatenate(y_ori_idx_lst,axis=0)
+#     skeletons = np.concatenate(skeletons_lst,axis=0)
+#     del x_data_lst,y_data_lst,y_ori_idx_lst,skeletons_lst,x_data_tmp,y_data_tmp,y_ori_idx_tmp,skeleton_tmp,out_dict
+
+#     return x_data,y_data,skeletons,y_ori_idx
+
 def output_dataset(ori_data_paths,
                    split_method_paths,
                    desired_dists,
-                   desired_angles):
+                   desired_angles,
+                   standard):
     out_dict = {}
     AccCount = 0 # accumulated counts
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
         _,coords = get_ori_data(data_path)
         split_method = get_splilt_method(split_path)
-        all_features = get_all_features(coords,desired_dists,desired_angles)
+        all_features = get_all_features(coords,desired_dists,desired_angles,standard)
         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
         for act_name,config in split_method.items():
             start,end,label = list(i for _,i in config.items())

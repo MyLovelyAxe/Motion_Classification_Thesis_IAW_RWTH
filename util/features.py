@@ -159,7 +159,39 @@ def calc_ChangeRate(features):
 
     return change_rate
 
-def get_all_features(coords,desired_dists,desired_angles):
+def calc_height_rate(frame):
+    """
+    frame: skeleton data to calculate scaling values for standarization of distance-related features, i.e. distance, velocity
+            which is from only one frame, i.e. with shape [3,26]
+    """
+
+    ### only one frame to calculate, because these features never change during the process
+    frame = np.expand_dims(frame,axis=0) # frame: [3,26] -> [1,3,26]
+    distances = calc_all_distances(frame) # all_distances: [1.26,26]
+
+    ### calculate length of spine
+    spines = ['spine1_spine2','spine2_spine3','spine3_spine4','spine4_spine5'] # len(spines) = 4
+    len_spine = np.sum(get_dist_feature(distances,spines))
+
+    ### calculate height without head, because distance spine5_head changes along with frames
+    legs = ['RAnkle_RKnee','RKnee_RHip','LAnkle_LKnee','LKnee_LHip'] # len(legs) = 4
+    height = len_spine + np.sum(get_dist_feature(distances,legs)) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
+
+    ### standard rate
+    std_height = 1.3 # unit: m, heigt without head and neck # 1.3 ??
+    std_spine = 0.4 # unit: m # 0.43 ??
+
+    scale_elements = {
+        'len_spine': 1.0/len_spine,
+        'height': 1.0/height,
+        'len_spine_rate': len_spine/std_spine,
+        'height_rate': height/std_height,
+        'no_scale': 1.0
+    }
+    del distances
+    return scale_elements
+
+def get_all_features(coords,desired_dists,desired_angles,standard):
     """
     concatenate all features
     """
@@ -168,6 +200,15 @@ def get_all_features(coords,desired_dists,desired_angles):
     dist_rate = calc_ChangeRate(dist_feature) # dist_rate with same shape of dist_feature
     angle_feature = get_angle_feature(all_distances,desired_angles) # angle_feature: [#frames,#desired_angle]
     angle_rate = calc_ChangeRate(angle_feature) # angle_rate with same shape of angle_feature
+
+    # standarize the distance-related features
+    scale_elements = calc_height_rate(coords[0])
+    scale_factor = scale_elements[standard]
+    print(f'------------------------------------------------------------------')
+    print(f'selected scaling factor is: {standard} = {scale_factor}')
+    print(f'------------------------------------------------------------------')
+    dist_feature = dist_feature * scale_factor
+    dist_rate = dist_rate * scale_factor
 
     all_features = np.concatenate((dist_feature,
                                    dist_rate,
@@ -415,32 +456,3 @@ def get_metric_index_dict():
                          'skewness':6}
     return metric_index_dict
 
-def calc_height_rate(skeleton):
-    """
-    use skeleton data to calculate scaling values for standarization of distance-related features, i.e. distance, velocity
-    """
-
-    ### only use 1st frame to calculate, because these features never change during the process
-    coords = np.expand_dims(skeleton[0],axis=0) # coords: [1,3,26]
-    all_distances = calc_all_distances(coords) # all_distances: [1.26,26]
-
-    ### calculate length of spine
-    spines = ['spine1_spine2','spine2_spine3','spine3_spine4','spine4_spine5'] # len(spines) = 4
-    len_spine = np.sum(get_dist_feature(all_distances,spines))
-
-    ### calculate height without head, because distance spine5_head changes along with frames
-    legs = ['RAnkle_RKnee','RKnee_RHip','LAnkle_LKnee','LKnee_LHip'] # len(legs) = 4
-    height = len_spine + np.sum(get_dist_feature(all_distances,legs)) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
-
-    ### standard rate
-    std_height = 1.3 # unit: m, heigt without head and neck # 1.3 ??
-    std_spine = 0.4 # unit: m # 0.43 ??
-
-    scale_elements = {
-        'len_spine': len_spine,
-        'height': height,
-        'len_spine_rate': len_spine/std_spine,
-        'height_rate': height/std_height
-    }
-    del all_distances
-    return scale_elements
