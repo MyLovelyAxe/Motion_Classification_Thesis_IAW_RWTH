@@ -7,7 +7,7 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic',
+    parser.add_argument('--exp_group',type=str,default='Agree',
                         choices=['Dynamic','Agree','Static'],
                         help='Select one group of training & testing')
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
@@ -21,8 +21,8 @@ def default_args():
     parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
     parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
-    parser.add_argument('--standard', type=str, default='height',
-                         choices={'len_spine','height','no_scale'},
+    parser.add_argument('--standard', type=str, default='neck_height',
+                         choices={'len_spine','neck_height','len_arm','len_shoulder','no_scale'},
                          help='standarize with which scaling factor')
 
     ###### models configuration ######

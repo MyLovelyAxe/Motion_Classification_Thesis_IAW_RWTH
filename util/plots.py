@@ -4,25 +4,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from util.utils import get_ori_data,output_dataset,get_feature_selection
-from util.features import get_joint_index,get_angle_pairs,calc_FFT
+from util.features import get_joint_index,get_angle_pairs,calc_FFT,get_scales_dict,calc_all_distances,get_dist_feature
 
-def calc_dist_plot(coords,links_idx):
+
+def calc_distances_timeline(coords,scales_dict):
     """
-    calculate distances for plotting
+    calculate the sum of length of desired limbs along with timeline
     """
-    dist_sum = np.zeros(coords.shape[0])
-    for i,j in zip(links_idx[:-1],links_idx[1:]):
-        # coords[:,0,i]: all frames, x, i-th joint
-        dist_sum += np.sqrt((coords[:,0,i] - coords[:,0,j])**2
-                            +(coords[:,1,i] - coords[:,1,j])**2
-                            +(coords[:,2,i] - coords[:,2,j])**2)
-    return dist_sum
-    
-def calc_distances_timeline(coords,links_dict):
     # coords: [#frames,3,26]
-    dist_time = np.zeros((len(links_dict),coords.shape[0])) # dist_time: [5,#frames]
-    for idx,(_,links_idx) in enumerate(links_dict.items()):
-        dist_time[idx,:] = calc_dist_plot(coords,links_idx)
+    dist_time = np.zeros((len(scales_dict),coords.shape[0])) # dist_time: [5,#frames]
+    distances = calc_all_distances(coords)
+    for idx,(_,links_idx) in enumerate(scales_dict.items()):
+        # dist_feature: [#frames,#features] -> [#frames,] -> [1,#frames]
+        dist_feature = np.expand_dims(np.sum(get_dist_feature(distances,links_idx),axis=1),axis=0)
+        dist_time[idx,:] = dist_feature
     return dist_time
 
 def connect_with_lines(frame,ax,joints_dict):
@@ -40,16 +35,31 @@ def plot_distances(dist_time,frame_id,ax):
     for joints in dist_time:
         ax.plot(np.arange(frame_id),dist_time[joints][:frame_id+1])
 
+def joints_name2index(joints_name_lst):
+    """
+    convert joint_name into joint_idx from list
+    """
+    joint_index_dict = get_joint_index()
+    joint_idx_lst = []
+    for jName in joints_name_lst:
+        joint_idx_lst.append(joint_index_dict[jName])
+    return joint_idx_lst
+
 def get_links_dict():
     """
     get joint indices for connecting joints in 3D projection plot
     """
-    links_dict = {'left arm': [15,0,1,2,14,24],
-                  'right arm': [18,3,4,5,17,24],
-                  'left leg': [16,6,7,8,9,20],
-                  'right leg': [19,10,11,12,13,20],
-                  'spine': [20,21,22,23,24,25]
-                 }
+    joint_names_dict = {
+        'left arm': ['LHandEnd','LWrist','LElbow','LShoulder','LClavicle','spine5'],
+        'right arm': ['RHandEnd','RWrist','RElbow','RShoulder','RClavicle','spine5'],
+        'left leg': ['LToesEnd','LToe','LAnkle','LKnee','LHip','spine1'],
+        'right leg': ['RToesEnd','RToe','RAnkle','RKnee','RHip','spine1'],
+        'spine': ['spine1','spine2','spine3','spine4','spine5','head']
+        }
+    links_dict = {}
+    for link_name,joints_name_lst in joint_names_dict.items():
+        links_dict[link_name] = joints_name2index(joints_name_lst)
+    
     return links_dict
 
 def prepare_for_plot(path,frame_range=None):
@@ -61,7 +71,7 @@ def prepare_for_plot(path,frame_range=None):
     if not frame_range is None:
         coords = coords[frame_range[0]:frame_range[1]]
     # change of distances
-    dist_time = calc_distances_timeline(coords,get_links_dict())
+    dist_time = calc_distances_timeline(coords,get_scales_dict())
     return coords,dist_time
 
 def calc_axis_limit(coords):
@@ -128,6 +138,7 @@ def plot_ori_data(data_path,start_frame,end_frame,output_anim):
     ### prepare ###
     input_path = os.path.join(data_path,'unknown.NoHead.csv')
     coords,dist_time = prepare_for_plot(input_path,frame_range=[start_frame,end_frame])
+    scales_dict = get_scales_dict()
     joints_dict = get_links_dict()
     N_frames = end_frame - start_frame
     ### plot ###
@@ -141,7 +152,7 @@ def plot_ori_data(data_path,start_frame,end_frame,output_anim):
     #### ax2: distance changing in 2D ###
     ax2 = fig.add_subplot(1, 2, 2)
     x = np.arange(N_frames)
-    dist_plots = [ax2.plot(x, dist_time[idx],label=f'{links}')[0] for idx,(links,joints) in enumerate(joints_dict.items())]
+    dist_plots = [ax2.plot(x, dist_time[idx],label=f'{links}')[0] for idx,(links,joints) in enumerate(scales_dict.items())]
     plt.legend()
     title_2 = f'Distances of limbs in frames {start_frame}-{end_frame}'
     ### animation ###
@@ -245,7 +256,8 @@ def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
     x_data,y_data,skeletons,_ = output_dataset(ori_data_paths,
                                                split_method_paths,
                                                desired_dists,
-                                               desired_angles)
+                                               desired_angles,
+                                               standard='no_scale')
     print(f'Trial x_data with shape {x_data.shape}')
     print(f'Trial y_data with shape {y_data.shape}')
 

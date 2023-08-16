@@ -23,6 +23,19 @@ def get_joint_index():
                       }
     return joint_index_dict
 
+def get_scales_dict():
+    """
+    scales_dict:
+        contains distance features for standarizing the whole distance-related features, i.e. distance, velocity
+    """
+    scales_dict = {
+                  'len_spine': ['spine5_spine4','spine4_spine3','spine3_spine2','spine2_spine1'],
+                  'neck_height': ['spine5_spine4','spine4_spine3','spine3_spine2','spine2_spine1','RHip_RKnee','RKnee_RAnkle'],
+                  'len_arm': ['LHandEnd_LWrist','LWrist_LElbow','LElbow_LShoulder','LShoulder_LClavicle','LClavicle_spine5','spine5_RClavicle','RClavicle_RShoulder','RShoulder_RElbow','RElbow_RWrist','RWrist_RHandEnd'],
+                  'len_shoulder': ['LShoulder_LClavicle','LClavicle_spine5','spine5_RClavicle','RClavicle_RShoulder'],
+                 }
+    return scales_dict
+
 def calc_all_distances(coords):
     """
     calculate all distance between random 2 joints for further slicing
@@ -169,19 +182,13 @@ def calc_height_rate(frame):
     frame = np.expand_dims(frame,axis=0) # frame: [3,26] -> [1,3,26]
     distances = calc_all_distances(frame) # all_distances: [1.26,26]
 
-    ### calculate length of spine
-    spines = ['spine1_spine2','spine2_spine3','spine3_spine4','spine4_spine5'] # len(spines) = 4
-    len_spine = np.sum(get_dist_feature(distances,spines))
+    scale_elements = {}
+    scales_dict = get_scales_dict()
+    for scale_name, scales_idx in scales_dict.items():
+        scale_length = np.sum(get_dist_feature(distances,scales_idx))
+        scale_elements[scale_name] = scale_length
+    scale_elements['no_scale'] = 1.0
 
-    ### calculate height without head, because distance spine5_head changes along with frames
-    legs = ['RAnkle_RKnee','RKnee_RHip','LAnkle_LKnee','LKnee_LHip'] # len(legs) = 4
-    height = len_spine + np.sum(get_dist_feature(distances,legs)) / 2.0 # leg_len = (left_leg_len + right_leg_len) / 2
-
-    scale_elements = {
-        'len_spine': 1.0/len_spine,
-        'height': 1.0/height,
-        'no_scale': 1.0
-    }
     del distances
     return scale_elements
 
@@ -201,8 +208,8 @@ def get_all_features(coords,desired_dists,desired_angles,standard):
     print(f'------------------------------------------------------------------')
     print(f'selected scaling factor is: {standard} = {scale_factor}')
     print(f'------------------------------------------------------------------')
-    dist_feature = dist_feature * scale_factor
-    dist_rate = dist_rate * scale_factor
+    dist_feature = dist_feature / scale_factor
+    dist_rate = dist_rate / scale_factor
 
     all_features = np.concatenate((dist_feature,
                                    dist_rate,
@@ -449,4 +456,3 @@ def get_metric_index_dict():
                          'kurtosis':5,
                          'skewness':6}
     return metric_index_dict
-
