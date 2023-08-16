@@ -136,3 +136,13 @@ class SVM(DynamicClassModel):
     def test(self):
         self.P_pred = self.svm.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
+
+def create_model(args):
+    ### create model
+    if args.model == 'KNN':
+        cls_model = KNN(args)
+    elif args.model == 'RandomForest':
+        cls_model = RandomForest(args)
+    elif args.model == 'SVM':
+        cls_model = SVM(args)
+    return cls_model

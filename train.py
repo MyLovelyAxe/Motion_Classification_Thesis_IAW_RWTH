@@ -1,5 +1,6 @@
 import argparse
 from model.ML_models import KNN,RandomForest,SVM
+from model.ML_models import create_model
 from util.utils import get_paths
 
 def default_args():
@@ -39,38 +40,26 @@ def default_args():
 
 
 def main(ext_args=None):
-
     """
     ext_args: args
         if None: use default args
         if not None: use external args
     """
-
     ### get args
     if not ext_args:
         args = default_args()
     else: 
         args = ext_args
-
     ### get paths for current experiment
     args = get_paths(args)
-
     ### create model
-    if args.model == 'KNN':
-        cls_model = KNN(args)
-
-    elif args.model == 'RandomForest':
-        cls_model = RandomForest(args)
-
-    elif args.model == 'SVM':
-        cls_model = SVM(args)
-        
-    ### train & test & show result
+    cls_model = create_model(args)
+    ### train & test
     cls_model.train()
     cls_model.test()
+    ### show results
     print(f'Result on {args.model}:')
     cls_model.show_result(args)
-
     return cls_model
 
 if __name__ == '__main__':
