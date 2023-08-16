@@ -1,5 +1,4 @@
 import argparse
-from model.ML_models import KNN,RandomForest,SVM
 from model.ML_models import create_model
 from util.utils import get_paths
 

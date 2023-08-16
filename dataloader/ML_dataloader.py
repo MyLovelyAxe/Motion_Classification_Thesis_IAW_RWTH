@@ -28,7 +28,6 @@ class Windowlize():
         self.aIdx_dict = get_act_index_dict(split_method_paths)
 
         self.load_data()
-        # self.standarization()
         self.create_windows()
         self.calc_statistic_features()
         self.localization()
@@ -58,20 +57,6 @@ class Windowlize():
         print(f'original y_data shape: {self.y_data_ori.shape}')
         print()
         self.num_features = self.x_data_ori.shape[1]
-
-    # def standarization(self):
-    #     """
-    #     because different people have different height,
-    #     i.e. distance-related features like distance, velocity
-    #     necessary to standarize
-    #     """
-    #     self.scale_elements = calc_height_rate(self.skeleton)
-    #     print(f'----------------------------------')
-    #     print(f'scale_elements:')
-    #     print('\n'.join(f'{k}: {v}' for k, v in self.scale_elements.items()))
-    #     print(f'----------------------------------')
-        
-    #     del self.skeleton
 
     def create_windows(self):
         """
@@ -109,7 +94,6 @@ class Windowlize():
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
-        # del self.x_data_win_lst, self.y_data_win_lst, self.x_data_ori, self.y_data_ori, start_index, counts
 
     def calc_statistic_features(self):
         """

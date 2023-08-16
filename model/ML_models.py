@@ -138,7 +138,7 @@ class SVM(DynamicClassModel):
         self.T_pred = np.argmax(self.P_pred,axis=1)
 
 def create_model(args):
-    ### create model
+
     if args.model == 'KNN':
         cls_model = KNN(args)
     elif args.model == 'RandomForest':

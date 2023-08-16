@@ -13,14 +13,15 @@ def get_joint_index():
     """
     the index of each joint from original data
     """
-    joint_index_dict = {'LWrist':0, 'LElbow':1, 'LShoulder':2,
-                       'RWrist':3, 'RElbow':4, 'RShoulder':5,
-                       'LToe':6, 'LAnkle':7, 'LKnee':8, 'LHip':9,
-                       'RToe':10, 'RAnkle':11, 'RKnee':12, 'RHip':13,
-                       'LClavicle':14, 'LHandEnd':15, 'LToesEnd':16,
-                       'RClavicle':17, 'RHandEnd':18, 'RToesEnd':19,
-                       'spine1':20, 'spine2':21, 'spine3':22, 'spine4':23, 'spine5':24, 'head':25
-                      }
+    joint_index_dict = {
+        'LWrist':0, 'LElbow':1, 'LShoulder':2,
+        'RWrist':3, 'RElbow':4, 'RShoulder':5,
+        'LToe':6, 'LAnkle':7, 'LKnee':8, 'LHip':9,
+        'RToe':10, 'RAnkle':11, 'RKnee':12, 'RHip':13,
+        'LClavicle':14, 'LHandEnd':15, 'LToesEnd':16,
+        'RClavicle':17, 'RHandEnd':18, 'RToesEnd':19,
+        'spine1':20, 'spine2':21, 'spine3':22, 'spine4':23, 'spine5':24, 'head':25
+        }
     return joint_index_dict
 
 def get_scales_dict():
@@ -29,11 +30,11 @@ def get_scales_dict():
         contains distance features for standarizing the whole distance-related features, i.e. distance, velocity
     """
     scales_dict = {
-                  'len_spine': ['spine5_spine4','spine4_spine3','spine3_spine2','spine2_spine1'],
-                  'neck_height': ['spine5_spine4','spine4_spine3','spine3_spine2','spine2_spine1','RHip_RKnee','RKnee_RAnkle'],
-                  'len_arm': ['LHandEnd_LWrist','LWrist_LElbow','LElbow_LShoulder','LShoulder_LClavicle','LClavicle_spine5','spine5_RClavicle','RClavicle_RShoulder','RShoulder_RElbow','RElbow_RWrist','RWrist_RHandEnd'],
-                  'len_shoulder': ['LShoulder_LClavicle','LClavicle_spine5','spine5_RClavicle','RClavicle_RShoulder'],
-                 }
+        'len_spine': ['spine5_spine4','spine4_spine3','spine3_spine2','spine2_spine1'],
+        'neck_height': ['spine5_spine4','spine4_spine3','spine3_spine2','spine2_spine1','RHip_RKnee','RKnee_RAnkle'],
+        'len_arm': ['LHandEnd_LWrist','LWrist_LElbow','LElbow_LShoulder','LShoulder_LClavicle','LClavicle_spine5','spine5_RClavicle','RClavicle_RShoulder','RShoulder_RElbow','RElbow_RWrist','RWrist_RHandEnd'],
+        'len_shoulder': ['LShoulder_LClavicle','LClavicle_spine5','spine5_RClavicle','RClavicle_RShoulder'],
+        }
     return scales_dict
 
 def calc_all_distances(coords):
