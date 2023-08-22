@@ -7,8 +7,8 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Agree',
-                        choices=['Dynamic','Agree','Static'],
+    parser.add_argument('--exp_group',type=str,default='Dynamic_Jialei',
+                        choices=['Dynamic','Agree','Static','Dynamic_Jialei'],
                         help='Select one group of training & testing')
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
     parser.add_argument('--trainset_paths', type=list, help='paths of data for trainset')

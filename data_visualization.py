@@ -36,7 +36,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/Dynamic/trainset/dynamic2_20230706',
+                    default='dataset/Dynamic_Jialei/testset/Test_Dynamic_Jialei',
                     help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=[
                              'dataset/Static/trainset/chor2_20230609',
@@ -49,8 +49,8 @@ parser.add_argument('--single_data_path', type=str,
                              'dataset/Agree/testset/agree_test_20230801',
                              ]
                     )
-parser.add_argument('--start_frame', type=int, default=3000, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=3300, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=12260, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=13253, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
