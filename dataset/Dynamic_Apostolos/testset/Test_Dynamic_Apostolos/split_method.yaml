@@ -1,0 +1,80 @@
+None1:
+  start: 0
+  end: 620
+  label: 0
+Bicep1:
+  start: 620
+  end: 1500
+  label: 9
+None2:
+  start: 1500
+  end: 2090
+  label: 0
+Reaching1:
+  start: 2090
+  end: 2880
+  label: 5
+None3:
+  start: 2880
+  end: 3460
+  label: 0
+Ball1:
+  start: 3460
+  end: 4370
+  label: 11
+None4:
+  start: 4370
+  end: 4770
+  label: 0
+Jumping1:
+  start: 4770
+  end: 5480
+  label: 2
+None5:
+  start: 5480
+  end: 5960
+  label: 0
+Boxing1:
+  start: 5960
+  end: 6970
+  label: 8
+None6:
+  start: 6970
+  end: 7740
+  label: 0
+JumpJack1:
+  start: 7740
+  end: 8400
+  label: 10
+None7:
+  start: 8400
+  end: 9100
+  label: 0
+Drinking1:
+  start: 9100
+  end: 9970
+  label: 6
+None8:
+  start: 9970
+  end: 10550
+  label: 0
+Waving1:
+  start: 10550
+  end: 11430
+  label: 4
+None9:
+  start: 11430
+  end: 11950
+  label: 0
+Squating1:
+  start: 11950
+  end: 12900
+  label: 3
+None10:
+  start: 12900
+  end: 13530
+  label: 0
+Idle1:
+  start: 13530
+  end: 14124
+  label: 7

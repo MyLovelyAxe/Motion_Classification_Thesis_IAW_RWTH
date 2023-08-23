@@ -7,8 +7,8 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic_Jialei',
-                        choices=['Dynamic','Agree','Static','Dynamic_Jialei'],
+    parser.add_argument('--exp_group',type=str,default='Dynamic_Apostolos',
+                        choices=['Dynamic','Agree','Static','Dynamic_Jialei','Dynamic_Apostolos'],
                         help='Select one group of training & testing')
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
     parser.add_argument('--trainset_paths', type=list, help='paths of data for trainset')
@@ -27,7 +27,7 @@ def default_args():
 
     ###### models configuration ######
     # select a model
-    parser.add_argument('--model', type=str, default='RandomForest', choices=['KNN','RandomForest','SVM'])
+    parser.add_argument('--model', type=str, default='SVM', choices=['KNN','RandomForest','SVM'])
     # for KNN
     parser.add_argument('--n_neighbor', type=int, default=20, help='number of neighbours, only for KNN')
     # for RandomForest
