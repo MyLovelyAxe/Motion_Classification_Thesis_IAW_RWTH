@@ -24,7 +24,7 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='check_ori_data',
+                    default='post_process',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           verify_npy: verify the existed .npy files which have been already output',
@@ -36,7 +36,7 @@ parser.add_argument('--function', type=str,
 ##############################################################
 
 parser.add_argument('--single_data_path', type=str,
-                    default='dataset/Dynamic_Apostolos/testset/Test_Dynamic_Apostolos',
+                    default='dataset/Static_Jialei/trainset/Train_Static_Jialei_00_None',
                     help='only one single dataset for function check_ori_data and verify_before_output',
                     choices=[
                              'dataset/Static/trainset/chor2_20230609',
@@ -49,8 +49,8 @@ parser.add_argument('--single_data_path', type=str,
                              'dataset/Agree/testset/agree_test_20230801',
                              ]
                     )
-parser.add_argument('--start_frame', type=int, default=13530, help='from which frame to start visualize')
-parser.add_argument('--end_frame', type=int, default=14124, help='to which frame to end visualize')
+parser.add_argument('--start_frame', type=int, default=0, help='from which frame to start visualize')
+parser.add_argument('--end_frame', type=int, default=200, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
@@ -62,7 +62,11 @@ parser.add_argument('--desired_features_trial', type=str,
 
 parser.add_argument('--examine_data_path', type=str,nargs="+",
                     default=[
-                             'dataset/Dynamic/testset/dynamic_test_20230801',
+                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_00_None',
+                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_01_ExtendArm',
+                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_02_RetractArm',
+                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_03_HandOverHead',
+                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_04_Phone',
                              ],
                     help='location of examined data for misclassified labels, only external testset',
                     choices=[
@@ -76,7 +80,7 @@ parser.add_argument('--examine_data_path', type=str,nargs="+",
                              'dataset/Agree/testset/agree_test_20230801',
                              ]
                     )
-parser.add_argument('--misclassified_frames', type=list,default=[2589,2789],help='check misclassified frames')
+parser.add_argument('--misclassified_frames', type=list,default=[194,198],help='check misclassified frames')
 parser.add_argument('--desired_features', type=str, 
                     default='dataset/desired_features.yaml', help='load features name from .yaml')
 

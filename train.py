@@ -7,8 +7,10 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic_Apostolos',
-                        choices=['Dynamic','Agree','Static','Dynamic_Jialei','Dynamic_Apostolos'],
+    parser.add_argument('--exp_group',type=str,default='Static_Jialei',
+                        choices=['Dynamic','Agree','Static',
+                                 'Dynamic_Jialei','Dynamic_Apostolos',
+                                 'Static_Jialei','Static_Apostolos'],
                         help='Select one group of training & testing')
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
     parser.add_argument('--trainset_paths', type=list, help='paths of data for trainset')
@@ -18,8 +20,8 @@ def default_args():
     ###### training configuration ######
     parser.add_argument('--desired_features',type=str,default='dataset/desired_features.yaml',help='load features name from .yaml')
     parser.add_argument('--split_ratio', type=float, default=0.9, help='the ratio for number of samples in trainset')
-    parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
-    parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
+    parser.add_argument('--window_size', type=int, default=5, help='the ratio for number of samples in trainset')
+    parser.add_argument('--outside_test',type=int,default=0,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='True: save plot; False: show plot')
     parser.add_argument('--standard', type=str, default='neck_height',
                          choices={'len_spine','neck_height','len_arm','len_shoulder','no_scale'},
@@ -27,7 +29,7 @@ def default_args():
 
     ###### models configuration ######
     # select a model
-    parser.add_argument('--model', type=str, default='SVM', choices=['KNN','RandomForest','SVM'])
+    parser.add_argument('--model', type=str, default='RandomForest', choices=['KNN','RandomForest','SVM'])
     # for KNN
     parser.add_argument('--n_neighbor', type=int, default=20, help='number of neighbours, only for KNN')
     # for RandomForest
