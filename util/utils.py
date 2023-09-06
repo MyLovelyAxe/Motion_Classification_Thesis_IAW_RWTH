@@ -175,8 +175,18 @@ def load_config(args):
     yaml_path = os.path.join(args.load_model,f'args.yaml')
     with open(yaml_path, "r") as file:
         features = yaml.safe_load(file)
-    args_dict = vars(args)
-    for argsK,argsV in features.items():
-        args_dict[argsK] = argsV
-    args = argparse.Namespace(**args_dict)
+    args.desired_features = features['desired_features']
+    args.split_ratio = features['split_ratio']
+    args.window_size = features['window_size']
+    args.outside_test = features['outside_test']
+    args.save_res = features['save_res']
+    args.standard = features['standard']
+    args.model = features['model']
+    args.n_neighbor = features['n_neighbor']
+    args.max_depth = features['max_depth']
+    args.random_state = features['random_state']
+    # args_dict = vars(args)
+    # for argsK,argsV in features.items():
+    #     args_dict[argsK] = argsV
+    # args = argparse.Namespace(**args_dict)
     return args
