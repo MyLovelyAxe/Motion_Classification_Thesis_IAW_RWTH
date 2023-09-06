@@ -1,4 +1,6 @@
+from datetime import datetime as dt
 import os
+import pickle
 import yaml
 import pandas as pd
 import numpy as np
@@ -131,3 +133,20 @@ def output_dataset(ori_data_paths,
     del x_data_lst,y_data_lst,y_ori_idx_lst,skeletons_lst,x_data_tmp,y_data_tmp,y_ori_idx_tmp,skeleton_tmp,out_dict
 
     return x_data,y_data,skeletons,y_ori_idx
+
+################################
+###### save & load models ######
+################################
+
+def save_model(args,model):
+    
+    save_path = 'save'
+    os.makedirs(save_path, exist_ok=True)
+    if args.model == 'KNN':
+        output_model = f"{dt.now().strftime('%d_%h_%H_%M')}-{args.exp_group}-{args.model}-NNeighbor{args.n_neighbor}.pickle"
+    elif args.model == 'RandomForest':
+        output_model = f"{dt.now().strftime('%d_%h_%H_%M')}-{args.exp_group}-{args.model}-MaxDepth{args.max_depth}-RandomState{args.random_state}.pickle"
+    elif args.model == 'SVM':
+        output_model = f"{dt.now().strftime('%d_%h_%H_%M')}-{args.exp_group}-{args.model}.pickle"
+    save_path = os.path.join(save_path,output_model)
+    pickle.dump(model, open(save_path, "wb"))
