@@ -1,4 +1,3 @@
-from datetime import datetime as dt
 import os
 import pickle
 import yaml
@@ -42,6 +41,7 @@ def get_paths(args):
         args.testset_paths = None
 
     return args
+
 
 #########################################
 ###### load original skeleton data ######
@@ -138,15 +138,21 @@ def output_dataset(ori_data_paths,
 ###### save & load models ######
 ################################
 
+def get_output_name(args,extension):
+
+    output_name = f"{args.start_time}-{args.exp_group}-{args.model}-wl{args.window_size}"
+    if args.model == 'KNN':
+        output_model = output_name + f"-NNeighbor{args.n_neighbor}.{extension}"
+    elif args.model == 'RandomForest':
+        output_model = output_name + f"-MaxDepth{args.max_depth}-RandomState{args.random_state}.{extension}"
+    elif args.model == 'SVM':
+        output_model = output_name + f".{extension}"
+    return output_model
+
 def save_model(args,model):
-    
+
     save_path = 'save'
     os.makedirs(save_path, exist_ok=True)
-    if args.model == 'KNN':
-        output_model = f"{dt.now().strftime('%d_%h_%H_%M')}-{args.exp_group}-{args.model}-NNeighbor{args.n_neighbor}.pickle"
-    elif args.model == 'RandomForest':
-        output_model = f"{dt.now().strftime('%d_%h_%H_%M')}-{args.exp_group}-{args.model}-MaxDepth{args.max_depth}-RandomState{args.random_state}.pickle"
-    elif args.model == 'SVM':
-        output_model = f"{dt.now().strftime('%d_%h_%H_%M')}-{args.exp_group}-{args.model}.pickle"
+    output_model = get_output_name(args,extension=".pickle")
     save_path = os.path.join(save_path,output_model)
     pickle.dump(model, open(save_path, "wb"))

@@ -1,6 +1,4 @@
 from datetime import datetime as dt
-import os
-import pickle
 import argparse
 from model.ML_models import create_model
 from util.utils import get_paths,save_model
@@ -27,6 +25,7 @@ def default_args():
     parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
     parser.add_argument('--save_res',type=int,default=1,help='1: save plot; 0: show plot')
     parser.add_argument('--save_model',type=int,default=1,help='1: save trained model; 0: not save model')
+    parser.add_argument('--start_time',type=str,help='starting time of current process')
     parser.add_argument('--standard', type=str, default='neck_height',
                          choices={'len_spine','neck_height','len_arm','len_shoulder','no_scale'},
                          help='standarize with which scaling factor')
@@ -57,6 +56,8 @@ def main(ext_args=None):
         args = ext_args
     ### get paths for current experiment
     args = get_paths(args)
+    ### get time
+    args.start_time = f"{dt.now().strftime('%d_%h_%H_%M')}"
     ### create model
     cls_model = create_model(args)
     ### train & test

@@ -86,7 +86,8 @@ class DynamicClassModel():
 
             ### save plot
             if args.save_res:
-                plt.savefig(os.path.join(output_path,f'{title}.png'))
+                output_image = f"{args.start_time}-{args.exp_group}-{args.model}-wl{args.window_size}-{use_ext_test}-Acc{round(acc, 3)}.png"
+                plt.savefig(os.path.join(output_path,output_image))
             else:
                 plt.show()
 
