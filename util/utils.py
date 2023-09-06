@@ -1,4 +1,5 @@
 import os
+import argparse
 import pickle
 import yaml
 import pandas as pd
@@ -138,21 +139,44 @@ def output_dataset(ori_data_paths,
 ###### save & load models ######
 ################################
 
-def get_output_name(args,extension):
+def get_output_name(args):
 
     output_name = f"{args.start_time}-{args.exp_group}-{args.model}-wl{args.window_size}"
     if args.model == 'KNN':
-        output_model = output_name + f"-NNeighbor{args.n_neighbor}.{extension}"
+        output_folder = output_name + f"-NNeighbor{args.n_neighbor}"
     elif args.model == 'RandomForest':
-        output_model = output_name + f"-MaxDepth{args.max_depth}-RandomState{args.random_state}.{extension}"
+        output_folder = output_name + f"-MaxDepth{args.max_depth}-RandomState{args.random_state}"
     elif args.model == 'SVM':
-        output_model = output_name + f".{extension}"
-    return output_model
+        output_folder = output_name
+    return output_folder
+
+def save_config(save_path, args):
+
+    arg_dict = {}
+    for arg_name in vars(args):
+        arg_value = getattr(args, arg_name)
+        arg_dict[arg_name] = arg_value
+    save_path = os.path.join(save_path,f'args.yaml')
+    with open(save_path, 'w') as yaml_file:
+        yaml.dump(arg_dict, yaml_file, default_flow_style=False)
 
 def save_model(args,model):
 
     save_path = 'save'
     os.makedirs(save_path, exist_ok=True)
-    output_model = get_output_name(args,extension=".pickle")
-    save_path = os.path.join(save_path,output_model)
-    pickle.dump(model, open(save_path, "wb"))
+    output_folder = get_output_name(args)
+    save_path = os.path.join(save_path,output_folder)
+    os.makedirs(save_path, exist_ok=True)
+    pickle.dump(model, open(os.path.join(save_path,f'model.pickle'), "wb"))
+    save_config(save_path, args)
+
+def load_config(args):
+    # e.g. model_path = 'save/06_Sep_20_30-Agree-KNN-wl5-NNeighbor20'
+    yaml_path = os.path.join(args.load_model,f'args.yaml')
+    with open(yaml_path, "r") as file:
+        features = yaml.safe_load(file)
+    args_dict = vars(args)
+    for argsK,argsV in features.items():
+        args_dict[argsK] = argsV
+    args = argparse.Namespace(**args_dict)
+    return args

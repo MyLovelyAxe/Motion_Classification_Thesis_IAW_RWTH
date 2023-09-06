@@ -108,10 +108,13 @@ class KNN(DynamicClassModel):
     def train(self):
         self.neigh.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
 
-    def test(self):
-        self.P_pred = self.neigh.predict_proba(self.dynamic_data.x_test)
+    def test(self,saved_model=None):
+        if not saved_model:
+            self.P_pred = self.neigh.predict_proba(self.dynamic_data.x_test)   
+        else:
+            self.P_pred = saved_model.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
-        
+
 class RandomForest(DynamicClassModel):
     
     def __init__(self,args):
