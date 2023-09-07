@@ -167,7 +167,7 @@ def save_model(args,model):
     output_folder = get_output_name(args)
     save_path = os.path.join(save_path,output_folder)
     os.makedirs(save_path, exist_ok=True)
-    pickle.dump(model, open(os.path.join(save_path,f'model.pickle'), "wb"))
+    pickle.dump(model.model, open(os.path.join(save_path,f'model.pickle'), "wb"))
     save_config(save_path, args)
 
 def load_config(args):

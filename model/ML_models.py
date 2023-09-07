@@ -14,6 +14,20 @@ class DynamicClassModel():
         self.P_pred = None
         self.wl = args.window_size
         self.dynamic_data = DynamicData(args)
+        # create model
+        if args.model == 'KNN':
+            self.model = KNeighborsClassifier(n_neighbors=args.n_neighbor)
+        elif args.model == 'RandomForest':
+            self.model = RandomForestClassifier(max_depth=args.max_depth,random_state=args.random_state)
+        elif args.model == 'SVM':
+            self.model = svm.SVC(probability=True)
+
+    def train(self):
+        self.model.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
+
+    def test(self):
+        self.P_pred = self.model.predict_proba(self.dynamic_data.x_test)
+        self.T_pred = np.argmax(self.P_pred,axis=1)
 
     def misclass_index(self):
         """
@@ -98,52 +112,3 @@ class DynamicClassModel():
         print(f'true target: {self.dynamic_data.y_test}')
         print(f'Accuracy = {acc}')
         print(f'Result: {self.T_pred == self.dynamic_data.y_test}')
-
-class KNN(DynamicClassModel):
-    
-    def __init__(self,args):
-        super().__init__(args)
-        self.neigh = KNeighborsClassifier(n_neighbors=args.n_neighbor)
-
-    def train(self):
-        self.neigh.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
-
-    def test(self,saved_model=None):
-        self.P_pred = self.neigh.predict_proba(self.dynamic_data.x_test)   
-        self.T_pred = np.argmax(self.P_pred,axis=1)
-
-class RandomForest(DynamicClassModel):
-    
-    def __init__(self,args):
-        super().__init__(args)
-        self.random_forest = RandomForestClassifier(max_depth=args.max_depth,random_state=args.random_state)
-
-    def train(self):
-        self.random_forest.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
-
-    def test(self):
-        self.P_pred = self.random_forest.predict_proba(self.dynamic_data.x_test)
-        self.T_pred = np.argmax(self.P_pred,axis=1)
-        
-class SVM(DynamicClassModel):
-    
-    def __init__(self,args):
-        super().__init__(args)
-        self.svm = svm.SVC(probability=True)
-
-    def train(self):
-        self.svm.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
-
-    def test(self):
-        self.P_pred = self.svm.predict_proba(self.dynamic_data.x_test)
-        self.T_pred = np.argmax(self.P_pred,axis=1)
-
-def create_model(args):
-
-    if args.model == 'KNN':
-        cls_model = KNN(args)
-    elif args.model == 'RandomForest':
-        cls_model = RandomForest(args)
-    elif args.model == 'SVM':
-        cls_model = SVM(args)
-    return cls_model

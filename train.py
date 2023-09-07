@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 import argparse
-from model.ML_models import create_model
+from model.ML_models import DynamicClassModel
 from util.utils import get_paths,save_model
 
 def default_args():
@@ -8,7 +8,7 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic_Jialei',
+    parser.add_argument('--exp_group',type=str,default='Dynamic_Apostolos',
                         choices=['Dynamic','Agree','Static',
                                  'Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
@@ -59,7 +59,7 @@ def main(ext_args=None):
     ### get time
     args.start_time = f"{dt.now().strftime('%d_%h_%H_%M')}"
     ### create model
-    cls_model = create_model(args)
+    cls_model = DynamicClassModel(args)
     ### train & test
     cls_model.train()
     if args.save_model:
