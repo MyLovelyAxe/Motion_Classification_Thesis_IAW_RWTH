@@ -25,8 +25,11 @@ class DynamicClassModel():
     def train(self):
         self.model.fit(self.dynamic_data.x_train, self.dynamic_data.y_train)
 
-    def test(self):
-        self.P_pred = self.model.predict_proba(self.dynamic_data.x_test)
+    def test(self, loaded_model=None):
+        if loaded_model is None:
+            self.P_pred = self.model.predict_proba(self.dynamic_data.x_test)
+        else:
+            self.P_pred = loaded_model.predict_proba(self.dynamic_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
 
     def misclass_index(self):
