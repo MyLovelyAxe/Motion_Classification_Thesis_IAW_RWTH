@@ -26,7 +26,7 @@ def default_args():
     parser.add_argument('--save_res',type=int,default=1,help='1: save plot; 0: show plot')
     parser.add_argument('--save_model',type=int,default=1,help='1: save trained model; 0: not save model')
     parser.add_argument('--start_time',type=str,help='starting time of current process')
-    parser.add_argument('--standard', type=str, default='neck_height',
+    parser.add_argument('--standard', type=str, default='no_scale',
                          choices={'len_spine','neck_height','len_arm','len_shoulder','no_scale'},
                          help='standarize with which scaling factor')
 

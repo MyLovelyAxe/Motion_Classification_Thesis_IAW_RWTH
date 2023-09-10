@@ -39,7 +39,7 @@ def default_args():
     parser.add_argument('--random_state', type=int)
 
     ###### load model ######
-    parser.add_argument('--load_model', type=str, default='save/09_Sep_21_32-Dynamic_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0')
+    parser.add_argument('--load_model', type=str, default='save/10_Sep_16_33-Dynamic_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0')
 
     args = parser.parse_args()
     return args

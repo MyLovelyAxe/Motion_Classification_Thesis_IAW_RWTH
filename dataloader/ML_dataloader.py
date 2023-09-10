@@ -254,6 +254,7 @@ class DynamicData():
     """
     def __init__(self,args):
         
+        
         self.train_data = Windowlize(window_size=args.window_size,
                                      data_paths=args.trainset_paths,
                                      split_method_paths=args.train_split_method_paths,
