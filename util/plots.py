@@ -106,7 +106,7 @@ def plot_func_3d(frame_id,ax,joints_dict,coords,high,low,title):
     plot links in 3D
     """
     ax.cla()
-    ax.set_axis_off()
+    # ax.set_axis_off()
     current_frame = coords[frame_id] # current_frame: [3,26]
     prepare_ax(ax,high,low)
     ax.set_title(title)
@@ -156,6 +156,7 @@ def plot_ori_data(data_path,start_frame,end_frame,output_anim):
     plt.legend()
     title_2 = f'Distances of limbs in frames {start_frame}-{end_frame}'
     ### animation ###
+    plt.grid(True)
     ani1 = animation.FuncAnimation(fig,plot_func,frames=N_frames,fargs=(ax1,joints_dict,coords,high_1,low_1,title_1,
                                                                         ax2,dist_plots,dist_time,title_2),interval=17)
     plt.show()
