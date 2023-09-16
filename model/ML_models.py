@@ -59,7 +59,7 @@ class DynamicClassModel():
         for mis_idx,exm_idxs,tru,pre in zip(plot_MisIdx,self.Exm_indices,true_labels,pred_labels):
             print(f'{mis_idx} | {exm_idxs} | {tru} | {pre}')
 
-    def show_result(self,args):
+    def show_result(self,args,cross=False):
 
         if not self.P_pred is None:
 
@@ -86,8 +86,8 @@ class DynamicClassModel():
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
             use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
             acc = np.sum(self.T_pred == self.dynamic_data.y_test) / len(self.T_pred)
-            title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
-            fig.suptitle(title,fontsize=15)
+            # title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
+            # fig.suptitle(title,fontsize=15)
 
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
@@ -103,7 +103,15 @@ class DynamicClassModel():
 
             ### save plot
             if args.save_res:
-                output_image = f"{args.start_time}-{args.exp_group}-{args.model}-wl{args.window_size}-{use_ext_test}-Acc{round(acc, 3)}.png"
+                # if train and test on data of same user
+                if not cross:
+                    output_image = f"{args.start_time}-NonCross-{args.exp_group}-{args.model}-wl{args.window_size}-{use_ext_test}-Acc{round(acc, 3)}.png"
+                # if train on user1's data while test on user2's data
+                else:
+                    # e.g. args.load_model: 'save/10_Sep_16_33-Dynamic_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0'
+                    train_exp = (args.load_model).split('/')[1].split('-')[1]
+                    test_exp = args.exp_group
+                    output_image = f"{args.start_time}-Cross-Train_{train_exp}-Test_{test_exp}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
                 plt.savefig(os.path.join(output_path,output_image))
             else:
                 plt.show()

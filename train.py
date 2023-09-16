@@ -3,12 +3,20 @@ import argparse
 from model.ML_models import DynamicClassModel
 from util.utils import get_paths,save_model
 
+######################################################################################
+#
+# in README.md:
+#       note that in order to do NonCross experiment, just run experiment in train.py
+#       the result is just trained and tested on the same exp_group
+#
+######################################################################################
+
 def default_args():
 
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic_Apostolos',
+    parser.add_argument('--exp_group',type=str,default='Static_Jialei',
                         choices=['Dynamic','Agree','Static',
                                  'Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
@@ -32,7 +40,7 @@ def default_args():
 
     ###### models configuration ######
     # select a model
-    parser.add_argument('--model', type=str, default='RandomForest', choices=['KNN','RandomForest','SVM'])
+    parser.add_argument('--model', type=str, default='SVM', choices=['KNN','RandomForest','SVM'])
     # for KNN
     parser.add_argument('--n_neighbor', type=int, default=20, help='number of neighbours, only for KNN')
     # for RandomForest
@@ -67,7 +75,7 @@ def main(ext_args=None):
     cls_model.test()
     ### show results
     print(f'Result on {args.model}:')
-    cls_model.show_result(args)
+    cls_model.show_result(args,)
     return cls_model
 
 if __name__ == '__main__':

@@ -5,12 +5,20 @@ import argparse
 from model.ML_models import DynamicClassModel
 from util.utils import get_paths, load_config
 
+#############################################################################
+#
+# in README.md:
+#       note that in order to do Cross experiment, run experiment in test.py
+#       the result is trained on loaded model and tested on local exp_group
+#
+#############################################################################
+
 def default_args():
 
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Dynamic_Jialei',
+    parser.add_argument('--exp_group',type=str,default='Static_Apostolos',
                         choices=['Dynamic','Agree','Static',
                                  'Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
@@ -39,7 +47,7 @@ def default_args():
     parser.add_argument('--random_state', type=int)
 
     ###### load model ######
-    parser.add_argument('--load_model', type=str, default='save/10_Sep_16_33-Dynamic_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0')
+    parser.add_argument('--load_model', type=str, default='save/16_Sep_19_45-Static_Jialei-SVM-wl100')
 
     args = parser.parse_args()
     return args
@@ -68,7 +76,7 @@ def main(ext_args=None):
     test_model.test(loaded_model=loaded_model)
     ### show results
     print(f'Result on {args.model}:')
-    test_model.show_result(args)
+    test_model.show_result(args,cross=True)
     return test_model
 
 if __name__ == '__main__':
