@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from util.utils import get_ori_data,output_dataset,get_feature_selection
-from util.features import get_joint_index,get_angle_pairs,calc_FFT,get_scales_dict,calc_all_distances,get_dist_feature
+from util.features import get_joint_index,get_angle_pairs,get_scales_dict,calc_all_distances,get_dist_feature
 
 
 def calc_distances_timeline(coords,scales_dict):
@@ -263,7 +263,7 @@ def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
     print(f'Trial y_data with shape {y_data.shape}')
 
     ### select random frames
-    choice_starts = np.random.randint(x_data.shape[0], size = 4)
+    choice_starts = np.random.randint(x_data.shape[0], size = 3)
     _,start_index = np.unique(y_data,return_index=True)
     print(f'start_index here: {start_index}')
     choices_lst = []
@@ -289,19 +289,11 @@ def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
         dist_equal_or_not(skeleton,feature[:,:len(desired_dists)],desired_dists)
         angles_equal_or_not(skeleton,feature[:,2*len(desired_dists):2*len(desired_dists)+len(desired_angles)],desired_angles)
         # plot animation of skeleton
-        ax = fig.add_subplot(2, 2*2, 2*idx+1, projection='3d')
+        ax = fig.add_subplot(1, 3, idx+1, projection='3d')
         ax.view_init(30, 150)
         high,low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
         title = f'label: {label} in frames {choices[0]}-{choices[-1]}'
         anim_configs_lst.append([ax,skeleton,high,low,title])
-        # plot fft
-        ax_fft = fig.add_subplot(2, 2*2, 2*idx+2)
-        Freq,FFT = calc_FFT(np.expand_dims(feature,axis=0))
-        for window in range(FFT.shape[0]):
-            for feature in range(FFT.shape[-1]):
-                ax_fft.plot(Freq, FFT[window,:,feature],label=f'feature{feature+1}')
-        ax_fft.set_title(f'fft real')
-        ax_fft.set_xticks(Freq,Freq)
     ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,),interval=17)
     plt.show()
 
