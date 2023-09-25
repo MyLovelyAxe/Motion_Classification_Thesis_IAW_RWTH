@@ -377,7 +377,7 @@ def get_feature_index_dict(split=False):
     If split is True, then return dict containg 4 dicts, each containing corresponding features
     IF split is False, then concatenate all features together in 1 dict
     """
-    feature_yaml_path = 'dataset/desired_features.yaml'
+    feature_yaml_path = 'config/desired_features.yaml'
     with open(feature_yaml_path, "r") as file:
         features = yaml.safe_load(file)
     dists = features['desired_dists']
