@@ -82,7 +82,7 @@ parser.add_argument('--examine_data_path', type=str,nargs="+",
                     )
 parser.add_argument('--misclassified_frames', type=list,default=[194,198],help='check misclassified frames')
 parser.add_argument('--desired_features', type=str, 
-                    default='dataset/desired_features.yaml', help='load features name from .yaml')
+                    default='config/desired_features.yaml', help='load features name from .yaml')
 
 args = parser.parse_args()
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
         input_paths = os.path.join(args.single_data_path,'unknown.NoHead.csv')
         split_method_paths = os.path.join(args.single_data_path,'split_method.yaml')
-        verification([input_paths],args.desired_features_trial,[split_method_paths],win_len=args.wl)
+        verification([input_paths],args.desired_features,[split_method_paths],win_len=args.wl)
 
     if args.function == 'post_process':
 

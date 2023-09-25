@@ -27,7 +27,7 @@ def default_args():
     parser.add_argument('--testset_paths', type=list, help='paths of data for testset')
     
     ###### training configuration ######
-    parser.add_argument('--desired_features',type=str,default='dataset/desired_features.yaml',help='load features name from .yaml')
+    parser.add_argument('--desired_features',type=str,default='config/desired_features.yaml',help='load features name from .yaml')
     parser.add_argument('--split_ratio', type=float, default=0.9, help='the ratio for number of samples in trainset')
     parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
     parser.add_argument('--outside_test',type=int,default=1,help='1: use extra testset; 0: extract testset from trainset')
