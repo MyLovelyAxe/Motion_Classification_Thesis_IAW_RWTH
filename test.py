@@ -47,7 +47,7 @@ def default_args():
     parser.add_argument('--random_state', type=int)
 
     ###### load model ######
-    parser.add_argument('--load_model', type=str, default='save/16_Sep_19_45-Static_Jialei-SVM-wl100')
+    parser.add_argument('--load_model', type=str, default='save/25_Sep_15_36-Static_Jialei-SVM-wl100')
 
     args = parser.parse_args()
     return args

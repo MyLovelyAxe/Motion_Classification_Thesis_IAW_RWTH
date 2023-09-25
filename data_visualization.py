@@ -1,6 +1,6 @@
 import os
 import argparse
-from util.plots import plot_ori_data,verification,output_dataset,get_feature_selection,show_misclassified_frames
+from util.examine import plot_ori_data,verification,output_dataset,get_feature_selection,show_misclassified_frames
 
 ############################# Attention ###########################
 ##
@@ -24,10 +24,10 @@ from util.plots import plot_ori_data,verification,output_dataset,get_feature_sel
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='check_ori_data',
+                    default='verify_before_output',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
-                          verify_npy: verify the existed .npy files which have been already output',
+                          post_process: examine misclassified windows after testing',
                     choices=['check_ori_data','verify_before_output','post_process']
                     )
 

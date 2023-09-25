@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
-from util.plots import get_feature_selection, output_dataset
+from util.examine import get_feature_selection, output_dataset
 
 
 class Windowlize():
