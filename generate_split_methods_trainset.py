@@ -32,7 +32,6 @@ if __name__ == "__main__":
     test_exp_path = os.path.join('dataset',args.exp_group,'testset',f'Test_{args.exp_group}')
     os.makedirs(test_exp_path, exist_ok=True)
     test_split_methods_yaml = os.path.join(test_exp_path,f'split_method.yaml')
-    train_split_methods_dict = {'':''}
     with open(test_split_methods_yaml, 'w') as yaml_file:
         # create a pure empty .yaml
         pass

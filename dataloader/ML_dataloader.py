@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
-from util.examine import get_feature_selection, output_dataset
+from util.utils import get_feature_selection, output_dataset
 
 
 class Windowlize():
@@ -48,11 +48,18 @@ class Windowlize():
                 # ie. order instead of real value
         """
         dists,angles = get_feature_selection(self.desired_features)
-        self.x_data_ori,self.y_data_ori,self.skeleton,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
+
+        self.x_data_ori,self.y_data_ori,self.skeleton,self.split_method = output_dataset(ori_data_paths=self.data_paths,
                                                                                       desired_dists=dists,
                                                                                       desired_angles=angles,
                                                                                       split_method_paths=self.split_method_paths,
                                                                                       standard=self.standard)
+
+        # self.x_data_ori,self.y_data_ori,self.skeleton,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
+        #                                                                               desired_dists=dists,
+        #                                                                               desired_angles=angles,
+        #                                                                               split_method_paths=self.split_method_paths,
+        #                                                                               standard=self.standard)
         print(f'original x_data shape: {self.x_data_ori.shape}')
         print(f'original y_data shape: {self.y_data_ori.shape}')
         print()
@@ -69,31 +76,60 @@ class Windowlize():
         """
         x_data_win_lst = []
         y_data_win_lst = []
-        # record index of current selected labels, for later examination
-        y_MisClsExm_lst = []
-        # in order to go back to initial index
-        y_ori_idx_win_lst = []
-        _, start_index, counts = np.unique(
-            self.y_data_ori, return_counts=True, return_index=True)
-        counts = counts[start_index.argsort()]
-        start_index.sort()
-        for start, count in zip(start_index, counts):
-            for step in range(count-self.wl):
+        for actName,actConfig in self.split_method.items():
+            start,end,label = list(i for _,i in actConfig.items())
+            # print(f'start: {start}')
+            # print(f'end: {end}')
+            # print(f'label: {label}')
+
+            # please make sure number of frames of each activitiy in recorded shots greater than window_size
+            for step in range(end-start-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl), :]
-                label_idx = int(start+step+self.wl/2)
-                label = self.y_data_ori[label_idx]
-                ori_idx = self.y_ori_idx[label_idx]
                 x_data_win_lst.append(np.expand_dims(window, axis=0))
                 y_data_win_lst.append(np.expand_dims(label, axis=0))
-                y_MisClsExm_lst.append(np.expand_dims(label_idx, axis=0))
-                y_ori_idx_win_lst.append(np.expand_dims(ori_idx, axis=0))
+
         self.x_data_win = np.concatenate(x_data_win_lst, axis=0)
         self.y_data_win = np.concatenate(y_data_win_lst, axis=0)
-        self.y_MisClsExm = np.concatenate(y_MisClsExm_lst, axis=0)
-        self.y_ori_idx_win = np.concatenate(y_ori_idx_win_lst, axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
+
+    # def create_windows(self):
+    #     """
+    #     x_data shape:
+    #         original: [#frames,#features]
+    #         with windows: [#win,window_size,#features]
+    #     y_data shape:
+    #         original: [#frames,]
+    #         with windows: [#win,]
+    #     """
+    #     x_data_win_lst = []
+    #     y_data_win_lst = []
+    #     # record index of current selected labels, for later examination
+    #     y_MisClsExm_lst = []
+    #     # in order to go back to initial index
+    #     y_ori_idx_win_lst = []
+    #     _, start_index, counts = np.unique(
+    #         self.y_data_ori, return_counts=True, return_index=True)
+    #     counts = counts[start_index.argsort()]
+    #     start_index.sort()
+    #     for start, count in zip(start_index, counts):
+    #         for step in range(count-self.wl):
+    #             window = self.x_data_ori[(start+step):(start+step+self.wl), :]
+    #             label_idx = int(start+step+self.wl/2)
+    #             label = self.y_data_ori[label_idx]
+    #             ori_idx = self.y_ori_idx[label_idx]
+    #             x_data_win_lst.append(np.expand_dims(window, axis=0))
+    #             y_data_win_lst.append(np.expand_dims(label, axis=0))
+    #             y_MisClsExm_lst.append(np.expand_dims(label_idx, axis=0))
+    #             y_ori_idx_win_lst.append(np.expand_dims(ori_idx, axis=0))
+    #     self.x_data_win = np.concatenate(x_data_win_lst, axis=0)
+    #     self.y_data_win = np.concatenate(y_data_win_lst, axis=0)
+    #     self.y_MisClsExm = np.concatenate(y_MisClsExm_lst, axis=0)
+    #     self.y_ori_idx_win = np.concatenate(y_ori_idx_win_lst, axis=0)
+    #     print(f'x_data with window has shape: {self.x_data_win.shape}')
+    #     print(f'y_data with window has shape: {self.y_data_win.shape}')
+    #     print()
 
     def calc_statistic_features(self):
         """
