@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict, get_act_index_dict
+from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict
 from util.utils import get_feature_selection, output_dataset
 
 
@@ -25,7 +25,6 @@ class Windowlize():
         self.split_method_paths = split_method_paths
         self.standard = standard
         self.desired_features = desired_features
-        self.aIdx_dict = get_act_index_dict(split_method_paths)
 
         self.load_data()
         self.create_windows()
@@ -54,12 +53,11 @@ class Windowlize():
                                                                                                desired_angles=angles,
                                                                                                split_method_paths=self.split_method_paths,
                                                                                                standard=self.standard)
-
+        self.num_features = self.x_data_ori.shape[1]
         print(f'original x_data shape: {self.x_data_ori.shape}')
         print(f'original y_data shape: {self.y_data_ori.shape}')
         print()
-        self.num_features = self.x_data_ori.shape[1]
-
+        
     def create_windows(self):
         """
         x_data shape:
@@ -71,15 +69,18 @@ class Windowlize():
         """
         x_data_win_lst = []
         y_data_win_lst = []
-        for actName,actConfig in self.frame_split_method.items():
+        win_frame_index_lst = [] # record index of frames inside each window, for checking misclassified window later
+        for _,actConfig in self.frame_split_method.items():
             start,end,label = list(i for _,i in actConfig.items())
             # please make sure number of frames of each activitiy in recorded shots greater than window_size
             for step in range(end-start-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl), :]
                 x_data_win_lst.append(np.expand_dims(window, axis=0))
                 y_data_win_lst.append(np.expand_dims(label, axis=0))
+                win_frame_index_lst.append(np.expand_dims(np.array([start+step,start+step+self.wl]), axis=0))
         self.x_data_win = np.concatenate(x_data_win_lst, axis=0)
         self.y_data_win = np.concatenate(y_data_win_lst, axis=0)
+        self.win_frame_index = np.concatenate(win_frame_index_lst, axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
@@ -260,6 +261,7 @@ class DynamicData():
         self.y_train = self.train_data.y_data
         self.x_test = self.test_data.x_data
         self.y_test = self.test_data.y_data
+        self.win_frame_index = self.test_data.win_frame_index
 
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')

@@ -351,18 +351,23 @@ def get_ActName(act_name):
     """
     return re.findall(r'[a-zA-Z]+', act_name)[0]
 
-def get_act_index_dict(split_method_paths):
+def get_act_index_dict(split_method,NL=True):
+    """
+    NL = True:
+        act_index_dict = {actName1:actLabel1, actName2:actLabel2, ...}
+    NL = False:
+        act_index_dict = {actLabel1:actName1, actLabel2:actName2, ...}
+    """
     act_index_dict = {}
-    for split_path in split_method_paths:
-        with open(split_path, "r") as file:
-            split_method = yaml.safe_load(file)
-        for act_name,config in split_method.items():
-            _,_,label = list(i for _,i in config.items())
-            # extract label name without digits
-            act_name = get_ActName(act_name)
-            # act_name = act_name[:-1]
-            if not act_name in act_index_dict:
-                act_index_dict[act_name] = label
+    for actName,actConfig in split_method.items():
+        _,_,label = list(i for _,i in actConfig.items())
+        # extract label name without digits
+        actName = get_ActName(actName)
+        if not actName in act_index_dict:
+            if NL:
+                act_index_dict[actName] = label
+            else:
+                act_index_dict[label] = actName
     return act_index_dict
 
 def get_feature_index(which_feature):

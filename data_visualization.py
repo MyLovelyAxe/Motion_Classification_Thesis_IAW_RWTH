@@ -24,7 +24,7 @@ from util.examine import plot_ori_data,verification,output_dataset,get_feature_s
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='verify_before_output',
+                    default='post_process',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           post_process: examine misclassified windows after testing',
@@ -62,25 +62,10 @@ parser.add_argument('--desired_features_trial', type=str,
 
 parser.add_argument('--examine_data_path', type=str,nargs="+",
                     default=[
-                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_00_None',
-                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_01_ExtendArm',
-                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_02_RetractArm',
-                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_03_HandOverHead',
-                             'dataset/Static_Jialei/trainset/Train_Static_Jialei_04_Phone',
+                             'dataset/Dynamic_Apostolos/testset/Test_Dynamic_Apostolos',
                              ],
-                    help='location of examined data for misclassified labels, only external testset',
-                    choices=[
-                             'dataset/Static/trainset/chor2_20230609',
-                             'dataset/Static/testset/testset_20230627',
-                             'dataset/Dynamic/trainset/dynamic1_20230706',
-                             'dataset/Dynamic/trainset/dynamic2_20230706',
-                             'dataset/Dynamic/trainset/dynamic3_20230706',
-                             'dataset/Dynamic/testset/dynamic_test_20230801',
-                             'dataset/Agree/trainset/agree_20230801',
-                             'dataset/Agree/testset/agree_test_20230801',
-                             ]
-                    )
-parser.add_argument('--misclassified_frames', type=list,default=[194,198],help='check misclassified frames')
+                    help='location of examined data for misclassified labels, only external testset')
+parser.add_argument('--misclassified_frames', type=list,default=[9145,9245],help='check misclassified frames')
 parser.add_argument('--desired_features', type=str, 
                     default='config/desired_features.yaml', help='load features name from .yaml')
 
