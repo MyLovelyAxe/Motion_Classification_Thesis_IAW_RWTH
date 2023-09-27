@@ -1,10 +1,9 @@
 import os
-import argparse
 import pickle
 import yaml
 import pandas as pd
 import numpy as np
-from util.features import get_all_features,get_ActName
+from util.features import get_all_features
 
 def extract_path(group_path,train_or_test):
     """
@@ -36,10 +35,6 @@ def get_paths(args):
     args.train_split_method_paths,args.trainset_paths = extract_path(group_path=group_path,train_or_test='trainset')
     # testset
     args.test_split_method_paths,args.testset_paths = extract_path(group_path=group_path,train_or_test='testset')
-    # whether use testset outside from trainset or not
-    if not args.outside_test:
-        args.test_split_method_paths = None
-        args.testset_paths = None
 
     return args
 
@@ -113,7 +108,6 @@ def output_dataset(ori_data_paths,
         if not len(split_method_paths) == 1:
             actName = list(ori_split_method.keys())[0]
             actConfig = list(ori_split_method.values())[0]
-            # offset = 0 if actConfig['label']==0 else 1
             current_split_method = {actName: {'start': actConfig['start']+AccFrame, 'end': actConfig['end']+AccFrame, 'label': actConfig['label']}}
             AccFrame += (actConfig['end'] - actConfig['start'])
         # if only 1 split methods, then it is testset, just save it
@@ -129,7 +123,6 @@ def output_dataset(ori_data_paths,
         # e.g. dynamic split_method = {'actName': {'start': 200, 'end': 3700, 'label': 1}}
         for _,actConfig in ori_split_method.items():
             start,end,label = list(i for _,i in actConfig.items())
-            # act_name = get_ActName(act_name)
             x_data_lst.append(all_features[start:end])
             y_data_lst.append(np.full((end-start),label))
             skeleton_lst.append(coords[start:end])
@@ -141,50 +134,6 @@ def output_dataset(ori_data_paths,
     del x_data_lst,y_data_lst,skeleton_lst
 
     return x_data,y_data,skeletons,general_split_methods
-
-# def output_dataset(ori_data_paths,
-#                    split_method_paths,
-#                    desired_dists,
-#                    desired_angles,
-#                    standard):
-#     out_dict = {}
-#     AccCount = 0 # accumulated counts
-#     for split_path,data_path in zip(split_method_paths,ori_data_paths):
-#         _,coords = get_ori_data(data_path)
-#         split_method = get_splilt_method(split_path)
-#         all_features = get_all_features(coords,desired_dists,desired_angles,standard)
-#         # e.g. dynamic split_method = {'Boxing1': {'start': 200, 'end': 3700, 'label': 1}}
-#         for act_name,config in split_method.items():
-#             start,end,label = list(i for _,i in config.items())
-#             act_name = get_ActName(act_name)
-#             if not act_name in out_dict:
-#                 out_dict[act_name] = {'x_data':[],'y_data':[],'y_ori_idx':[],'skeleton':[]}
-#             out_dict[act_name]['x_data'].append(all_features[start:end])
-#             out_dict[act_name]['y_data'].append(np.full((end-start),label))
-#             out_dict[act_name]['y_ori_idx'].append(np.arange(start+AccCount,end+AccCount))
-#             out_dict[act_name]['skeleton'].append(coords[start:end])
-#         AccCount += len(coords)
-#     # concatenate all activities
-#     x_data_lst = []
-#     y_data_lst = []
-#     y_ori_idx_lst = []
-#     skeletons_lst = []
-#     for act,data in out_dict.items():
-#         x_data_tmp = np.concatenate(data['x_data'],axis=0)
-#         y_data_tmp = np.concatenate(data['y_data'],axis=0)
-#         y_ori_idx_tmp = np.concatenate(data['y_ori_idx'],axis=0)
-#         skeleton_tmp = np.concatenate(data['skeleton'],axis=0)
-#         x_data_lst.append(x_data_tmp)
-#         y_data_lst.append(y_data_tmp)
-#         y_ori_idx_lst.append(y_ori_idx_tmp)
-#         skeletons_lst.append(skeleton_tmp)
-#     x_data = np.concatenate(x_data_lst,axis=0)
-#     y_data = np.concatenate(y_data_lst,axis=0)
-#     y_ori_idx = np.concatenate(y_ori_idx_lst,axis=0)
-#     skeletons = np.concatenate(skeletons_lst,axis=0)
-#     del x_data_lst,y_data_lst,y_ori_idx_lst,skeletons_lst,x_data_tmp,y_data_tmp,y_ori_idx_tmp,skeleton_tmp,out_dict
-
-#     return x_data,y_data,skeletons,y_ori_idx
 
 ################################
 ###### save & load models ######
@@ -228,9 +177,7 @@ def load_config(args):
     with open(yaml_path, "r") as file:
         features = yaml.safe_load(file)
     args.desired_features = features['desired_features']
-    args.split_ratio = features['split_ratio']
     args.window_size = features['window_size']
-    args.outside_test = features['outside_test']
     args.save_res = features['save_res']
     args.standard = features['standard']
     args.model = features['model']

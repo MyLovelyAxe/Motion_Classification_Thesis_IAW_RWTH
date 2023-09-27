@@ -79,15 +79,12 @@ class DynamicClassModel():
                 aName_dict[v] = k
 
             ### re-index result to match original order
-            plot_truth = self.dynamic_data.y_test[(self.dynamic_data.y_ori_idx_win).argsort()]
-            plot_pred = self.P_pred[self.dynamic_data.y_ori_idx_win.argsort()]
+            plot_truth = self.dynamic_data.y_test
+            plot_pred = self.P_pred
 
             ### Plotting
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
-            use_ext_test = '(with external testset)' if args.outside_test else '(with internal testset)'
             acc = np.sum(self.T_pred == self.dynamic_data.y_test) / len(self.T_pred)
-            # title = f'{args.exp_group}: {args.model}_wl{args.window_size} {use_ext_test} acc={round(acc, 3)}'
-            # fig.suptitle(title,fontsize=15)
 
             # prediction & truth plot
             for idx,act_idx in enumerate(self.dynamic_data.train_data.values):
@@ -105,7 +102,7 @@ class DynamicClassModel():
             if args.save_res:
                 # if train and test on data of same user
                 if not cross:
-                    output_image = f"{args.start_time}-NonCross-{args.exp_group}-{args.model}-wl{args.window_size}-{use_ext_test}-Acc{round(acc, 3)}.png"
+                    output_image = f"{args.start_time}-NonCross-{args.exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
                 # if train on user1's data while test on user2's data
                 else:
                     # e.g. args.load_model: 'save/10_Sep_16_33-Dynamic_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0'

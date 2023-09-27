@@ -18,7 +18,7 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Static_Apostolos',
+    parser.add_argument('--exp_group',type=str,default='Dynamic_Jialei',
                         choices=['Dynamic','Agree','Static',
                                  'Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
@@ -30,9 +30,7 @@ def default_args():
     
     ###### training configuration ######
     parser.add_argument('--desired_features',type=str)
-    parser.add_argument('--split_ratio', type=float)
     parser.add_argument('--window_size', type=int)
-    parser.add_argument('--outside_test',type=int)
     parser.add_argument('--save_res',type=int)
     parser.add_argument('--start_time',type=str)
     parser.add_argument('--standard', type=str)
@@ -47,7 +45,7 @@ def default_args():
     parser.add_argument('--random_state', type=int)
 
     ###### load model ######
-    parser.add_argument('--load_model', type=str, default='save/25_Sep_15_36-Static_Jialei-SVM-wl100')
+    parser.add_argument('--load_model', type=str, default='save/27_Sep_17_21-Dynamic_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0')
 
     args = parser.parse_args()
     return args

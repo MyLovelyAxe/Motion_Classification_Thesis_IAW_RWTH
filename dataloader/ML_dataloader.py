@@ -49,17 +49,12 @@ class Windowlize():
         """
         dists,angles = get_feature_selection(self.desired_features)
 
-        self.x_data_ori,self.y_data_ori,self.skeleton,self.split_method = output_dataset(ori_data_paths=self.data_paths,
-                                                                                      desired_dists=dists,
-                                                                                      desired_angles=angles,
-                                                                                      split_method_paths=self.split_method_paths,
-                                                                                      standard=self.standard)
+        self.x_data_ori,self.y_data_ori,self.skeleton,self.frame_split_method = output_dataset(ori_data_paths=self.data_paths,
+                                                                                               desired_dists=dists,
+                                                                                               desired_angles=angles,
+                                                                                               split_method_paths=self.split_method_paths,
+                                                                                               standard=self.standard)
 
-        # self.x_data_ori,self.y_data_ori,self.skeleton,self.y_ori_idx = output_dataset(ori_data_paths=self.data_paths,
-        #                                                                               desired_dists=dists,
-        #                                                                               desired_angles=angles,
-        #                                                                               split_method_paths=self.split_method_paths,
-        #                                                                               standard=self.standard)
         print(f'original x_data shape: {self.x_data_ori.shape}')
         print(f'original y_data shape: {self.y_data_ori.shape}')
         print()
@@ -76,60 +71,18 @@ class Windowlize():
         """
         x_data_win_lst = []
         y_data_win_lst = []
-        for actName,actConfig in self.split_method.items():
+        for actName,actConfig in self.frame_split_method.items():
             start,end,label = list(i for _,i in actConfig.items())
-            # print(f'start: {start}')
-            # print(f'end: {end}')
-            # print(f'label: {label}')
-
             # please make sure number of frames of each activitiy in recorded shots greater than window_size
             for step in range(end-start-self.wl):
                 window = self.x_data_ori[(start+step):(start+step+self.wl), :]
                 x_data_win_lst.append(np.expand_dims(window, axis=0))
                 y_data_win_lst.append(np.expand_dims(label, axis=0))
-
         self.x_data_win = np.concatenate(x_data_win_lst, axis=0)
         self.y_data_win = np.concatenate(y_data_win_lst, axis=0)
         print(f'x_data with window has shape: {self.x_data_win.shape}')
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
-
-    # def create_windows(self):
-    #     """
-    #     x_data shape:
-    #         original: [#frames,#features]
-    #         with windows: [#win,window_size,#features]
-    #     y_data shape:
-    #         original: [#frames,]
-    #         with windows: [#win,]
-    #     """
-    #     x_data_win_lst = []
-    #     y_data_win_lst = []
-    #     # record index of current selected labels, for later examination
-    #     y_MisClsExm_lst = []
-    #     # in order to go back to initial index
-    #     y_ori_idx_win_lst = []
-    #     _, start_index, counts = np.unique(
-    #         self.y_data_ori, return_counts=True, return_index=True)
-    #     counts = counts[start_index.argsort()]
-    #     start_index.sort()
-    #     for start, count in zip(start_index, counts):
-    #         for step in range(count-self.wl):
-    #             window = self.x_data_ori[(start+step):(start+step+self.wl), :]
-    #             label_idx = int(start+step+self.wl/2)
-    #             label = self.y_data_ori[label_idx]
-    #             ori_idx = self.y_ori_idx[label_idx]
-    #             x_data_win_lst.append(np.expand_dims(window, axis=0))
-    #             y_data_win_lst.append(np.expand_dims(label, axis=0))
-    #             y_MisClsExm_lst.append(np.expand_dims(label_idx, axis=0))
-    #             y_ori_idx_win_lst.append(np.expand_dims(ori_idx, axis=0))
-    #     self.x_data_win = np.concatenate(x_data_win_lst, axis=0)
-    #     self.y_data_win = np.concatenate(y_data_win_lst, axis=0)
-    #     self.y_MisClsExm = np.concatenate(y_MisClsExm_lst, axis=0)
-    #     self.y_ori_idx_win = np.concatenate(y_ori_idx_win_lst, axis=0)
-    #     print(f'x_data with window has shape: {self.x_data_win.shape}')
-    #     print(f'y_data with window has shape: {self.y_data_win.shape}')
-    #     print()
 
     def calc_statistic_features(self):
         """
@@ -296,56 +249,20 @@ class DynamicData():
                                      split_method_paths=args.train_split_method_paths,
                                      standard=args.standard,
                                      desired_features=args.desired_features)
-        self.split_ratio = args.split_ratio
-        self.Internal_TrainTest()
-        if args.test_split_method_paths and args.testset_paths and args.desired_features:
-            self.test_data = Windowlize(window_size=args.window_size,
-                                        data_paths=args.testset_paths,
-                                        split_method_paths=args.test_split_method_paths,
-                                        standard=args.standard,
-                                        desired_features=args.desired_features)
-            # test with ouside testset, simply rewrite self.x_test and self.y_test
-            self.y_data_ori = self.test_data.y_data_ori
-            self.x_test = self.test_data.x_data
-            self.y_test = self.test_data.y_data
-            self.y_MisClsExm = self.test_data.y_MisClsExm
-            self.y_ori_idx_win = self.test_data.y_ori_idx_win
-        else:
-            self.y_data_ori = self.train_data.y_data_ori
-            self.y_MisClsExm = self.train_data.y_MisClsExm
+
+        self.test_data = Windowlize(window_size=args.window_size,
+                                    data_paths=args.testset_paths,
+                                    split_method_paths=args.test_split_method_paths,
+                                    standard=args.standard,
+                                    desired_features=args.desired_features)
+
+        self.x_train = self.train_data.x_data
+        self.y_train = self.train_data.y_data
+        self.x_test = self.test_data.x_data
+        self.y_test = self.test_data.y_data
 
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()
-
-    def Internal_TrainTest(self):
-        """
-        Create trainset and test set with one signle dataset
-        """
-        x_train_lst = []
-        y_train_lst = []
-        x_test_lst = []
-        y_test_lst = []
-        y_ori_idx_win_lst = []
-        for aNum,(aName,aIdx) in enumerate(self.train_data.aIdx_dict.items()):
-            ## where is beginning index of this act in self.y_data, based on 'values':
-            label_idx = np.where(self.train_data.values == aIdx)[0][0]
-            ## define indices of train and test set
-            train_start_idx = self.train_data.starts[label_idx]
-            train_end_idx = train_start_idx + int(self.train_data.counts[label_idx]*self.split_ratio)
-            test_start_idx = train_end_idx + 1
-            test_end_idx = train_start_idx + self.train_data.counts[label_idx]
-            ## split train and test part in each activity
-            x_train_lst.append(self.train_data.x_data[train_start_idx:train_end_idx])
-            y_train_lst.append(self.train_data.y_data[train_start_idx:train_end_idx])
-            x_test_lst.append(self.train_data.x_data[test_start_idx:test_end_idx])
-            y_test_lst.append(self.train_data.y_data[test_start_idx:test_end_idx])
-            y_ori_idx_win_lst.append(self.train_data.y_ori_idx_win[test_start_idx:test_end_idx])
-        self.x_train = np.concatenate(x_train_lst,axis=0)
-        self.y_train = np.concatenate(y_train_lst,axis=0)
-        self.x_test = np.concatenate(x_test_lst,axis=0)
-        self.y_test = np.concatenate(y_test_lst,axis=0)
-        self.y_ori_idx_win = np.concatenate(y_ori_idx_win_lst,axis=0)
-        del x_train_lst,y_train_lst,x_test_lst,y_test_lst,y_ori_idx_win_lst
