@@ -11,16 +11,35 @@ from util.utils import get_paths,save_model
 #
 ######################################################################################
 
+######################################################################################
+#
+# 1. select training method: cross test or not
+#       if cross_test is True:
+#           then define both train_exp_group and test_exp_group
+#       if cross_test is False:
+#           then only define train_exp_group
+#
+######################################################################################
+
 def default_args():
 
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
-    ###### datasets parameters ######
-    parser.add_argument('--exp_group',type=str,default='Static_Jialei',
+    ###### select exp_group ######
+    parser.add_argument('--cross_test', type=bool, default=True,
+                        help='True: train with user1 trainset, test with user2 testset; False: train and test with data of same user')
+    parser.add_argument('--train_exp_group',type=str,default='Static_Jialei',
                         choices=['Dynamic','Agree','Static',
                                  'Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
                         help='Select one group of training & testing')
+    parser.add_argument('--test_exp_group',type=str,default='Static_Apostolos',
+                        choices=['Dynamic','Agree','Static',
+                                 'Dynamic_Jialei','Dynamic_Apostolos',
+                                 'Static_Jialei','Static_Apostolos'],
+                        help='Select one group of training & testing')
+    
+    ###### path of data and config files ######
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
     parser.add_argument('--trainset_paths', type=list, help='paths of data for trainset')
     parser.add_argument('--test_split_method_paths', type=list, help='paths of split methods for testset')
@@ -68,12 +87,10 @@ def main(ext_args=None):
     cls_model = DynamicClassModel(args)
     ### train & test
     cls_model.train()
-    if args.save_model:
-        save_model(args,cls_model)
     cls_model.test()
     ### show results
     print(f'Result on {args.model}:')
-    cls_model.show_result(args,)
+    cls_model.show_result(args)
     return cls_model
 
 if __name__ == '__main__':

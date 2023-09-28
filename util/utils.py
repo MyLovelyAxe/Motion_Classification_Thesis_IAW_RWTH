@@ -3,6 +3,7 @@ import pickle
 import yaml
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from util.features import get_all_features
 
 ##########################################
@@ -32,11 +33,15 @@ def get_paths(args):
         - testset from M .csv files
         (N>=1, M>=1)
     """
-    group_path = os.path.join('dataset',args.exp_group)
+    train_group_path = os.path.join('dataset',args.train_exp_group)
+    if args.cross_test:
+        test_group_path = os.path.join('dataset',args.test_exp_group)
+    else:
+        test_group_path = train_group_path
     # trainset
-    args.train_split_method_paths,args.trainset_paths = extract_path(group_path=group_path,train_or_test='trainset')
+    args.train_split_method_paths,args.trainset_paths = extract_path(group_path=train_group_path,train_or_test='trainset')
     # testset
-    args.test_split_method_paths,args.testset_paths = extract_path(group_path=group_path,train_or_test='testset')
+    args.test_split_method_paths,args.testset_paths = extract_path(group_path=test_group_path,train_or_test='testset')
     return args
 
 
@@ -157,7 +162,7 @@ def get_output_name(args):
     """
     output name for folders containing corresponding model and args.yaml
     """
-    output_name = f"{args.start_time}-{args.exp_group}-{args.model}-wl{args.window_size}"
+    output_name = f'{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}'
     if args.model == 'KNN':
         output_folder = output_name + f"-NNeighbor{args.n_neighbor}"
     elif args.model == 'RandomForest':
@@ -165,6 +170,12 @@ def get_output_name(args):
     elif args.model == 'SVM':
         output_folder = output_name
     return output_folder
+
+def save_model(save_path, model):
+    """
+    save the trained model as .pickle for cross testing
+    """
+    pickle.dump(model, open(os.path.join(save_path,f'model.pickle'), "wb"))
 
 def save_config(save_path, args):
     """
@@ -178,17 +189,45 @@ def save_config(save_path, args):
     with open(save_path, 'w') as yaml_file:
         yaml.dump(arg_dict, yaml_file, default_flow_style=False)
 
-def save_model(args,model):
+def save_plot(save_path, args, acc, plot_pred, values,plot_truth,actName_actLabel_dict):
     """
-    save the trained model as .pickle for cross testing
+    save performance of current experiment as plot for prediction and target
     """
+    sample_numbers = np.arange(plot_pred.shape[0])/60 # frame_rate=60
+    _, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
+    for idx,act_idx in enumerate(values):
+        ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{actName_actLabel_dict[act_idx]}')
+        truth = np.where(plot_truth==act_idx,1,0)
+        ax2.plot(sample_numbers, truth, label=f'{actName_actLabel_dict[act_idx]}')
+    ax1.set_title(f'Prediction',fontsize=10)
+    ax1.set_ylabel(f'Prediction Probability')
+    ax2.set_title(f'Truth',fontsize=10)
+    ax2.set_xlabel(f'Time [sec]')
+    ax2.set_ylabel(f'Prediction Probability')
+    plt.legend()
+    output_image = f"{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
+    plt.savefig(os.path.join(save_path,output_image))
+
+def save_result(args,
+                model,
+                acc,
+                plot_pred,
+                values,
+                plot_truth,
+                actName_actLabel_dict):
+    """
+    save result of current experiment: trained model, args config, performance plot
+    """
+    # define output folder
     save_path = 'save'
     os.makedirs(save_path, exist_ok=True)
     output_folder = get_output_name(args)
     save_path = os.path.join(save_path,output_folder)
     os.makedirs(save_path, exist_ok=True)
-    pickle.dump(model.model, open(os.path.join(save_path,f'model.pickle'), "wb"))
-    save_config(save_path, args)
+    # save results
+    save_model(save_path,model)
+    save_config(save_path,args)
+    save_plot(save_path,args,acc,plot_pred,values,plot_truth,actName_actLabel_dict)
 
 def load_config(args):
     """

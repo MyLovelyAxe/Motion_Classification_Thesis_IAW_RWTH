@@ -321,7 +321,7 @@ def calc_Skewness(data) -> np.array:
 
     return Skewness
 
-def dynamic_features(x_data):
+def meta_features(x_data):
     """
     shape:
         input x_data should have shape: [#win,window_size,#features]
@@ -329,13 +329,13 @@ def dynamic_features(x_data):
     type:
         concatenation of different statistic features of features inside each window
     """
-    dynamic_statistics = np.concatenate((calc_Mean(x_data),
-                                         calc_Std(x_data),
-                                         calc_TopMean_Range(x_data,num=30),
-                                         calc_Kurtosis(x_data),
-                                         calc_Skewness(x_data),
-                                         ),axis=1)
-    return dynamic_statistics
+    MetaFeatures = np.concatenate((calc_Mean(x_data),
+                                   calc_Std(x_data),
+                                   calc_TopMean_Range(x_data,num=30),
+                                   calc_Kurtosis(x_data),
+                                   calc_Skewness(x_data),
+                                   ),axis=1)
+    return MetaFeatures
 
 def get_act_index(split_method_paths,which_activity):
     act_idx_lst = []

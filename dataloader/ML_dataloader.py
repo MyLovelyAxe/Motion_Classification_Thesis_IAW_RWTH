@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util.features import dynamic_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict
+from util.features import meta_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict
 from util.utils import get_feature_selection, output_dataset
 
 
@@ -28,7 +28,7 @@ class Windowlize():
 
         self.load_data()
         self.create_windows()
-        self.calc_statistic_features()
+        self.calc_meta_features()
         self.localization()
 
     def load_data(self):
@@ -61,12 +61,19 @@ class Windowlize():
         
     def create_windows(self):
         """
-        x_data:
-            self.x_data_ori -> self.x_data_win
-            shape: [#frames,#features] -> [#win,window_size,#features]
-        y_data:
-            self.y_data_ori -> self.y_data_win
-            shape: [#frames,] -> [#win,]
+        Data definition:
+            self.x_data_win:
+                Windowlized Array Arr_w, samples, containing features for each frame but compressed in each window
+            self.y_data_win:
+                labels/classes for windows
+
+        Data dimension transformation:
+            x_data:
+                self.x_data_ori -> self.x_data_win
+                shape: [#frames,#features] -> [#win,window_size,#features]
+            y_data:
+                self.y_data_ori -> self.y_data_win
+                shape: [#frames,] -> [#win,]
         """
         x_data_win_lst = []
         y_data_win_lst = []
@@ -86,16 +93,23 @@ class Windowlize():
         print(f'y_data with window has shape: {self.y_data_win.shape}')
         print()
 
-    def calc_statistic_features(self):
+    def calc_meta_features(self):
         """
-        x_data:
-            self.x_data_win -> self.x_data
-            shape: [#win,window_size,#features] -> [#win,#features*#metrics]
-        y_data:
-            self.y_data_win -> self.y_data
-            shape: [#win,] -> [#win,]
+        Data definition:
+            self.x_data:
+                Window Feature Array Arr_wf, samples, containing features for each window
+            self.y_data:
+                labels/classes for windows
+                
+        Data dimension transformation:
+            x_data:
+                self.x_data_win -> self.x_data
+                shape: [#win,window_size,#features] -> [#win,#features*#metrics]
+            y_data:
+                self.y_data_win -> self.y_data
+                shape: [#win,] -> [#win,]
         """
-        self.x_data = dynamic_features(self.x_data_win)
+        self.x_data = meta_features(self.x_data_win)
         self.y_data = self.y_data_win
         print(f'x_data with window features has shape: {self.x_data.shape}')
         print(f'y_data with window features has shape: {self.y_data.shape}')
@@ -235,7 +249,6 @@ class Windowlize():
         fig.suptitle(f'MetaFeature: {which_metric[0]}',fontsize=40)
         fig.tight_layout()
         plt.show()
-
 
 class DynamicData():
     """
