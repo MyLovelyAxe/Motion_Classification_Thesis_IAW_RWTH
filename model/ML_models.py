@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from dataloader.ML_dataloader import TrainTestExp,LoadTestExp
 from util.features import get_act_index_dict
-from util.utils import save_result,save_miscls_index
+from util.utils import save_result
 
 class Exp():
     
@@ -35,22 +35,6 @@ class Exp():
         else:
             self.P_pred = loaded_model.predict_proba(self.exp_data.x_test)
         self.T_pred = np.argmax(self.P_pred,axis=1)
-
-    # def misclass_index(self):
-    #     """
-    #     record the indices of windows which are misclassified
-    #     """
-    #     MisclsWinIndex = np.where(self.T_pred!=self.exp_data.y_test)[0]
-    #     PredLabels = self.T_pred[MisclsWinIndex]
-    #     TrueLabels = self.exp_data.y_test[MisclsWinIndex]
-    #     ExamineFrameIndex = self.exp_data.win_frame_index[MisclsWinIndex]
-    #     # print(f'idx of misclassified window | check on dataset with:[start_frame, end_frame] | truth | prediction')
-    #     # for mis_idx,exm_idxs,tru,pre in zip(MisclsWinIndex,ExamineFrameIndex,TrueLabels,PredLabels):
-    #     #     print(f'{mis_idx} | {exm_idxs} | {tru} | {pre}')
-    #     save_miscls_index(miscls_win_index=MisclsWinIndex,
-    #                       examine_frame_index=ExamineFrameIndex,
-    #                       true_labels=TrueLabels,
-    #                       pred_labels=PredLabels)
         
     def result(self,args):
         """

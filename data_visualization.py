@@ -24,7 +24,7 @@ from util.examine import plot_ori_data,verification,output_dataset,get_feature_s
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='post_process',
+                    default='verify_before_output',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           post_process: examine misclassified windows after testing',
@@ -93,10 +93,10 @@ if __name__ == '__main__':
         split_method_paths = [os.path.join(data_path,'split_method.yaml') for data_path in args.examine_data_path]
         dists,angles = get_feature_selection(args.desired_features)
 
-        _,_,skeleton,_ = output_dataset(ori_data_paths=input_paths,
-                                        desired_dists=dists,
-                                        desired_angles=angles,
-                                        split_method_paths=split_method_paths,
-                                        standard='no_scale')
+        _,_,skeleton = output_dataset(ori_data_paths=input_paths,
+                                      desired_dists=dists,
+                                      desired_angles=angles,
+                                      split_method_paths=split_method_paths,
+                                      standard='no_scale')
         
         show_misclassified_frames(skeleton,args.misclassified_frames)

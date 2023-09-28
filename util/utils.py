@@ -229,6 +229,9 @@ def save_miscls_index(save_path,
                       examine_frame_index,
                       true_labels,
                       pred_labels):
+    """
+    record the misclassified index of window and corresponding frames, examine with data_visualization.py
+    """
     file_name = os.path.join(save_path,'mixcls_index.txt')
     with open(file_name, 'w') as file:
         file.write(f'idx of misclassified window | check on dataset with:[start_frame, end_frame] | truth | prediction' + '\n')

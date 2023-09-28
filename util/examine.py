@@ -254,11 +254,11 @@ def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
     """
     ### get data
     desired_dists,desired_angles = get_feature_selection(feature_path)
-    x_data,y_data,skeletons,_ = output_dataset(ori_data_paths,
-                                               split_method_paths,
-                                               desired_dists,
-                                               desired_angles,
-                                               standard='no_scale')
+    x_data,y_data,skeletons = output_dataset(ori_data_paths,
+                                             split_method_paths,
+                                             desired_dists,
+                                             desired_angles,
+                                             standard='no_scale')
     print(f'Trial x_data with shape {x_data.shape}')
     print(f'Trial y_data with shape {y_data.shape}')
 
@@ -294,11 +294,13 @@ def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
         high,low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
         title = f'label: {label} in frames {choices[0]}-{choices[-1]}'
         anim_configs_lst.append([ax,skeleton,high,low,title])
-    ani1 = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,),interval=17)
+    _ = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,),interval=17)
     plt.show()
 
 def show_misclassified_frames(skeleton,MisCls_frames):
-
+    """
+    examine the misclassified windows from result of experiment
+    """
     start_frame, end_frame = MisCls_frames
     skeleton = skeleton[start_frame:end_frame]
     fig = plt.figure(figsize=(16,8))
@@ -307,24 +309,10 @@ def show_misclassified_frames(skeleton,MisCls_frames):
     joints_dict = get_links_dict()
     high, low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
     title = f'Misclassified frames {start_frame}-{end_frame}'
-    mis_ani = animation.FuncAnimation(fig,
-                                      plot_func_3d,
-                                      frames=end_frame-start_frame,
-                                      fargs=(ax1,joints_dict,skeleton,high,low,title),
-                                      interval=17)
+    _ = animation.FuncAnimation(fig,
+                                plot_func_3d,
+                                frames=end_frame-start_frame,
+                                fargs=(ax1,joints_dict,skeleton,high,low,title),
+                                interval=17)
     fig.tight_layout()
     plt.show()
-
-if __name__ == '__main__':
-
-    skeleton = np.random.randint(0,24,24).reshape(2,3,4) # [#frames,xyz,#features]
-    joint_1_idx = 0
-    joint_2_idx = 1
-    dist = np.sqrt((skeleton[:,0,joint_1_idx] - skeleton[:,0,joint_2_idx])**2 
-                    + (skeleton[:,1,joint_1_idx] - skeleton[:,1,joint_2_idx])**2 
-                    + (skeleton[:,2,joint_1_idx] - skeleton[:,2,joint_2_idx])**2
-                    )
-    dist2 = np.sqrt(np.sum((skeleton[...,joint_1_idx] - skeleton[...,joint_2_idx])**2,axis=1))
-    print(dist.shape)
-    print(dist2.shape)
-    print(np.all(dist==dist2))
