@@ -2,14 +2,14 @@ import os
 import pickle
 from datetime import datetime as dt
 import argparse
-from model.ML_models import DynamicClassModel
+from model.ML_models import Exp
 from util.utils import get_paths, load_config
 
 #############################################################################
 #
 # in README.md:
 #       note that in order to do Cross experiment, run experiment in test.py
-#       the result is trained on loaded model and tested on local exp_group
+#       the result is trained on loaded model and tested on test_exp_group
 #
 #############################################################################
 
@@ -17,12 +17,16 @@ def default_args():
 
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
-    ###### datasets parameters ######
-    parser.add_argument('--test_exp_group',type=str,default='Dynamic_Jialei',
-                        choices=['Dynamic','Agree','Static',
-                                 'Dynamic_Jialei','Dynamic_Apostolos',
+    ###### only define these arguments ######
+    parser.add_argument('--load_model', type=str, default='save/28_Sep_14_41-Cross-Train_Static_Jialei-Test_Static_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0')
+    parser.add_argument('--test_exp_group',type=str,default='Static_Apostolos',
+                        choices=['Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
                         help='Select one group of training & testing')
+
+    ###### datasets parameters ######
+    parser.add_argument('--cross_test', type=bool, help='True: train with user1 trainset, test with user2 testset; False: train and test with data of same user')
+    parser.add_argument('--train_exp_group',type=str, help='Select one group of training & testing')
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')
     parser.add_argument('--trainset_paths', type=list, help='paths of data for trainset')
     parser.add_argument('--test_split_method_paths', type=list, help='paths of split methods for testset')
@@ -31,7 +35,6 @@ def default_args():
     ###### training configuration ######
     parser.add_argument('--desired_features',type=str)
     parser.add_argument('--window_size', type=int)
-    parser.add_argument('--save_res',type=int)
     parser.add_argument('--start_time',type=str)
     parser.add_argument('--standard', type=str)
 
@@ -43,9 +46,6 @@ def default_args():
     # for RandomForest
     parser.add_argument('--max_depth', type=int)
     parser.add_argument('--random_state', type=int)
-
-    ###### load model ######
-    parser.add_argument('--load_model', type=str, default='save/28_Sep_11_57-Static_Jialei-RandomForest-wl100-MaxDepth6-RandomState0')
 
     args = parser.parse_args()
     return args
@@ -67,14 +67,14 @@ def main(ext_args=None):
     ### get time
     args.start_time = f"{dt.now().strftime('%d_%h_%H_%M')}"
     ### create model for new testset
-    test_model = DynamicClassModel(args)
+    test_model = Exp(args)
     ### load trained model
     loaded_model = pickle.load(open(os.path.join(args.load_model,f'model.pickle'), "rb"))
     ### test with loaded model
     test_model.test(loaded_model=loaded_model)
     ### show results
     print(f'Result on {args.model}:')
-    test_model.show_result(args)
+    test_model.result(args)
     return test_model
 
 if __name__ == '__main__':

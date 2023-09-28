@@ -89,7 +89,7 @@ def get_feature_selection(yaml_path):
     angles = features['desired_angles']
     return dists,angles
 
-def get_splilt_method(yaml_path,show=False):
+def single_splilt_method(yaml_path,show=False):
     """
     load split_mehthods.yaml as dict, containing starting frame, end frame, label for each shot
     """
@@ -98,6 +98,29 @@ def get_splilt_method(yaml_path,show=False):
     if show:
         print(f'split method: {split_method}')
     return split_method
+
+def get_split_methods(split_method_paths):
+    """
+    get general split methods for trainset or testset
+    """
+    AccFrame = 0 # accumulated counts
+    general_split_methods = {}
+    ### iterate all split_methods.yaml
+    for split_path in split_method_paths:
+        ### save split methods
+        ori_split_method = single_splilt_method(split_path)
+        # check if it is trainset or testset:
+        # if not only 1 split methods, then it is trainset, accumulate corresponding number of frame
+        if not len(split_method_paths) == 1:
+            actName = list(ori_split_method.keys())[0]
+            actConfig = list(ori_split_method.values())[0]
+            current_split_method = {actName: {'start': actConfig['start']+AccFrame, 'end': actConfig['end']+AccFrame, 'label': actConfig['label']}}
+            AccFrame += (actConfig['end'] - actConfig['start'])
+        # if only 1 split methods, then it is testset, just save it
+        else:
+            current_split_method = ori_split_method
+        general_split_methods.update(current_split_method)
+    return general_split_methods
 
 def output_dataset(ori_data_paths,
                    split_method_paths,
@@ -115,27 +138,13 @@ def output_dataset(ori_data_paths,
         general_split_methods:
             split methods for all segments of recorded shot, for trainset or testset
     """
-    AccFrame = 0 # accumulated counts
     x_data_lst = []
     y_data_lst = []
     skeleton_lst = []
-    general_split_methods = {}
     ### iterate all split_methods.yaml
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
-        ### save split methods
-        ori_split_method = get_splilt_method(split_path)
-        # check if it is trainset or testset:
-        # if not only 1 split methods, then it is trainset, accumulate corresponding number of frame
-        if not len(split_method_paths) == 1:
-            actName = list(ori_split_method.keys())[0]
-            actConfig = list(ori_split_method.values())[0]
-            current_split_method = {actName: {'start': actConfig['start']+AccFrame, 'end': actConfig['end']+AccFrame, 'label': actConfig['label']}}
-            AccFrame += (actConfig['end'] - actConfig['start'])
-        # if only 1 split methods, then it is testset, just save it
-        else:
-            current_split_method = ori_split_method
-        general_split_methods.update(current_split_method)
         ### calculate features
+        ori_split_method = single_splilt_method(split_path)
         _,coords = get_ori_data(data_path)
         all_features = get_all_features(coords,desired_dists,desired_angles,standard)
         ### iterate all activities in current split_methods.yaml
@@ -151,7 +160,7 @@ def output_dataset(ori_data_paths,
     skeletons = np.concatenate(skeleton_lst,axis=0)
     del x_data_lst,y_data_lst,skeleton_lst
 
-    return x_data,y_data,skeletons,general_split_methods
+    return x_data,y_data,skeletons
 
 
 ################################
@@ -162,13 +171,17 @@ def get_output_name(args):
     """
     output name for folders containing corresponding model and args.yaml
     """
-    output_name = f'{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}'
-    if args.model == 'KNN':
-        output_folder = output_name + f"-NNeighbor{args.n_neighbor}"
-    elif args.model == 'RandomForest':
-        output_folder = output_name + f"-MaxDepth{args.max_depth}-RandomState{args.random_state}"
-    elif args.model == 'SVM':
-        output_folder = output_name
+    ### load trained model or not
+    if args.load_model is None:
+        output_name = f'{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}'
+        if args.model == 'KNN':
+            output_folder = output_name + f"-NNeighbor{args.n_neighbor}"
+        elif args.model == 'RandomForest':
+            output_folder = output_name + f"-MaxDepth{args.max_depth}-RandomState{args.random_state}"
+        elif args.model == 'SVM':
+            output_folder = output_name
+    else:
+        output_folder = '{}-load:{}-test_{}'.format(args.start_time,args.load_model.split('/')[1],args.test_exp_group)
     return output_folder
 
 def save_model(save_path, model):
@@ -189,32 +202,34 @@ def save_config(save_path, args):
     with open(save_path, 'w') as yaml_file:
         yaml.dump(arg_dict, yaml_file, default_flow_style=False)
 
-def save_plot(save_path, args, acc, plot_pred, values,plot_truth,actName_actLabel_dict):
+def save_plot(save_path, args, acc, plot_pred,plot_truth,actLabel_actName_dict):
     """
     save performance of current experiment as plot for prediction and target
     """
     sample_numbers = np.arange(plot_pred.shape[0])/60 # frame_rate=60
     _, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
-    for idx,act_idx in enumerate(values):
-        ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{actName_actLabel_dict[act_idx]}')
-        truth = np.where(plot_truth==act_idx,1,0)
-        ax2.plot(sample_numbers, truth, label=f'{actName_actLabel_dict[act_idx]}')
+    for idx,(actLabel,_) in enumerate(actLabel_actName_dict.items()):
+        ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{actLabel_actName_dict[actLabel]}')
+        truth = np.where(plot_truth==actLabel,1,0)
+        ax2.plot(sample_numbers, truth, label=f'{actLabel_actName_dict[actLabel]}')
     ax1.set_title(f'Prediction',fontsize=10)
     ax1.set_ylabel(f'Prediction Probability')
     ax2.set_title(f'Truth',fontsize=10)
     ax2.set_xlabel(f'Time [sec]')
     ax2.set_ylabel(f'Prediction Probability')
     plt.legend()
-    output_image = f"{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
+    if args.load_model is None:
+        output_image = f"{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
+    else:
+        output_image = '{}-load[{}]-test_{}-Acc{}.png'.format(args.start_time,args.load_model.split('/')[1],args.test_exp_group,round(acc, 3))
     plt.savefig(os.path.join(save_path,output_image))
 
 def save_result(args,
                 model,
                 acc,
                 plot_pred,
-                values,
                 plot_truth,
-                actName_actLabel_dict):
+                actLabel_actName_dict):
     """
     save result of current experiment: trained model, args config, performance plot
     """
@@ -227,7 +242,7 @@ def save_result(args,
     # save results
     save_model(save_path,model)
     save_config(save_path,args)
-    save_plot(save_path,args,acc,plot_pred,values,plot_truth,actName_actLabel_dict)
+    save_plot(save_path,args,acc,plot_pred,plot_truth,actLabel_actName_dict)
 
 def load_config(args):
     """
@@ -238,9 +253,10 @@ def load_config(args):
     yaml_path = os.path.join(args.load_model,f'args.yaml')
     with open(yaml_path, "r") as file:
         features = yaml.safe_load(file)
+    args.cross_test = features['cross_test']
+    args.train_exp_group = features['train_exp_group']
     args.desired_features = features['desired_features']
     args.window_size = features['window_size']
-    args.save_res = features['save_res']
     args.standard = features['standard']
     args.model = features['model']
     args.n_neighbor = features['n_neighbor']

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from util.features import meta_features, get_feature_index, get_metric_index, get_act_index, get_feature_index_dict
-from util.utils import get_feature_selection, output_dataset
+from util.utils import get_feature_selection, output_dataset, get_split_methods
 
 
 class Windowlize():
@@ -49,11 +49,12 @@ class Windowlize():
         """
         dists,angles = get_feature_selection(self.desired_features)
 
-        self.x_data_ori,self.y_data_ori,self.skeleton,self.frame_split_method = output_dataset(ori_data_paths=self.data_paths,
+        self.x_data_ori,self.y_data_ori,self.skeleton = output_dataset(ori_data_paths=self.data_paths,
                                                                                                desired_dists=dists,
                                                                                                desired_angles=angles,
                                                                                                split_method_paths=self.split_method_paths,
                                                                                                standard=self.standard)
+        self.frame_split_method = get_split_methods(split_method_paths=self.split_method_paths)
         self.num_features = self.x_data_ori.shape[1]
         print(f'original x_data shape: {self.x_data_ori.shape}')
         print(f'original y_data shape: {self.y_data_ori.shape}')
@@ -250,7 +251,7 @@ class Windowlize():
         fig.tight_layout()
         plt.show()
 
-class DynamicData():
+class TrainTestExp():
     """
     integrate trainset and testset into one instance containing all training and testing data
     """
@@ -269,9 +270,28 @@ class DynamicData():
         self.y_train = self.train_data.y_data
         self.x_test = self.test_data.x_data
         self.y_test = self.test_data.y_data
+        self.frame_split_method = self.train_data.frame_split_method
         self.win_frame_index = self.test_data.win_frame_index
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')
+        print(f'x_test shape: {self.x_test.shape}')
+        print(f'y_test shape: {self.y_test.shape}')
+        print()
+
+class LoadTestExp():
+    """
+    integrate trainset and testset into one instance containing all training and testing data
+    """
+    def __init__(self,args):
+        self.test_data = Windowlize(window_size=args.window_size,
+                                    data_paths=args.testset_paths,
+                                    split_method_paths=args.test_split_method_paths,
+                                    standard=args.standard,
+                                    desired_features=args.desired_features)
+        self.x_test = self.test_data.x_data
+        self.y_test = self.test_data.y_data
+        self.frame_split_method = get_split_methods(split_method_paths=args.train_split_method_paths)
+        self.win_frame_index = self.test_data.win_frame_index
         print(f'x_test shape: {self.x_test.shape}')
         print(f'y_test shape: {self.y_test.shape}')
         print()
