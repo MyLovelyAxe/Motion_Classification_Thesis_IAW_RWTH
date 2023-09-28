@@ -7,10 +7,10 @@ from util.utils import get_feature_selection, output_dataset
 class Windowlize():
 
     """
-    Dynamic activities can not be easily classified with single frame,
-    therefore, to create window which covers several sequential frames is necessary.
+    Take specific number of frames as 1 sample, i.e. windowlize,
+    and slide along with all shot sequence but within each activity.
     In each window, there are statistic data of each features
-    to describe the movement inside.
+    to describe the activity inside.
     """
 
     def __init__(self,
@@ -33,18 +33,19 @@ class Windowlize():
 
     def load_data(self):
         """
-        in order to plot result of testset in original order,
-        it is necessary to save the index from original dataset,
-        then load data and output dataset inside dataloader instead of save in .npy.
-        the process is:
-            1. load x_data and y_data and y_ori_idx directly in dataloader, instead of save in .npy
-            2. also windowlize on y_ori_idx -> y_ori_idx_win
-            3. plot self.T_pred[y_ori_idx_win.argsort()]
-            # explain step 3:
-                # because after windowlize, index get less,
-                # then some index inside y_ori_idx will exceed length of windowlized y_data,
-                # therefore, take .argsort() to just get the index of index,
-                # ie. order instead of real value
+        return of output dataset.
+            self.x_data_ori:
+                Frame Feature Array Arr_ff, samples, containing features for each frame
+                shape: [#frames,#features]
+            self.y_data_ori:
+                labels/classes for frames
+                shape: [#frames,]
+            self.skeleton:
+                Original Data Arr_ori, containig original coordinates for skeleton joints
+                shape: [#frames,3,26] # 3 means XYZ, 26 means 26 selected joints
+            self.frame_split_method:
+                split methods for all segments of recorded shot, for trainset or testset
+                type: dict
         """
         dists,angles = get_feature_selection(self.desired_features)
 
@@ -60,12 +61,12 @@ class Windowlize():
         
     def create_windows(self):
         """
-        x_data shape:
-            original: [#frames,#features]
-            with windows: [#win,window_size,#features]
-        y_data shape:
-            original: [#frames,]
-            with windows: [#win,]
+        x_data:
+            self.x_data_ori -> self.x_data_win
+            shape: [#frames,#features] -> [#win,window_size,#features]
+        y_data:
+            self.y_data_ori -> self.y_data_win
+            shape: [#frames,] -> [#win,]
         """
         x_data_win_lst = []
         y_data_win_lst = []
@@ -87,12 +88,12 @@ class Windowlize():
 
     def calc_statistic_features(self):
         """
-        x_data shape:
-            with windows: [#win,window_size,#features]
-            with statistic features: [#win,#features*#metrics]
-        y_data shape:
-            with windows: [#win,]
-            with statistic features: [#win,]
+        x_data:
+            self.x_data_win -> self.x_data
+            shape: [#win,window_size,#features] -> [#win,#features*#metrics]
+        y_data:
+            self.y_data_win -> self.y_data
+            shape: [#win,] -> [#win,]
         """
         self.x_data = dynamic_features(self.x_data_win)
         self.y_data = self.y_data_win
@@ -237,32 +238,25 @@ class Windowlize():
 
 
 class DynamicData():
-
     """
-    If external testset is provided, then test with external testset;
-    If not, then extract part of trainset for testing
+    integrate trainset and testset into one instance containing all training and testing data
     """
     def __init__(self,args):
-        
-        
         self.train_data = Windowlize(window_size=args.window_size,
                                      data_paths=args.trainset_paths,
                                      split_method_paths=args.train_split_method_paths,
                                      standard=args.standard,
                                      desired_features=args.desired_features)
-
         self.test_data = Windowlize(window_size=args.window_size,
                                     data_paths=args.testset_paths,
                                     split_method_paths=args.test_split_method_paths,
                                     standard=args.standard,
                                     desired_features=args.desired_features)
-
         self.x_train = self.train_data.x_data
         self.y_train = self.train_data.y_data
         self.x_test = self.test_data.x_data
         self.y_test = self.test_data.y_data
         self.win_frame_index = self.test_data.win_frame_index
-
         print(f'x_train shape: {self.x_train.shape}')
         print(f'y_train shape: {self.y_train.shape}')
         print(f'x_test shape: {self.x_test.shape}')

@@ -5,13 +5,16 @@ import pandas as pd
 import numpy as np
 from util.features import get_all_features
 
+##########################################
+###### generate paths for exp_group ######
+##########################################
+
 def extract_path(group_path,train_or_test):
     """
     param:
         group_path: string, the root path of current group of experiment
         train_or_test: string, 'train' or 'test'
     """
-    # trainset
     set_path = os.path.join(group_path,train_or_test)
     set_path_lst = os.listdir(set_path)
     set_path_lst.sort()
@@ -29,13 +32,11 @@ def get_paths(args):
         - testset from M .csv files
         (N>=1, M>=1)
     """
-
     group_path = os.path.join('dataset',args.exp_group)
     # trainset
     args.train_split_method_paths,args.trainset_paths = extract_path(group_path=group_path,train_or_test='trainset')
     # testset
     args.test_split_method_paths,args.testset_paths = extract_path(group_path=group_path,train_or_test='testset')
-
     return args
 
 
@@ -68,11 +69,15 @@ def get_ori_data(path):
     print(f'cog shape: {cog.shape}')
     return cog,coords
 
+
 ##############################
 ###### generate dataset ######
 ##############################
 
 def get_feature_selection(yaml_path):
+    """
+    get pre-selected features for creation of dataset, including distance and angle features
+    """
     with open(yaml_path, "r") as file:
         features = yaml.safe_load(file)
     dists = features['desired_dists']
@@ -80,6 +85,9 @@ def get_feature_selection(yaml_path):
     return dists,angles
 
 def get_splilt_method(yaml_path,show=False):
+    """
+    load split_mehthods.yaml as dict, containing starting frame, end frame, label for each shot
+    """
     with open(yaml_path, "r") as file:
         split_method = yaml.safe_load(file)
     if show:
@@ -91,16 +99,24 @@ def output_dataset(ori_data_paths,
                    desired_dists,
                    desired_angles,
                    standard):
-
+    """
+    return:
+        x_data:
+            Frame Feature Array Arr_ff, containing features for each frame
+        y_data:
+            labels/classes for frames
+        skeleton:
+            Original Data Arr_ori, containig original coordinates for skeleton joints
+        general_split_methods:
+            split methods for all segments of recorded shot, for trainset or testset
+    """
     AccFrame = 0 # accumulated counts
     x_data_lst = []
     y_data_lst = []
     skeleton_lst = []
     general_split_methods = {}
-
     ### iterate all split_methods.yaml
     for split_path,data_path in zip(split_method_paths,ori_data_paths):
-        
         ### save split methods
         ori_split_method = get_splilt_method(split_path)
         # check if it is trainset or testset:
@@ -114,11 +130,9 @@ def output_dataset(ori_data_paths,
         else:
             current_split_method = ori_split_method
         general_split_methods.update(current_split_method)
-
         ### calculate features
         _,coords = get_ori_data(data_path)
         all_features = get_all_features(coords,desired_dists,desired_angles,standard)
-
         ### iterate all activities in current split_methods.yaml
         # e.g. dynamic split_method = {'actName': {'start': 200, 'end': 3700, 'label': 1}}
         for _,actConfig in ori_split_method.items():
@@ -126,7 +140,6 @@ def output_dataset(ori_data_paths,
             x_data_lst.append(all_features[start:end])
             y_data_lst.append(np.full((end-start),label))
             skeleton_lst.append(coords[start:end])
-        
     # concatenate all data
     x_data = np.concatenate(x_data_lst,axis=0)
     y_data = np.concatenate(y_data_lst,axis=0)
@@ -135,12 +148,15 @@ def output_dataset(ori_data_paths,
 
     return x_data,y_data,skeletons,general_split_methods
 
+
 ################################
 ###### save & load models ######
 ################################
 
 def get_output_name(args):
-
+    """
+    output name for folders containing corresponding model and args.yaml
+    """
     output_name = f"{args.start_time}-{args.exp_group}-{args.model}-wl{args.window_size}"
     if args.model == 'KNN':
         output_folder = output_name + f"-NNeighbor{args.n_neighbor}"
@@ -151,7 +167,9 @@ def get_output_name(args):
     return output_folder
 
 def save_config(save_path, args):
-
+    """
+    save configuration of current experiment from args into .yaml
+    """
     arg_dict = {}
     for arg_name in vars(args):
         arg_value = getattr(args, arg_name)
@@ -161,7 +179,9 @@ def save_config(save_path, args):
         yaml.dump(arg_dict, yaml_file, default_flow_style=False)
 
 def save_model(args,model):
-
+    """
+    save the trained model as .pickle for cross testing
+    """
     save_path = 'save'
     os.makedirs(save_path, exist_ok=True)
     output_folder = get_output_name(args)
@@ -171,7 +191,10 @@ def save_model(args,model):
     save_config(save_path, args)
 
 def load_config(args):
-
+    """
+    load the configuration of the experiments for trained model,
+    make sure the cross-tested experiment have the same configuration
+    """
     # e.g. model_path = 'save/06_Sep_20_30-Agree-KNN-wl5-NNeighbor20'
     yaml_path = os.path.join(args.load_model,f'args.yaml')
     with open(yaml_path, "r") as file:
@@ -184,5 +207,4 @@ def load_config(args):
     args.n_neighbor = features['n_neighbor']
     args.max_depth = features['max_depth']
     args.random_state = features['random_state']
-
     return args
