@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 import argparse
 from model.ML_models import DynamicClassModel
-from util.utils import get_paths,save_model
+from util.utils import get_paths
 
 ######################################################################################
 #
@@ -29,13 +29,11 @@ def default_args():
     parser.add_argument('--cross_test', type=bool, default=True,
                         help='True: train with user1 trainset, test with user2 testset; False: train and test with data of same user')
     parser.add_argument('--train_exp_group',type=str,default='Static_Jialei',
-                        choices=['Dynamic','Agree','Static',
-                                 'Dynamic_Jialei','Dynamic_Apostolos',
+                        choices=['Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
                         help='Select one group of training & testing')
     parser.add_argument('--test_exp_group',type=str,default='Static_Apostolos',
-                        choices=['Dynamic','Agree','Static',
-                                 'Dynamic_Jialei','Dynamic_Apostolos',
+                        choices=['Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
                         help='Select one group of training & testing')
     
@@ -48,8 +46,6 @@ def default_args():
     ###### training configuration ######
     parser.add_argument('--desired_features',type=str,default='config/desired_features.yaml',help='load features name from .yaml')
     parser.add_argument('--window_size', type=int, default=100, help='the ratio for number of samples in trainset')
-    parser.add_argument('--save_res',type=int,default=1,help='1: save plot; 0: show plot')
-    parser.add_argument('--save_model',type=int,default=1,help='1: save trained model; 0: not save model')
     parser.add_argument('--start_time',type=str,help='starting time of current process')
     parser.add_argument('--standard', type=str, default='no_scale',
                          choices={'len_spine','neck_height','len_arm','len_shoulder','no_scale'},
@@ -88,9 +84,9 @@ def main(ext_args=None):
     ### train & test
     cls_model.train()
     cls_model.test()
-    ### show results
+    ### save results
     print(f'Result on {args.model}:')
-    cls_model.show_result(args)
+    cls_model.result(args)
     return cls_model
 
 if __name__ == '__main__':

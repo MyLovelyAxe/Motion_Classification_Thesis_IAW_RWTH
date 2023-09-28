@@ -1,6 +1,4 @@
-import os
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
@@ -46,7 +44,7 @@ class DynamicClassModel():
         for mis_idx,exm_idxs,tru,pre in zip(self.misCls_win_index,misCls_win_frame_index,true_labels,pred_labels):
             print(f'{mis_idx} | {exm_idxs} | {tru} | {pre}')
 
-    def show_result(self,args):
+    def result(self,args):
 
         ### save results
         actName_actLabel_dict = get_act_index_dict(self.dynamic_data.train_data.frame_split_method,NL=False)
