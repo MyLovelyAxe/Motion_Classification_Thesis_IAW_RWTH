@@ -163,9 +163,9 @@ def output_dataset(ori_data_paths,
     return x_data,y_data,skeletons
 
 
-################################
-###### save & load models ######
-################################
+##########################
+###### save results ######
+##########################
 
 def get_output_name(args):
     """
@@ -224,12 +224,27 @@ def save_plot(save_path, args, acc, plot_pred,plot_truth,actLabel_actName_dict):
         output_image = '{}-load[{}]-test_{}-Acc{}.png'.format(args.start_time,args.load_model.split('/')[1],args.test_exp_group,round(acc, 3))
     plt.savefig(os.path.join(save_path,output_image))
 
+def save_miscls_index(save_path,
+                      miscls_win_index,
+                      examine_frame_index,
+                      true_labels,
+                      pred_labels):
+    file_name = os.path.join(save_path,'mixcls_index.txt')
+    with open(file_name, 'w') as file:
+        file.write(f'idx of misclassified window | check on dataset with:[start_frame, end_frame] | truth | prediction' + '\n')
+        for mis_idx,exm_idxs,tru,pre in zip(miscls_win_index,examine_frame_index,true_labels,pred_labels):
+            file.write(f'{mis_idx} | {exm_idxs} | {tru} | {pre}' + '\n')
+
 def save_result(args,
                 model,
                 acc,
                 plot_pred,
                 plot_truth,
-                actLabel_actName_dict):
+                actLabel_actName_dict,
+                miscls_win_index,
+                examine_frame_index,
+                true_labels,
+                pred_labels):
     """
     save result of current experiment: trained model, args config, performance plot
     """
@@ -243,6 +258,11 @@ def save_result(args,
     save_model(save_path,model)
     save_config(save_path,args)
     save_plot(save_path,args,acc,plot_pred,plot_truth,actLabel_actName_dict)
+    save_miscls_index(save_path,miscls_win_index,examine_frame_index,true_labels,pred_labels)
+
+#################################
+###### load trained models ######
+#################################
 
 def load_config(args):
     """
