@@ -2,20 +2,38 @@ import os
 import argparse
 from util.examine import plot_ori_data,verification,output_dataset,get_feature_selection,show_misclassified_frames
 
-############################# Attention ###########################
-##
-## Please edit these arguments in order:
-##
-##      1. if --function is check_ori_data or verify_before_output
-##              edit --single_data_path
-##              edit --start_frame
-##              edit --end_frame
-##
-##      2. if --function is post_process
-##              edit --examine_data_path
-##              edit --misclassified_frames
-##
-###################################################################
+################################# Instruction for usage ######################################
+#
+# Please define argument --function and other arguments following:
+#
+#      1. check_ori_data:
+#
+#           function:
+#               visualize Original Data Arr_ori
+#           edit:
+#               --single_data_path: which shot to examine
+#               --start_frame:      from which frame
+#               --end_frame:        to which frame
+#
+#      2. verify_before_output:
+#
+#           function:
+#               examine Frame Feature Array Arr_ff for calculation error
+#           edit:
+#               --single_data_path: which shot to examine
+#               --start_frame:      from which frame
+#               --end_frame:        to which frame
+#
+#      3. post_process:
+#
+#           function:
+#               check the window which is wrong classified
+#           edit:
+#               --examine_data_path:    which shot to examine
+#               --misclassified_frames: index of frame in this window in miscls_index.txt
+#               --end_frame:            to which frame
+#
+################################# Instruction for usage ######################################
 
 ####################################
 ###### get general parameters ######
@@ -37,24 +55,13 @@ parser.add_argument('--function', type=str,
 
 parser.add_argument('--single_data_path', type=str,
                     default='dataset/Static_Apostolos/testset/Test_Staic_Apostolos',
-                    help='only one single dataset for function check_ori_data and verify_before_output',
-                    choices=[
-                             'dataset/Static/trainset/chor2_20230609',
-                             'dataset/Static/testset/testset_20230627',
-                             'dataset/Dynamic/trainset/dynamic1_20230706',
-                             'dataset/Dynamic/trainset/dynamic2_20230706',
-                             'dataset/Dynamic/trainset/dynamic3_20230706',
-                             'dataset/Dynamic/testset/dynamic_test_20230801',
-                             'dataset/Agree/trainset/agree_20230801',
-                             'dataset/Agree/testset/agree_test_20230801',
-                             ]
-                    )
+                    help='only one single dataset for function check_ori_data and verify_before_output')
 parser.add_argument('--start_frame', type=int, default=2000, help='from which frame to start visualize')
 parser.add_argument('--end_frame', type=int, default=2400, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
 parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
-                    default='dataset/desired_features_trial.yaml', help='load features name from .yaml')
+                    default='config/desired_features_trial.yaml', help='load features name from .yaml')
 
 ####################################
 ###### function: post_process ######

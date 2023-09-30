@@ -3,23 +3,26 @@ import argparse
 from model.ML_models import Exp
 from util.utils import get_paths
 
-######################################################################################
+################################# Instruction for usage ######################################
 #
-# in README.md:
-#       note that in order to do NonCross experiment, just run experiment in train.py
-#       the result is just trained and tested on the same exp_group
+# Edit the following arguments to define training configuration:
 #
-######################################################################################
-
-######################################################################################
+#    1. cross_test:
+#          True:
+#              then define both train_exp_group and test_exp_group
+#          False:
+#              then only define train_exp_group
 #
-# 1. select training method: cross test or not
-#       if cross_test is True:
-#           then define both train_exp_group and test_exp_group
-#       if cross_test is False:
-#           then only define train_exp_group
+#    2. window_size:
+#          how many frames are in a window
 #
-######################################################################################
+#    3. model:
+#          select one model for classification: KNN, Random Forest, SVM
+#
+#    4. parameters for corresponding model:
+#          see details in "help" of arguments of parameters
+#
+################################# Instruction for usage ######################################
 
 def default_args():
 

@@ -212,11 +212,11 @@ def save_plot(save_path, args, acc, plot_pred,plot_truth,actLabel_actName_dict):
         ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{actLabel_actName_dict[actLabel]}')
         truth = np.where(plot_truth==actLabel,1,0)
         ax2.plot(sample_numbers, truth, label=f'{actLabel_actName_dict[actLabel]}')
-    ax1.set_title(f'Prediction',fontsize=10)
-    ax1.set_ylabel(f'Prediction Probability')
+    ax1.set_title(f'Classification',fontsize=10)
+    ax1.set_ylabel(f'Confidence of Classification')
     ax2.set_title(f'Truth',fontsize=10)
     ax2.set_xlabel(f'Time [sec]')
-    ax2.set_ylabel(f'Prediction Probability')
+    ax2.set_ylabel(f'Confidence of Classification')
     plt.legend()
     if args.load_model is None:
         output_image = f"{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
@@ -232,7 +232,7 @@ def save_miscls_index(save_path,
     """
     record the misclassified index of window and corresponding frames, examine with data_visualization.py
     """
-    file_name = os.path.join(save_path,'mixcls_index.txt')
+    file_name = os.path.join(save_path,'miscls_index.txt')
     with open(file_name, 'w') as file:
         file.write(f'idx of misclassified window | check on dataset with:[start_frame, end_frame] | truth | prediction' + '\n')
         for mis_idx,exm_idxs,tru,pre in zip(miscls_win_index,examine_frame_index,true_labels,pred_labels):

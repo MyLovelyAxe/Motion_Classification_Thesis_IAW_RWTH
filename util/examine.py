@@ -153,10 +153,10 @@ def plot_ori_data(data_path,start_frame,end_frame,output_anim):
     ax2 = fig.add_subplot(1, 2, 2)
     x = np.arange(N_frames)
     dist_plots = [ax2.plot(x, dist_time[idx],label=f'{links}')[0] for idx,(links,joints) in enumerate(scales_dict.items())]
-    plt.legend()
     title_2 = f'Distances of limbs in frames {start_frame}-{end_frame}'
-    ### animation ###
+    plt.legend()
     plt.grid(True)
+    ### animation ###
     ani1 = animation.FuncAnimation(fig,plot_func,frames=N_frames,fargs=(ax1,joints_dict,coords,high_1,low_1,title_1,
                                                                         ax2,dist_plots,dist_time,title_2),interval=17)
     plt.show()

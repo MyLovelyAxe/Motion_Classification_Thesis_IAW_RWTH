@@ -5,13 +5,17 @@ import argparse
 from model.ML_models import Exp
 from util.utils import get_paths, load_config
 
-#############################################################################
+############################ Instruction for usage #################################
 #
-# in README.md:
-#       note that in order to do Cross experiment, run experiment in test.py
-#       the result is trained on loaded model and tested on test_exp_group
+# Please define these arguments:
 #
-#############################################################################
+#       1. load_model:
+#               the path of the trained model to load, i.e. path of a model.pickle
+#
+#       2. test_exp_group:
+#               select a group for testing
+#
+############################ Instruction for usage #################################
 
 def default_args():
 

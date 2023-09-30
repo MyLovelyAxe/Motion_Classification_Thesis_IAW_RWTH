@@ -22,7 +22,6 @@ This thesis theme is offered by M.Sc Apostolos Vrontos from [Institute of Indust
 * Pandas
 * Matplotlib
 * scikit-learn
-* jupyter
 
 ## Project Description
 
@@ -43,7 +42,7 @@ After the operation of preprocessing mentioned above, we split dataset into **tr
 
 ## Getting Started
 
-### 1) Prepare
+### 1) Configure env
 
 Firstly create a new env and install all necessary dependencies. If you are using **Anaconda** on **Linux**, you can directly run the following commands in terminal:
 
@@ -55,129 +54,68 @@ pip install -U matplotlib
 pip install -U scikit-learn
 ```
 
-And the whole directory structure is shown as follows.
+### 2) Create dataset
+
+Follow the steps to prepare and examine data for creating dataset.
+
+#### Step1: Generate exp_group
+
+**exp_group** is the folder containing trainset and testset data of one single user, whose name follow the naming-style **Dynamic/Static_username**, and whose folder structure is like the following example:
 
 ```
-└── root/
-    ├── data_visualization.py
-    ├── train.py
-    ├── plot_features.ipynb
-    ├── README.md
-    ├── Archiv/
-    ├── bash/
-    |   ├── exp_agree.sh
-    |   ├── exp_dynamic.sh
-    |   └── exp_static.sh
-    ├── dataloader/
-    |   └── ML_dataloader.py
-    ├── datasets/
-    |   ├── desired_features_trial.yaml
-    |   ├── desired_features.yaml
-    |   ├── Agree/
-    |   ├── Static/
-    |   └── Dynamic/
-    |       ├── testset/
-    |       |   └── dynamic_test_20230801/
-    |       |       ├── split_method.yaml
-    |       |       └── unknown.NoHead.csv
-    |       └── trainset/
-    |           ├── dynamic1_20230706/
-    |           |   ├── split_method.yaml
-    |           |   └── unknown.NoHead.csv
-    |           ├── dynamic2_20230706/
-    |           |   ├── split_method.yaml
-    |           |   └── unknown.NoHead.csv
-    |           └── dynamic3_20230706/
-    |               ├── split_method.yaml
-    |               └── unknown.NoHead.csv
-    ├── model/
-    |   ├── dynamic_models.py
-    |   └── static_models.py
-    ├── result/
-    |   ├── result1.png
-    |   └── result2.png
-    └── util/
-        ├── features.py
-        ├── plots.py
-        └── utils.py
+└── datasets/
+    └── Dynamic_user1/
+        ├── testset/
+        |   └── Test_Dynamic_user1/
+        |       ├── split_method.yaml
+        |       └── unknown.NoHead.csv
+        └── trainset/
+            ├── Train_Dynamic_user1_00_act1/
+            |   ├── split_method.yaml
+            |   └── unknown.NoHead.csv
+            ├── Train_Dynamic_user1_01_act2/
+            |   ├── split_method.yaml
+            |   └── unknown.NoHead.csv
+            └── Train_Dynamic_user1_02_act3/
+                ├── split_method.yaml
+                └── unknown.NoHead.csv
 ```
 
-Inside, the paths ```dataset/Static``` and ```dataset/Agree``` has similar structure as ```dataset/Dynamic```. Here to simplify, just show details inside ```dataset/Dynamic```. When create new datasets, please follow the **naming-rule**:
+The above exp_group **Dynamic_user1** defines 3 classes of activities. Due to recording methods, shot of each class of activity in **trainset** are saved separately, while **testset** not. Please refer to report for details.
 
-* Give the group experiment (i.e. new datasets) a specific name
-* Save train data and test data separately
-* If multiple ```.csv``` exist, keep them with own ```splid_method.yaml``` in corresponding folder
-* Please keep all ```.csv``` named as ```unknown.NoHead.csv```, and all .yaml for splitting named as ```split_method.yaml```
+In order to generate a exp_group:
 
-### 2) Check data
+1. Create a new ```/config/class_ExpName.yaml``` according to example ```/config/class_Morning.yaml```
+2. Edit arguments in ```generate_split_methods_trainset.py``` according to tips inside
+3. Run with: ```python generate_split_methods_trainset.py```
 
-The dataset can be customized based on raw data from .csv from Captury Live. Feel free to research on which **features** to select for dataset, which is directly used to train model.
 
-#### Step1: Edit .csv
+#### Step2: Cut .csv file
 
-**Important!!!**
-
-Due to version issue of Captury Live software on Ubuntu18, the .csv output has problems to number of columns in head-part, i.e. number of columns of these items differ from each other:
-
-* 1st row: recording information
-* 2nd row: number of frames
-* 3rd row: names of coordinates / joints
-* 4th row: coordinates signs
-* 5th row: unit of coordinates
-* last rows: camera calibration configuration
-
-As a reusult, it is difficult to directly extract data from raw .csv with Pandas, which needs manual editing. Please follow the steps below:
-
-* 1. manually delete first 5 rows and last rows of camera calibration configuration
-* 2. rename .csv as ```unknown.NoHead.csv```
-* 3. move ```unknown.NoHead.csv``` under path ```/dataset/name_of_your_raw_data/```
-
-#### Step2: Check data by plotting
-
-Run this script in terminal under **root path**, to plot the segment with default arguments:
+The form of initial csv files output from Captury Live have problem to be converted into ```numpy.array```. Hence, some of lines need to be cut off.
+Move the ```unknown.csv``` under same path with ```cut_csv.py```, run ```cut_csv.py``` with:
 
 ```
-python data_visualization.py --function "check_ori_data" --single_data_path "dataset/Agree/trainset/agree_20230801" --start_frame 0 --end_frame 200
+python cut_csv.py
 ```
 
-Also, you can edit the arguments which you want to check:
+Then a ```unknown.NoHead.csv``` will be generated under same path. And paste the ```unknown.NoHead.csv``` under corresponding location in **exp_group**
 
-| args | Type | Description |
-|--|--|--|
-| --single_data_path | str | edit to the path where your ```unknown.NoHead.csv``` is located |
-| --start_frame | int | from which frame to plot |
-| --end_frame | int | to which frame to plot |
-| --output_anim | bool | set it as True if you want to output the animation of selected segments (defaultly set as False) |
+#### Step3: Check data by plotting
 
-#### Step3: Create split_method.yaml
+Check the Original Data $Arr_{ori}$ from ```unknown.NoHead.csv``` from **Step2** with function **check_ori_data**, by editing the arguments according to instruction in ```data_visualization.py``` and running it with:
 
-Oringinal data only have coordinates of joints, without label. Manually labelling should be done in this step. The examples below is for the prepared dataset, you can always customized your own:
+```
+python data_visualization.py
+```
 
-1. Static Activity
+#### Step4: Edit ```split_methods.yaml``` for testset
 
-| label | Abbreviation | Description |
-|-------|--------------|-------------|
-|1| HandNear | hold hands near body |
-|2| HandAway | hold hands away from body |
-|3| HandOverHead | hands over head |
-|4| PhoneLH | hold phone with left hand |
-|5| PhoneRH | hold phone with right hand |
-    
-2. Dynamic Activity
+Note that due to recording methods, **trainset** consists of shots with same frames, each of shot contains only one activity, hence the ```split_methods.yaml``` can be generated automatically by ```generate_split_methods_trainset.py```. While **testset** consists of only one shot with all activities for testing, the concrete ```split_methods.yaml``` need to be manully edited with help of function **check_ori_data** in ```data_visualization.py```.
 
-| label | Abbreviation | Description |
-|-------|--------------|-------------|
-|1| Walking | Walking |
-|2| Jumping | Jumping |
-|3| Squating | Squating |
-|4| Waving | Waving |
-|5| Reaching | Reaching out for a cup |
-|6| Drinking | Drinking from a cup |
-|7| Boxing | Reaching out left and right arms alternatively |
-|8| Bicep | Bicep curl |
-|9| JumpJack | Jumping jack |
+Refer to **Step3** for how to use ```data_visualization.py```.
 
-According the examples above, you need to customized your own ```split_method.yaml```, which is vital when split orginal data and labelling. Check this example from one ```split_method.yaml```:
+Refer to example below to manully edit ```split_methods.yaml``` for testset(number after activity name indicates how many same activities appear in current shot, e.g. None1, None2):
 
 ```
 None1:            # None class is for unexplicit or transitional movement between defined classes
@@ -196,22 +134,11 @@ Boxing2:
   start: 680
   end: 860
   label: 7
-None3:
-  start: 860
-  end: 1770
-  label: 0
-Bicep1:
-  start: 1770
-  end: 2160
-  label: 8
 ```
 
-In order to obtain the value of **start** and **end** of each segment, you have to repeat **Step2: Check data by plotting** manually to define them.
+#### Step5: Edit desired_features.yaml
 
-
-#### Step4: Edit desired_features.yaml
-
-Following the example inside ```dataset/desired_features.yaml```, you can customize which features which you want to add into your final dataset to train.
+Edit ```config/desired_features.yaml``` to determine which features which you want to add into your final dataset to train. E.g.:
 
 ```
 desired_dists:
@@ -223,7 +150,12 @@ desired_angles:
   - LWrist_LElbow_LShoulder
 ```
 
-All joints to be selected and corresponding index is shown below:
+The rule of defining feature's name is as following:
+
+* distance features: joint1_joint2
+* angle features: joint1_joint2_joint3 (joint2 is vertex of the angle)
+
+All joints' names to be selected and corresponding index is shown below:
 
 | Index | Abbreviation | Joint |
 |--|--|--|
@@ -256,101 +188,47 @@ All joints to be selected and corresponding index is shown below:
 
 <img src="Archive/joint_index.jpg" alt="My Image" width="350" height="450">
 
-The rule of defining feature's name is as following:
+Refer to report for more details.
 
-* distance features: joint1_joint2
-* angle features: joint1_joint2_joint3 (joint2 is vertex of the angle)
+#### Step6: Verify features
 
-#### Step5: Verify features
+Use function **verify_before_output** in ```data_visualization.py``` to check whether there are errors in calcualtion of Frame Feature Array $Arr_{ff}$. Refer to **Step3** for how to use ```data_visualization.py```.
 
-Use features definded in ```dataset/desired_features_trial.yaml``` to verify whether calculation of features are correct by plotting, and check the fft of randomly selected windows, with command:
+### 3) Plot meta-feature
 
-```
-python data_visualization.py --function "verify_before_output" --single_data_path "dataset/Agree/trainset/agree_20230801" --wl 51
-```
+To get a intuition of periodical behavior of window Window Feature Array $Arr_{wf}$, run ```plot_features.ipynb``` to visualize meta-features. Refer to ```plot_features.ipynb``` for usage. Refer to report for details about **windowlization** and **calculation of meta-features**.
 
-Also, you can edit the arguments which you want to check:
+### 4) Train & Test
 
-| args | Type | Description |
-|--|--|--|
-| --single_data_path | str | edit to the path where your ```unknown.NoHead.csv``` is located |
-| --wl | int | the window size for one window, please make it as odd number |
+#### 1. Train model
 
-You can see corresponding message if there are incorrect calculation. But usually it shows difference as long as there are error within 10e-5, which is totally bearable for most of the cases.
-
-### 3) Windows
-
-#### Shape of data
-
-The generated dataset has shape: **[num_frames,num_features]**, where:
+Edit arguments in ```train.py``` according to instructions inside. And run by:
 
 ```
-num_frames:     the number of frames in current dataset
-num_features:   the number of features of each frame, i.e. num_dist + num_dist_rate + num_angle + num_angle_rate
-num_dist:       the number of distance features, e.g. distance between LWrist and head
-num_dist_rate:  the number of rate of change of distance features, which is equal to num_dist
-num_dist:       the number of angle features, e.g. angle of LWrist with edges passing LHandEnd and LElbow
-num_dist_rate:  the number of rate of change of angle features, which is equal to num_dist
+python train.py
 ```
 
-In dataloader, generated dataset would be windowlized based on defined **window_size**. Then each window contains multiple frames, and metrics of all features within in each window (i.e. meta-features) would be calculated. Hence, the final shape of data into model is: **[num_win,num_features*num_metrics]**, where:
+Note that
 
-```
-num_win:        the number of windows, equal to **num_frames-window_size**
-num_features:   the number of features of each frame as before
-num_metrics:    the number of meta-features which describe statistical features of each window
-```
+1. **Cross Test** means that train on trainset of train_exp_group, i.e. from user1, and test on testset of test_exp_group, i.e. from user2.
+1. **NonCross Test** means that train and test on same exp_group, i.e. current train_exp_group from one user
 
-And the metrics are:
+#### 2. Outputs
 
-| Metric | Description |
-|--|--|
-| mean | mean of specific feature in one window |
-| std | standard deviation of specific feature in one window |
-| top_max_mean | mean of N-highest maximum of specific feature in one window |
-| top_min_mean | mean of N-lowest minimum of specific feature in one window |
-| max_min_range | top_max_mean - top_min_mean |
-| kurtosis | (https://www.scribbr.com/statistics/kurtosis/#:~:text=Kurtosis%20is%20a%20measure%20of,(medium%20tails)%20are%20mesokurtic.) |
-| skewness | (https://www.scribbr.com/statistics/skewness/) |
+Every time ```train.py``` is successfully run, a folder with outputs is generated. In the folder, there are 4 forms of results or outputs:
 
-#### Plot features of window
+1. PNG picture:         performance of accuracy of testing, both classification result and truth
+2. arg.yaml:            configuration of current experiment, for extra testing in ```test.py``` and loading later, if necessary
+3. miscls_index.txt:    index of misclassified windows, indices of frames making up these windows
+4. model.pickle:        trained model in current experiment, for extra testing in ```test.py``` and loading later, if necessary
 
-With ```plot_features.ipynb```, you can try to load data with dynamic dataloader (static case doesn't have windows). Inside the .ipynb, you can follow the instruction to see plot of each meta-features of all activities, all windows, and all featuers.
+#### 3. Extra testing
 
-### 4) Train model
-
-#### Machine learning model
-
-The model we choose for classification are RandomForest, KNN, and SVM.
-
-You can run the script files in ```/bash``` to directly run trainings.
-
-We take example of **Dynamic** group, you can run by:
-
-```
-bash exp_dynamic.sh KNN 1 200
-```
-
-where the 3 passed arguments mean:
-
-* **KNN**:  use KNN model
-* **0**:    0 means not use external testset for testing, change to 1 to use external testset
-* **200**:  window size
-
-Similar for **RandomForest** and **SVM**:
-
-```
-bash exp_dynamic.sh RandomForest 1 200
-bash exp_dynamic.sh SVM 0 200
-```
-
-**PS**: some other parameters for specific model can be edited inside ```.sh```, e.g. ```n_neighbor``` for **KNN**, ```max_depth``` for **RandomForest**.
+You can define which trainset and which testset to train and test, but you can also load a trained model output from ```train.py``` and designate a new testset to test it with ```test.py```. Refer to instructions inside ```test.py``` for usage.
 
 ### 5) Post processing
 
-You can check the misclassified windows with ```PostProcess.ipynb```.
-
-Inside ```PostProcess.ipynb```, choose the desired experiments to train, and get the misclassified indices. With these indices, go to ```data_visualization.py``` to plot the corresponding frames or windows.
+Get frames of misclassified windows in ```miscls.txt```, and visualize corresponding windows ```data_visualization.py```, under function **post_process**. Refer to **2) Step3** for usage.
 
 ## Contact
 
