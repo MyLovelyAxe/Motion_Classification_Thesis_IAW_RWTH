@@ -90,11 +90,11 @@ The above exp_group **Dynamic_user1** defines 3 classes of activities **act1**, 
 
 In order to generate a exp_group under ```/dataset```:
 
-1. Create a new ```/config/class_ExpName.yaml``` according to example ```/config/class_Morning.yaml```
+1. Create a new ```/config/class_ExpName.yaml``` according to example ```/config/class_Static.yaml```
 2. Edit arguments in ```generate_split_methods_trainset.py``` according to instructions inside
 3. Run with: ```python generate_split_methods_trainset.py```
 
-Note that the ```/config/class_ExpName.yaml``` should follow naming style: **actName: actLabel**, actName is the abbreviation of activity name, which will be presented in plot of performance at last, actLabel is integer representing class of activity. Refer to example ```/config/class_Morning.yaml```.
+Note that the ```/config/class_ExpName.yaml``` should follow naming style: **actName: actLabel**, actName is the abbreviation of activity name, which will be presented in plot of performance at last, actLabel is integer representing class of activity. Refer to example ```/config/class_Static.yaml```.
 
 #### Step2: Cut .csv file
 

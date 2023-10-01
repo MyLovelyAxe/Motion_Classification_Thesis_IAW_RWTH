@@ -19,8 +19,8 @@ import yaml
 
 parser = argparse.ArgumentParser(description='generate split_methods.yaml for trainset of each new exp_group')
 
-parser.add_argument('--exp_class',type=str,default='config/class_Static_trial.yaml',help='names and labels of activities')
-parser.add_argument('--exp_group',type=str,default='Static_Jialei_trial',help='name of exp group in dataset, naming style: groupName_user')
+parser.add_argument('--exp_class',type=str,default='config/class_Static.yaml',help='names and labels of activities')
+parser.add_argument('--exp_group',type=str,default='Static_Apostolos_trial',help='name of exp group in dataset, naming style: groupName_user')
 parser.add_argument('--record_time',type=int,default=20,help='number of seconds of recorded shot, unit: sec')
 
 args = parser.parse_args()
