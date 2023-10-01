@@ -206,7 +206,7 @@ def save_plot(save_path, args, acc, plot_pred,plot_truth,actLabel_actName_dict):
     """
     save performance of current experiment as plot for prediction and target
     """
-    sample_numbers = np.arange(plot_pred.shape[0])/60 # frame_rate=60
+    sample_numbers = np.arange(plot_pred.shape[0])#/60 # frame_rate=60
     _, (ax1, ax2) = plt.subplots(2, 1, figsize=(8,13))
     for idx,(actLabel,_) in enumerate(actLabel_actName_dict.items()):
         ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{actLabel_actName_dict[actLabel]}')
