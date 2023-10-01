@@ -197,7 +197,7 @@ All joints' names to be selected and corresponding index is shown below:
 |24| spine5 | 5th spinal joint from spine1 |
 |25| head | head vertex |
 
-<img src="Archive/joint_index.jpg" alt="My Image" width="350" height="450">
+<img src="Archive/joint_index.jpg" alt="My Image" width="150" height="450">
 
 Refer to report for more details.
 
