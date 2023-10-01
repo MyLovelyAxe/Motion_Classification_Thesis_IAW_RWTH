@@ -212,12 +212,12 @@ def save_plot(save_path, args, acc, plot_pred,plot_truth,actLabel_actName_dict):
         ax1.plot(sample_numbers, plot_pred[:, idx], label=f'{actLabel_actName_dict[actLabel]}')
         truth = np.where(plot_truth==actLabel,1,0)
         ax2.plot(sample_numbers, truth, label=f'{actLabel_actName_dict[actLabel]}')
-    ax1.set_title(f'Classification',fontsize=10)
-    ax1.set_ylabel(f'Confidence of Classification')
-    ax2.set_title(f'Truth',fontsize=10)
-    ax2.set_xlabel(f'Time [sec]')
-    ax2.set_ylabel(f'Confidence of Classification')
-    plt.legend()
+    ax1.set_title(f'Result of classification',fontsize=20)
+    ax1.set_ylabel(f'Probability of Classification',fontsize=20)
+    ax2.set_title(f'Ground truth',fontsize=20)
+    ax2.set_xlabel(f'Windows',fontsize=20)
+    ax2.set_ylabel(f'Probability of Classification',fontsize=20)
+    plt.legend(fontsize=15)
     if args.load_model is None:
         output_image = f"{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
     else:
