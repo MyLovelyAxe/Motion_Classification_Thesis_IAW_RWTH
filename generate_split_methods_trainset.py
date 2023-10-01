@@ -7,8 +7,11 @@ import yaml
 #   When a new exp_group is designed:
 #
 #       1. write corresponding config/class_groupName.yaml to name activities and labels
-#       2. run this script to generate split_methods.yaml for each activity of trainset of this exp_group
-#       3. note that split_methods.yaml of testset needs manually edition
+#       2. change argument 'exp_class' with new 'config/class_groupName.yaml'
+#       3. change argument 'exp_group' with name of exp_group according to naming style: groupName_user
+#       4. change argument 'record_time' with shot duration of trainset, defaultly 20s
+#       5. run this script to generate split_methods.yaml for each activity of trainset for this exp_group
+#       6. note that split_methods.yaml of testset needs manually edition
 #
 #   The config/class_Morning.yaml is an example to play with
 #
@@ -16,9 +19,9 @@ import yaml
 
 parser = argparse.ArgumentParser(description='generate split_methods.yaml for trainset of each new exp_group')
 
-parser.add_argument('--exp_class',type=str,default='config/class_Morning.yaml',help='names and labels of activities')
-parser.add_argument('--exp_group',type=str,default='Morning',help='name of exp group in dataset')
-parser.add_argument('--record_time',type=int,default=20,help='number of seconds of recorded shot')
+parser.add_argument('--exp_class',type=str,default='config/class_Static_trial.yaml',help='names and labels of activities')
+parser.add_argument('--exp_group',type=str,default='Static_Jialei_trial',help='name of exp group in dataset, naming style: groupName_user')
+parser.add_argument('--record_time',type=int,default=20,help='number of seconds of recorded shot, unit: sec')
 
 args = parser.parse_args()
 

@@ -34,11 +34,11 @@ def default_args():
     parser.add_argument('--train_exp_group',type=str,default='Static_Jialei',
                         choices=['Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
-                        help='Select one group of training & testing')
+                        help='Select one group of training')
     parser.add_argument('--test_exp_group',type=str,default='Static_Apostolos',
                         choices=['Dynamic_Jialei','Dynamic_Apostolos',
                                  'Static_Jialei','Static_Apostolos'],
-                        help='Select one group of training & testing')
+                        help='Select one group of testing')
     
     ###### path of data and config files ######
     parser.add_argument('--train_split_method_paths', type=list, help='paths of split methods for trainset')

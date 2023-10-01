@@ -1,3 +1,5 @@
+import os
+import argparse
 import pandas as pd
 
 #############################################################################################
@@ -19,7 +21,36 @@ import pandas as pd
 #
 #############################################################################################
 
-ori_csv_path = 'unknown.csv'
-ori_csv = pd.read_csv(ori_csv_path ,header=None, low_memory=False)
-noHead_csv = ori_csv.iloc[5:-10]
-noHead_csv.to_csv('unknown.NoHead.csv',header=None,index=False)
+parser = argparse.ArgumentParser(description='Cut heads and tails in original csv')
+parser.add_argument('--exp_group', type=str, default='Static_Jialei_trial',
+                    help='cut csv files in which exp_group')
+args = parser.parse_args()
+
+def cut_csv(exp_group,train_or_test):
+    """
+    cut off redundant information in orignal unknown.csv
+    """
+    print(f'/dataset/{exp_group}/{train_or_test}')
+    set_path = os.path.join('dataset',exp_group,train_or_test)
+    set_path_lst = os.listdir(set_path)
+    set_path_lst.sort()
+    for shot_path in set_path_lst:
+        print(shot_path)
+        unknown_csv_path = os.path.join(set_path,shot_path,'unknown.csv')
+        Nohead_csv_path = os.path.join(set_path,shot_path,'unknown.NoHead.csv')
+        ori_csv = pd.read_csv(unknown_csv_path ,header=None, low_memory=False)
+        noHead_csv = ori_csv.iloc[5:-10]
+        noHead_csv.to_csv(Nohead_csv_path,header=None,index=False)
+
+def main():
+    """
+    cut trainset and testset separately
+    """
+    # trainset
+    cut_csv(exp_group=args.exp_group,train_or_test='trainset')
+    # testset
+    cut_csv(exp_group=args.exp_group,train_or_test='testset')
+
+if __name__ == '__main__':
+
+    main()

@@ -21,9 +21,9 @@ def extract_path(group_path,train_or_test):
     set_path_lst.sort()
     split_method_paths = []
     data_paths = []
-    for train_path in set_path_lst:
-        split_method_paths.append(os.path.join(set_path,train_path,'split_method.yaml'))
-        data_paths.append(os.path.join(set_path,train_path,'unknown.NoHead.csv'))
+    for shot_path in set_path_lst:
+        split_method_paths.append(os.path.join(set_path,shot_path,'split_method.yaml'))
+        data_paths.append(os.path.join(set_path,shot_path,'unknown.NoHead.csv'))
     return split_method_paths,data_paths
 
 def get_paths(args):

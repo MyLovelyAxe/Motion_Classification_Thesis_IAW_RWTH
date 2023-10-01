@@ -47,11 +47,12 @@ After the operation of preprocessing mentioned above, we split dataset into **tr
 Firstly create a new env and install all necessary dependencies. If you are using **Anaconda** on **Linux**, you can directly run the following commands in terminal:
 
 ```
-conda create --name MotionClass python
+conda create --name ActClass python
 pip install numpy
 pip install pandas
 pip install -U matplotlib
 pip install -U scikit-learn
+pip install pyyaml
 ```
 
 ### 2) Create dataset
@@ -60,7 +61,7 @@ Follow the steps to prepare and examine data for creating dataset.
 
 #### Step1: Generate exp_group
 
-**exp_group** is the folder containing trainset and testset data of one single user, whose name follow the naming-style **Dynamic/Static_username**, and whose folder structure is like the following example:
+**exp_group** is the folder containing trainset and testset data of one single user, whose name follow the naming-style **Dynamic/Static_username**. Folder structure of a whole **exp_group** is like the following example:
 
 ```
 └── datasets/
@@ -68,38 +69,48 @@ Follow the steps to prepare and examine data for creating dataset.
         ├── testset/
         |   └── Test_Dynamic_user1/
         |       ├── split_method.yaml
+        |       ├── unknown.csv
         |       └── unknown.NoHead.csv
         └── trainset/
             ├── Train_Dynamic_user1_00_act1/
             |   ├── split_method.yaml
+            |   ├── unknown.csv
             |   └── unknown.NoHead.csv
             ├── Train_Dynamic_user1_01_act2/
             |   ├── split_method.yaml
+            |   ├── unknown.csv
             |   └── unknown.NoHead.csv
             └── Train_Dynamic_user1_02_act3/
                 ├── split_method.yaml
+                ├── unknown.csv
                 └── unknown.NoHead.csv
 ```
 
-The above exp_group **Dynamic_user1** defines 3 classes of activities. Due to recording methods, shot of each class of activity in **trainset** are saved separately, while **testset** not. Please refer to report for details.
+The above exp_group **Dynamic_user1** defines 3 classes of activities **act1**, **act2** and **act3**. Due to recording methods, shot of each class of activity in **trainset** are saved separately, while **testset** not. Please refer to report for details.
 
-In order to generate a exp_group:
+In order to generate a exp_group under ```/dataset```:
 
 1. Create a new ```/config/class_ExpName.yaml``` according to example ```/config/class_Morning.yaml```
-2. Edit arguments in ```generate_split_methods_trainset.py``` according to tips inside
+2. Edit arguments in ```generate_split_methods_trainset.py``` according to instructions inside
 3. Run with: ```python generate_split_methods_trainset.py```
 
+Note that the ```/config/class_ExpName.yaml``` should follow naming style: **actName: actLabel**, actName is the abbreviation of activity name, which will be presented in plot of performance at last, actLabel is integer representing class of activity. Refer to example ```/config/class_Morning.yaml```.
 
 #### Step2: Cut .csv file
 
 The form of initial csv files output from Captury Live have problem to be converted into ```numpy.array```. Hence, some of lines need to be cut off.
-Move the ```unknown.csv``` under same path with ```cut_csv.py```, run ```cut_csv.py``` with:
+
+**!!! Important: Manually paste unknown.csv!!!**
+
+Firstly, paste the ```unknown.csv``` under corresponding path which are generated in **step1**, e.g. ```unknown.csv``` trainset shot of dynamic activity **Walking** of user1 will be pasted under ```/dataset/Dynamic_user1/trainset/Train_Dynamic_user1_01_Walking```.
+
+Secondly, run ```cut_csv.py``` with:
 
 ```
 python cut_csv.py
 ```
 
-Then a ```unknown.NoHead.csv``` will be generated under same path. And paste the ```unknown.NoHead.csv``` under corresponding location in **exp_group**
+Then a ```unknown.NoHead.csv``` will be generated under same path.
 
 #### Step3: Check data by plotting
 
@@ -111,7 +122,7 @@ python data_visualization.py
 
 #### Step4: Edit ```split_methods.yaml``` for testset
 
-Note that due to recording methods, **trainset** consists of shots with same frames, each of shot contains only one activity, hence the ```split_methods.yaml``` can be generated automatically by ```generate_split_methods_trainset.py```. While **testset** consists of only one shot with all activities for testing, the concrete ```split_methods.yaml``` need to be manully edited with help of function **check_ori_data** in ```data_visualization.py```.
+Note that due to recording methods, **trainset** consists of shots with same frames, each of shot contains only one activity, hence the ```split_methods.yaml``` can be generated automatically by ```generate_split_methods_trainset.py``` in **step1**. While **testset** consists of only one shot with all activities for testing, the ```split_methods.yaml``` need to be manully edited with help of function **check_ori_data** in ```data_visualization.py```.
 
 Refer to **Step3** for how to use ```data_visualization.py```.
 
@@ -120,9 +131,9 @@ Refer to example below to manully edit ```split_methods.yaml``` for testset(numb
 ```
 None1:            # None class is for unexplicit or transitional movement between defined classes
   start: 0        # starts from the "end" of previous class
-  end: 220        # ends from the "start" of next class
+  end: 220        # ends at the "start" of next class
   label: 0        # label as 0
-Boxing1:          # Name = Abbreviation(from above) + x-th segment with same activity
+Boxing1:          # Name = Abbreviation of activity + x-th segment with same activity
   start: 220      # start: from which frame belong to this segment of activity
   end: 480        # end: to which frame belong to this segment of activity
   label: 7        # label: customized label of this activity
@@ -138,7 +149,7 @@ Boxing2:
 
 #### Step5: Edit desired_features.yaml
 
-Edit ```config/desired_features.yaml``` to determine which features which you want to add into your final dataset to train. E.g.:
+Edit ```config/desired_features.yaml``` to determine which features you want to add into your final dataset to train. E.g.:
 
 ```
 desired_dists:
@@ -215,7 +226,7 @@ Note that
 
 #### 2. Outputs
 
-Every time ```train.py``` is successfully run, a folder with outputs is generated. In the folder, there are 4 forms of results or outputs:
+Every time ```train.py``` is successfully run, a folder with outputs is generated. In the folder, there are 4 forms of results:
 
 1. PNG picture:         performance of accuracy of testing, both classification result and truth
 2. arg.yaml:            configuration of current experiment, for extra testing in ```test.py``` and loading later, if necessary

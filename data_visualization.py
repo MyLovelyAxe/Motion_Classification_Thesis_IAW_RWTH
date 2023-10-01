@@ -4,7 +4,7 @@ from util.examine import plot_ori_data,verification,output_dataset,get_feature_s
 
 ################################# Instruction for usage ######################################
 #
-# Please define argument --function and other arguments following:
+# Please define argument --function for what you want to do and other arguments following:
 #
 #      1. check_ori_data:
 #
