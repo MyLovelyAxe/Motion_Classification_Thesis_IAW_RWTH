@@ -22,10 +22,10 @@ def default_args():
     parser = argparse.ArgumentParser(description='Machine learning method on classification of human activities from skeleton data')
 
     ###### only define these arguments ######
-    parser.add_argument('--load_model', type=str, default='save/28_Sep_15_09-Cross-Train_Static_Jialei-Test_Static_Apostolos-RandomForest-wl100-MaxDepth6-RandomState0')
-    parser.add_argument('--test_exp_group',type=str,default='Static_Jialei',
-                        choices=['Dynamic_Jialei','Dynamic_Apostolos',
-                                 'Static_Jialei','Static_Apostolos'],
+    parser.add_argument('--load_model', type=str, default='save/02_Oct_13_18-Train_Static_User1-Test_Static_User2-RandomForest-wl100-MaxDepth6-RandomState0')
+    parser.add_argument('--test_exp_group',type=str,default='Static_User1',
+                        choices=['Dynamic_User1','Dynamic_User2',
+                                 'Static_User1','Static_User'],
                         help='Select one group of training & testing')
 
     ###### datasets parameters ######

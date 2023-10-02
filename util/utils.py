@@ -33,11 +33,10 @@ def get_paths(args):
         - testset from M .csv files
         (N>=1, M>=1)
     """
+    if not args.cross_test:
+        args.test_exp_group = args.train_exp_group
     train_group_path = os.path.join('dataset',args.train_exp_group)
-    if args.cross_test:
-        test_group_path = os.path.join('dataset',args.test_exp_group)
-    else:
-        test_group_path = train_group_path
+    test_group_path = os.path.join('dataset',args.test_exp_group)
     # trainset
     args.train_split_method_paths,args.trainset_paths = extract_path(group_path=train_group_path,train_or_test='trainset')
     # testset
@@ -173,7 +172,7 @@ def get_output_name(args):
     """
     ### load trained model or not
     if args.load_model is None:
-        output_name = f'{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}'
+        output_name = f'{args.start_time}-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}'
         if args.model == 'KNN':
             output_folder = output_name + f"-NNeighbor{args.n_neighbor}"
         elif args.model == 'RandomForest':
@@ -219,7 +218,7 @@ def save_plot(save_path, args, acc, plot_pred,plot_truth,actLabel_actName_dict):
     ax2.set_ylabel(f'Probability of Classification',fontsize=20)
     plt.legend(fontsize=15)
     if args.load_model is None:
-        output_image = f"{args.start_time}-Cross-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
+        output_image = f"{args.start_time}-Train_{args.train_exp_group}-Test_{args.test_exp_group}-{args.model}-wl{args.window_size}-Acc{round(acc, 3)}.png"
     else:
         output_image = '{}-load[{}]-test_{}-Acc{}.png'.format(args.start_time,args.load_model.split('/')[1],args.test_exp_group,round(acc, 3))
     plt.savefig(os.path.join(save_path,output_image))

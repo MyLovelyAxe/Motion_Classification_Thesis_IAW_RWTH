@@ -31,13 +31,13 @@ def default_args():
     ###### select exp_group ######
     parser.add_argument('--cross_test', type=bool, default=True,
                         help='True: train with user1 trainset, test with user2 testset; False: train and test with data of same user')
-    parser.add_argument('--train_exp_group',type=str,default='Static_Jialei',
-                        choices=['Dynamic_Jialei','Dynamic_Apostolos',
-                                 'Static_Jialei','Static_Apostolos'],
+    parser.add_argument('--train_exp_group',type=str,default='Static_User1',
+                        choices=['Dynamic_User1','Dynamic_User2',
+                                 'Static_User1','Static_User2'],
                         help='Select one group of training')
-    parser.add_argument('--test_exp_group',type=str,default='Static_Apostolos',
-                        choices=['Dynamic_Jialei','Dynamic_Apostolos',
-                                 'Static_Jialei','Static_Apostolos'],
+    parser.add_argument('--test_exp_group',type=str,default='Static_User2',
+                        choices=['Dynamic_User1','Dynamic_User2',
+                                 'Static_User1','Static_User2'],
                         help='Select one group of testing')
     
     ###### path of data and config files ######
