@@ -55,13 +55,46 @@ pip install -U scikit-learn
 pip install pyyaml
 ```
 
-### 2) Create dataset
+### 2) Record shot with Captury Live
+
+The original data of this project is from Captury Live, which outputs abandunt forms of data. We only use the ```unknown.csv```.
+
+Please build the original data according to the following points in order to run this repo successfully:
+
+1. Save each ```unknown.csv``` in a sub-folder, without change csv's name
+2. Name the sub-folders with style: **TrainOrTest_ExpGroup_2DigitActLabel_ActAbbreviation**, e.g. **Train_Dynamic_Jialei_00_None**.
+  Attention:
+    1) ExpGroup consists of DynamicOrStatic_UserName
+    2) Make sure the ActLabel is 2-digital starting with 0
+    3) use the same ActAbbreviation when editing ```split_method.yaml``` for testset in **3) Step4**
+3. Save train data in ```ori_csv/ExpGroup/trainset``` and test data in ```ori_data/ExpGroup/testset```. For example, a folder for one ExpGroup **Static_Jialei** has such structure:
+
+```
+└── ori_csv/
+    └── Static_Jialei/
+        ├── testset/
+        |   └── Test_Static_Jialei/
+        |       └── unknown.csv
+        └── trainset/
+            ├── Train_Static_Jialei_00_None/
+            |   └── unknown.csv
+            ├── Train_Static_Jialei_01_ExtendArm/
+            |   └── unknown.csv
+            ├── Train_Static_Jialei_02_RetractArm/
+            |   └── unknown.csv
+            ├── Train_Static_Jialei_03_HandOverHead/
+            |   └── unknown.csv
+            └── Train_Static_Jialei_04_Phone/
+                └── unknown.csv
+```
+
+### 3) Create dataset
 
 Follow the steps to prepare and examine data for creating dataset.
 
-#### Step1: Generate exp_group
+#### Step1: Generate exp_group & cut csv
 
-**exp_group** is the folder containing trainset and testset data of one single user, whose name follow the naming-style **Dynamic/Static_username**. Folder structure of a whole **exp_group** is like the following example:
+Firstly, **exp_group** is the folder containing trainset and testset data of one single user, whose name follow the naming-style **Dynamic/Static_username**. Folder structure of a complete **exp_group** is like the following example:
 
 ```
 └── datasets/
@@ -69,62 +102,44 @@ Follow the steps to prepare and examine data for creating dataset.
         ├── testset/
         |   └── Test_Dynamic_user1/
         |       ├── split_method.yaml
-        |       ├── unknown.csv
         |       └── unknown.NoHead.csv
         └── trainset/
             ├── Train_Dynamic_user1_00_act1/
             |   ├── split_method.yaml
-            |   ├── unknown.csv
             |   └── unknown.NoHead.csv
             ├── Train_Dynamic_user1_01_act2/
             |   ├── split_method.yaml
-            |   ├── unknown.csv
             |   └── unknown.NoHead.csv
             └── Train_Dynamic_user1_02_act3/
                 ├── split_method.yaml
-                ├── unknown.csv
                 └── unknown.NoHead.csv
 ```
 
 The above exp_group **Dynamic_user1** defines 3 classes of activities **act1**, **act2** and **act3**. Due to recording methods, shot of each class of activity in **trainset** are saved separately, while **testset** not. Please refer to report for details.
 
+Note that the ```/config/class_ExpName.yaml``` should follow naming style: **actName: actLabel**, actName is the abbreviation of activity name, which will be presented in plot of performance at last, actLabel is integer representing class of activity. Refer to example ```/config/class_Static.yaml```.
+
+Secondly, original ```unknown.csv``` files from Captury Live has redandunt information. Hence, some of lines need to be cut off.
+
 In order to generate a exp_group under ```/dataset```:
 
 1. Create a new ```/config/class_ExpName.yaml``` according to example ```/config/class_Static.yaml```
-2. Edit arguments in ```generate_split_methods_trainset.py``` according to instructions inside
-3. Run with: ```python generate_split_methods_trainset.py```
+2. Edit arguments in ```prepare_exp_group.py``` according to instructions inside
+3. Run with: ```python prepare_exp_group.py```
 
-Note that the ```/config/class_ExpName.yaml``` should follow naming style: **actName: actLabel**, actName is the abbreviation of activity name, which will be presented in plot of performance at last, actLabel is integer representing class of activity. Refer to example ```/config/class_Static.yaml```.
+#### Step2: Check data by plotting
 
-#### Step2: Cut .csv file
-
-The form of initial csv files output from Captury Live have problem to be converted into ```numpy.array```. Hence, some of lines need to be cut off.
-
-**!!! Important: Manually paste unknown.csv!!!**
-
-Firstly, paste the ```unknown.csv``` under corresponding path which are generated in **step1**, e.g. ```unknown.csv``` trainset shot of dynamic activity **Walking** of user1 will be pasted under ```/dataset/Dynamic_user1/trainset/Train_Dynamic_user1_01_Walking```.
-
-Secondly, run ```cut_csv.py``` with:
-
-```
-python cut_csv.py
-```
-
-Then a ```unknown.NoHead.csv``` will be generated under same path.
-
-#### Step3: Check data by plotting
-
-Check the Original Data $Arr_{ori}$ from ```unknown.NoHead.csv``` from **Step2** with function **check_ori_data**, by editing the arguments according to instruction in ```data_visualization.py``` and running it with:
+Check the Original Data $Arr_{ori}$ from ```unknown.NoHead.csv``` from **Step1** with function **check_ori_data**, by editing the arguments according to instruction in ```data_visualization.py``` and running it with:
 
 ```
 python data_visualization.py
 ```
 
-#### Step4: Edit ```split_methods.yaml``` for testset
+#### Step3: Edit ```split_methods.yaml``` for testset
 
 Note that due to recording methods, **trainset** consists of shots with same frames, each of shot contains only one activity, hence the ```split_methods.yaml``` can be generated automatically by ```generate_split_methods_trainset.py``` in **step1**. While **testset** consists of only one shot with all activities for testing, the ```split_methods.yaml``` need to be manully edited with help of function **check_ori_data** in ```data_visualization.py```.
 
-Refer to **Step3** for how to use ```data_visualization.py```.
+Refer to **Step2** for how to use ```data_visualization.py```.
 
 Refer to example below to manully edit ```split_methods.yaml``` for testset(number after activity name indicates how many same activities appear in current shot, e.g. None1, None2):
 
@@ -147,7 +162,7 @@ Boxing2:
   label: 7
 ```
 
-#### Step5: Edit desired_features.yaml
+#### Step4: Edit desired_features.yaml
 
 Edit ```config/desired_features.yaml``` to determine which features you want to add into your final dataset to train. E.g.:
 
@@ -201,9 +216,9 @@ All joints' names to be selected and corresponding index is shown below:
 
 Refer to report for more details.
 
-#### Step6: Verify features
+#### Step5: Verify features
 
-Use function **verify_before_output** in ```data_visualization.py``` to check whether there are errors in calcualtion of Frame Feature Array $Arr_{ff}$. Refer to **Step3** for how to use ```data_visualization.py```.
+Use function **verify_before_output** in ```data_visualization.py``` to check whether there are errors in calcualtion of Frame Feature Array $Arr_{ff}$. Refer to **Step2** for how to use ```data_visualization.py```.
 
 ### 3) Plot meta-feature
 
@@ -239,7 +254,7 @@ You can define which trainset and which testset to train and test, but you can a
 
 ### 5) Post processing
 
-Get frames of misclassified windows in ```miscls.txt```, and visualize corresponding windows ```data_visualization.py```, under function **post_process**. Refer to **2) Step3** for usage.
+Get frames of misclassified windows in ```miscls.txt```, and visualize corresponding windows ```data_visualization.py```, under function **post_process**. Refer to **3) Step2** for usage.
 
 ## Contact
 
