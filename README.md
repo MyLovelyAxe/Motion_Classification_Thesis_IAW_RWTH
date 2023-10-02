@@ -127,6 +127,8 @@ In order to generate a exp_group under ```/dataset```:
 2. Edit arguments in ```prepare_exp_group.py``` according to instructions inside
 3. Run with: ```python prepare_exp_group.py```
 
+If you want to try prepared dataset, you can download the data [here](https://www.kaggle.com/datasets/jialeili/csv-dynamic-static/) and paste them under ```/ori_csv```. Or work on your new recorded shots.
+
 #### Step2: Check data by plotting
 
 Check the Original Data $Arr_{ori}$ from ```unknown.NoHead.csv``` from **Step1** with function **check_ori_data**, by editing the arguments according to instruction in ```data_visualization.py``` and running it with:
@@ -136,6 +138,8 @@ python data_visualization.py
 ```
 
 #### Step3: Edit ```split_methods.yaml``` for testset
+
+If you try on prepared data, you can find corresponding prepared ```split_method.yaml``` files for **testset** under ```config/prepared_testset_split_method```, replace the empty ```split_method.yaml``` which is generated from steps above with these ones. Or you can create on your own for new recorded shots.
 
 Note that due to recording methods, **trainset** consists of shots with same frames, each of shot contains only one activity, hence the ```split_methods.yaml``` can be generated automatically by ```generate_split_methods_trainset.py``` in **step1**. While **testset** consists of only one shot with all activities for testing, the ```split_methods.yaml``` need to be manully edited with help of function **check_ori_data** in ```data_visualization.py```.
 
