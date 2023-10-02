@@ -145,8 +145,8 @@ class Windowlize():
             print()
             print(f'Check features:')
             print('=========================================')
-            for catogary,fIdx_dict in feature_index_dict.items():
-                print(f'catogary: {catogary}')
+            for category,fIdx_dict in feature_index_dict.items():
+                print(f'category: {category}')
                 print('----------------------------------------')
                 for fName,fIdx in fIdx_dict.items():
                     print(f'feature name: {fName}, feature idx: {fIdx}')
@@ -155,7 +155,7 @@ class Windowlize():
         ncol = len(feature_index_dict) # 4, i.e. dist, rate_dist, angle, rate_angle
         nrow = len(self.actLabel_actName_dict) # number of classes
         fig, axes = plt.subplots(nrow, ncol, figsize=(40,30))
-        for fNum,(catogary,fIdx_dict) in enumerate(feature_index_dict.items()):
+        for fNum,(category,fIdx_dict) in enumerate(feature_index_dict.items()):
             ## determine limits for y axis
             current_features_idx = list(f_idx for _,f_idx in fIdx_dict.items())
             y_upperLim = np.max(metric_data[:, current_features_idx])
@@ -164,7 +164,7 @@ class Windowlize():
                 for fName,fIdx in fIdx_dict.items():
                     axes[aNum,fNum].plot(np.arange(0,aStartEnd['end']-aStartEnd['start']), metric_data[aStartEnd['start']:aStartEnd['end'],fIdx])
                 if aNum == 0:
-                    axes[aNum,fNum].set_title(f'feature: {catogary}',fontsize=20)
+                    axes[aNum,fNum].set_title(f'feature: {category}',fontsize=20)
                 if fNum == 0:
                     axes[aNum,fNum].set_ylabel(f'{aName}',fontsize=20)
                 axes[aNum,fNum].set_ylim([y_lowerLim,y_upperLim])
