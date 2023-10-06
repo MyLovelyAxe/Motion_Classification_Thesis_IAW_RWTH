@@ -297,11 +297,11 @@ def verification(ori_data_paths,feature_path,split_method_paths,win_len=1):
     _ = animation.FuncAnimation(fig,dynamic_plot_func,frames=win_len,fargs=(anim_configs_lst,),interval=17)
     plt.show()
 
-def show_misclassified_frames(skeleton,MisCls_frames):
+def show_misclassified_frames(skeleton,args):
     """
     examine the misclassified windows from result of experiment
     """
-    start_frame, end_frame = MisCls_frames
+    start_frame, end_frame = args.misclassified_frames
     skeleton = skeleton[start_frame:end_frame]
     fig = plt.figure(figsize=(16,8))
     ax1 = fig.add_subplot(1, 1, 1, projection='3d')
@@ -309,10 +309,17 @@ def show_misclassified_frames(skeleton,MisCls_frames):
     joints_dict = get_links_dict()
     high, low = calc_axis_limit(skeleton) # (x_high, x_low), (y_high, y_low), (z_high, z_low)
     title = f'Misclassified frames {start_frame}-{end_frame}'
-    _ = animation.FuncAnimation(fig,
+    ani1 = animation.FuncAnimation(fig,
                                 plot_func_3d,
                                 frames=end_frame-start_frame,
                                 fargs=(ax1,joints_dict,skeleton,high,low,title),
                                 interval=17)
     fig.tight_layout()
     plt.show()
+
+    if args.output_anim:
+        data_path = 'report/plots'
+        os.makedirs(data_path, exist_ok=True)
+        plot_name = '{}.gif'.format(args.examine_data_path[0].split('/')[-1])
+        writergif = animation.PillowWriter(fps=30) 
+        ani1.save(os.path.join(data_path,plot_name), writer=writergif)

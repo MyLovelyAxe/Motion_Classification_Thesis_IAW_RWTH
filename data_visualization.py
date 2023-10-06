@@ -42,7 +42,7 @@ from util.examine import plot_ori_data,verification,output_dataset,get_feature_s
 parser = argparse.ArgumentParser(description='Visualize original csv data')
 
 parser.add_argument('--function', type=str,
-                    default='verify_before_output',
+                    default='post_process',
                     help='check_ori_data: visualize original data from Captury Live; \
                           verify_before_output: verify dataset before output into .npy files; \
                           post_process: examine misclassified windows after testing',
@@ -59,7 +59,7 @@ parser.add_argument('--single_data_path', type=str,
 parser.add_argument('--start_frame', type=int, default=2000, help='from which frame to start visualize')
 parser.add_argument('--end_frame', type=int, default=2400, help='to which frame to end visualize')
 parser.add_argument('--wl', type=int, default=51, help='window length for dataset creation, make it as odd number')
-parser.add_argument('--output_anim', type=bool, default=False, help='whether to output animation of visualization')
+parser.add_argument('--output_anim', type=bool, default=True, help='whether to output animation of visualization')
 parser.add_argument('--desired_features_trial', type=str, 
                     default='config/desired_features_trial.yaml', help='load features name from .yaml')
 
@@ -69,10 +69,10 @@ parser.add_argument('--desired_features_trial', type=str,
 
 parser.add_argument('--examine_data_path', type=str,nargs="+",
                     default=[
-                             'dataset/Dynamic_Apostolos/testset/Test_Dynamic_Apostolos',
+                             'dataset/Dynamic_User1/trainset/Train_Dynamic_User1_11_Ball',
                              ],
                     help='location of examined data for misclassified labels, only external testset')
-parser.add_argument('--misclassified_frames', type=list,default=[9145,9245],help='check misclassified frames')
+parser.add_argument('--misclassified_frames', type=list,default=[0,100],help='check misclassified frames')
 parser.add_argument('--desired_features', type=str, 
                     default='config/desired_features.yaml', help='load features name from .yaml')
 
@@ -106,4 +106,4 @@ if __name__ == '__main__':
                                       split_method_paths=split_method_paths,
                                       standard='no_scale')
         
-        show_misclassified_frames(skeleton,args.misclassified_frames)
+        show_misclassified_frames(skeleton,args)
